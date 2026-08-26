@@ -1,0 +1,99 @@
+# GoReleaser configuration for the Redwood Rust CLI.
+#
+# Release Please owns version bumps, tags, CHANGELOG.md, and release notes.
+# The tag workflow builds only the `redwood` binary, signs and notarizes the
+# Darwin artifacts, publishes packages, and updates cadenya/homebrew-tools.
+version: 2
+project_name: redwood
+
+builds:
+  - id: redwood
+    builder: rust
+    binary: redwood
+    command: zigbuild
+    targets:
+      - aarch64-apple-darwin
+      - x86_64-apple-darwin
+      - aarch64-unknown-linux-gnu
+      - x86_64-unknown-linux-gnu
+      - x86_64-pc-windows-gnu
+    flags:
+      - --release
+      - --locked
+      - --bin=redwood
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: default
+    ids: [redwood]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+changelog:
+  disable: true
+
+release:
+  mode: keep-existing
+  replace_existing_artifacts: true
+  draft: false
+  prerelease: auto
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+# anchore/quill signs and notarizes both macOS architectures from Linux. The
+# publishing workflow performs a mandatory secret preflight before this runs.
+notarize:
+  macos:
+    # Snapshot CI has no production credentials and renders unsigned local
+    # artifacts. Tagged publishing has a mandatory secret preflight.
+    - enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
+      ids: [redwood]
+      sign:
+        certificate: "{{ .Env.MACOS_SIGN_P12 }}"
+        password: "{{ .Env.MACOS_SIGN_PASSWORD }}"
+      notarize:
+        issuer_id: "{{ .Env.MACOS_NOTARY_ISSUER_ID }}"
+        key_id: "{{ .Env.MACOS_NOTARY_KEY_ID }}"
+        key: "{{ .Env.MACOS_NOTARY_KEY }}"
+        wait: true
+        timeout: 20m
+
+homebrew_casks:
+  - name: redwood
+    ids: [default]
+    binaries: [redwood]
+    directory: Casks
+    homepage: https://github.com/cadenya/redwood
+    description: Statically typed SDK and CLI generator for OpenAPI
+    license: Apache-2.0
+    repository:
+      owner: cadenya
+      name: homebrew-tools
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: cadenya-release-bot
+      email: cadenya-release-bot@users.noreply.github.com
+    commit_msg_template: "redwood {{ .Tag }}"
+
+nfpms:
+  - id: packages
+    ids: [redwood]
+    package_name: redwood
+    vendor: Cadenya
+    homepage: https://github.com/cadenya/redwood
+    maintainer: Cadenya <support@cadenya.com>
+    description: Statically typed SDK and CLI generator for OpenAPI
+    license: Apache-2.0
+    formats: [deb, rpm, apk]
+    bindir: /usr/bin

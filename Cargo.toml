@@ -1,0 +1,38 @@
+[package]
+name = "redwood"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Statically-typed SDK generator: OpenAPI -> IR -> {TypeScript, Go, Python, Ruby, CLI, api.md}"
+license = "Apache-2.0"
+repository = "https://github.com/cadenya/redwood"
+homepage = "https://github.com/cadenya/redwood"
+readme = "README.md"
+keywords = ["openapi", "sdk", "codegen", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+exclude = [
+    ".github/",
+    ".release-please-manifest.json",
+    "e2e/",
+    "scripts/",
+    "tmp/",
+    "internal.toml",
+    "api-spec.yml",
+    "release-please-config.json",
+]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+heck = "0.5"
+indexmap = { version = "2", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+toml = "1.1.4"
+ureq = "3"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

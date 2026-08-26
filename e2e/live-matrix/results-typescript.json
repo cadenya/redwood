@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "sdk": "typescript",
+  "executedAt": "2026-08-14T05:13:38.892Z",
+  "operations": {
+    "AccountService_GetAccount": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AccountService_RotateChallengeToken": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "AccountService_RotateWebhookSigningKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "GlobalAPIKeyService_GetGlobalAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "GlobalAPIKeyService_DisableGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "GlobalAPIKeyService_EnableGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "GlobalAPIKeyService_RotateGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "APIKeyService_ListAPIKeys": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "APIKeyService_CreateAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "APIKeyService_GetAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "APIKeyService_DeleteAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "APIKeyService_UpdateAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "APIKeyService_DisableAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "APIKeyService_EnableAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "APIKeyService_RotateAPIKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WorkspaceAdminService_ListProfiles": {
+      "status": "blocked",
+      "evidence": "real API read wave: credential authorization prerequisite (HTTP 403)"
+    },
+    "WorkspaceAdminService_ListAccountWorkspaces": {
+      "status": "blocked",
+      "evidence": "real API read wave: credential authorization prerequisite (HTTP 403)"
+    },
+    "WorkspaceAdminService_CreateWorkspace": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "WorkspaceAdminService_GetWorkspace": {
+      "status": "blocked",
+      "evidence": "real API read wave: credential authorization prerequisite (HTTP 403)"
+    },
+    "WorkspaceAdminService_ArchiveWorkspace": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "WorkspaceAdminService_UpdateWorkspace": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "WorkspaceAdminService_ListWorkspaceMembers": {
+      "status": "blocked",
+      "evidence": "real API read wave: credential authorization prerequisite (HTTP 403)"
+    },
+    "WorkspaceAdminService_AddWorkspaceMember": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "WorkspaceAdminService_RemoveWorkspaceMember": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "ProfilesService_Whoami": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "WorkspaceService_ListWorkspaces": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentService_ListAgents": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentService_CreateAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentService_ListAgentFeedback": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentService_ListAgentWebhookDeliveries": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentService_GetAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentService_DeleteAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentService_UpdateAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentService_ArchiveAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentService_PublishAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentService_UnarchiveAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentService_UnpublishAgent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_ListAgentSchedules": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentScheduleService_CreateAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_GetAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_DeleteAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_UpdateAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_ArchiveAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_PauseAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentScheduleService_ResumeAgentSchedule": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_ListAgentVariations": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentVariationService_CreateAgentVariation": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_GetAgentVariation": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AgentVariationService_DeleteAgentVariation": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_UpdateAgentVariation": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_AddAgentVariationAssignment": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_RemoveAgentVariationAssignment": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_AddAgentVariationMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_RemoveAgentVariationMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AgentVariationService_UpdateAgentVariationMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "AIProviderKeyService_ListAIProviderKeys": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AIProviderKeyService_CreateAIProviderKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "AIProviderKeyService_GetAIProviderKey": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "AIProviderKeyService_DeleteAIProviderKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "AIProviderKeyService_UpdateAIProviderKey": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "MemoryService_ListMemoryLayers": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "MemoryService_CreateMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "MemoryService_GetMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "MemoryService_DeleteMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "MemoryService_UpdateMemoryLayer": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "MemoryService_ListMemoryEntries": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "MemoryService_CreateMemoryEntry": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "MemoryService_GetMemoryEntry": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "MemoryService_DeleteMemoryEntry": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "MemoryService_UpdateMemoryEntry": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ModelService_ListModels": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ModelService_GetModel": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ModelService_DisableModel": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "ModelService_EnableModel": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "ModelService_SwapModelOnVariations": {
+      "status": "blocked",
+      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+    },
+    "ObjectiveService_ListObjectives": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_CreateObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; created and decoded independent owned objectives; no response body or resource ID persisted"
+    },
+    "ObjectiveService_GetObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_ListObjectiveContextWindows": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_GetObjectiveDiagnostics": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_ListObjectiveEvents": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveEventStreamsService_StreamObjectiveEvents": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; SSE decoded a persisted approval event from a Last-Event-ID checkpoint; no response body or resource ID persisted"
+    },
+    "ObjectiveService_ListObjectiveFeedback": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_CreateObjectiveFeedback": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; submitted feedback on the completed MCP interaction; no response body or resource ID persisted"
+    },
+    "ObjectiveService_ListObjectiveTasks": {
+      "status": "blocked",
+      "evidence": "real API read wave: live endpoint reports not implemented (HTTP 501)"
+    },
+    "ObjectiveService_GetObjectiveTask": {
+      "status": "blocked",
+      "evidence": "real API read wave: no list-derived objective task fixture"
+    },
+    "ObjectiveService_ListObjectiveToolCalls": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_GetObjectiveToolCall": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; retrieved the approved call after MCP execution completed; no response body or resource ID persisted"
+    },
+    "ObjectiveService_ApproveToolCall": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; approved a durably paused GenerateCurseWord call and observed MCP execution complete; no response body or resource ID persisted"
+    },
+    "ObjectiveService_DenyToolCall": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; denied an independent durably paused GenerateCurseWord call; no response body or resource ID persisted"
+    },
+    "ObjectiveService_SetToolCallContent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; supplied content to an independently approved bare tool call; no response body or resource ID persisted"
+    },
+    "ObjectiveService_ListObjectiveTools": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ObjectiveService_CancelObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; cancelled a separate objective observed in RUNNING state; no response body or resource ID persisted"
+    },
+    "ObjectiveService_CompactObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; compacted the continued MCP objective and decoded the response; no response body or resource ID persisted"
+    },
+    "ObjectiveService_ContinueObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; continued a WAITING objective and decoded its persisted event; no response body or resource ID persisted"
+    },
+    "SearchService_SearchToolsOrToolSets": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "TenantService_ListTenants": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "TenantService_GetTenant": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "TenantService_DeleteTenant": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "TenantService_ListTenantSubjects": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_ListToolSets": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_CreateToolSet": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_GetToolSet": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_DeleteToolSet": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_UpdateToolSet": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_ArchiveToolSet": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_UnarchiveToolSet": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_ListToolSetEvents": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_GetToolSetOpenAPISpec": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: generated TypeScript specialized fixture succeeded; URL adapter returned and decoded a consumed Petstore document with at least ten paths; no response body or resource ID persisted"
+    },
+    "ToolService_ListToolSetUsage": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_ListToolSetSecrets": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_CreateToolSetSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_GetToolSetSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_DeleteToolSetSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_UpdateToolSetSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_ListTools": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_CreateTool": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_GetTool": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "ToolService_DeleteTool": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_UpdateTool": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_OmitTool": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "ToolService_RestoreTool": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "UploadService_CreateUpload": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "UploadService_GetUpload": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetSessionService_ListWidgetSessions": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "WidgetSessionService_CreateWidgetSession": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetSessionService_DeleteTenantWidgetSessions": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetSessionService_GetWidgetSession": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetSessionService_DeleteWidgetSession": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetSessionService_RevokeWidgetSession": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetService_ListWidgets": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "WidgetService_CreateWidget": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetService_GetWidget": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetService_DeleteWidget": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetService_UpdateWidget": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetService_ArchiveWidget": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WidgetService_UnarchiveWidget": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WorkspaceSecretService_ListWorkspaceSecrets": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: successful decoded response; no response body persisted"
+    },
+    "WorkspaceSecretService_CreateWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WorkspaceSecretService_GetWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WorkspaceSecretService_DeleteWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    },
+    "WorkspaceSecretService_UpdateWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: TypeScript owned-fixture mutation succeeded (live-ts-msshm0dk); response body not persisted"
+    }
+  }
+}

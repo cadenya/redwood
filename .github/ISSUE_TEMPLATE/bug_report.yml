@@ -1,0 +1,48 @@
+name: Bug report
+description: Report incorrect generator behavior or generated output.
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Redwood version
+      placeholder: redwood 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - TypeScript
+        - Go
+        - Python
+        - Ruby
+        - CLI
+        - Docs
+        - Manifest
+        - OpenAPI export
+        - Lowering or shared behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include the command and a minimal OpenAPI fragment when possible. Remove credentials and private data.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system and relevant language runtime versions.

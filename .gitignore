@@ -1,0 +1,19 @@
+/target
+/gen
+/dist
+node_modules
+.env*
+# Conformance environments live under the OS temp dir, but never let one
+# slip into the tree again either way.
+.venv*
+.gem-home*
+*.gem
+widgets-sdk/
+cadenya-typescript-staging/
+/tmp/*
+!/tmp/.gitignore
+/.claude/
+/internal.toml
+/PROGRESS.md
+/RESEARCH.md
+/NAMING-PROPOSAL.md

@@ -1,0 +1,576 @@
+{
+  "executedAt": "2026-08-14T05:11:20.758406000Z",
+  "installedArtifact": "/private/var/folders/v7/ft01dt3x6g912h9664vs5t2w0000gn/T/redwood-conformance/gem-home-ceee47f02e88abe5/gems/cadenya-0.1.0/lib/cadenya/client.rb",
+  "operations": {
+    "AIProviderKeyService_CreateAIProviderKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; provider-credential mutation not executed after shared credential/state sweep was rejected by execution policy"
+    },
+    "AIProviderKeyService_DeleteAIProviderKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; provider-credential mutation not executed after shared credential/state sweep was rejected by execution policy"
+    },
+    "AIProviderKeyService_GetAIProviderKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AIProviderKey",
+      "status": "completed"
+    },
+    "AIProviderKeyService_ListAIProviderKeys": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "AIProviderKeyService_UpdateAIProviderKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; provider-credential mutation not executed after shared credential/state sweep was rejected by execution policy"
+    },
+    "APIKeyService_CreateAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "APIKeyService_DeleteAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "APIKeyService_DisableAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "APIKeyService_EnableAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "APIKeyService_GetAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "APIKeyService_ListAPIKeys": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "APIKeyService_RotateAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "APIKeyService_UpdateAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "AccountService_GetAccount": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Account",
+      "status": "completed"
+    },
+    "AccountService_RotateChallengeToken": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; account-wide credential mutation not executed after destructive shared-key sweep was rejected by execution policy"
+    },
+    "AccountService_RotateWebhookSigningKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; account-wide credential mutation not executed after destructive shared-key sweep was rejected by execution policy"
+    },
+    "AgentScheduleService_ArchiveAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentSchedule",
+      "status": "completed"
+    },
+    "AgentScheduleService_CreateAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentSchedule",
+      "status": "completed"
+    },
+    "AgentScheduleService_DeleteAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "AgentScheduleService_GetAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentSchedule",
+      "status": "completed"
+    },
+    "AgentScheduleService_ListAgentSchedules": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "AgentScheduleService_PauseAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentSchedule",
+      "status": "completed"
+    },
+    "AgentScheduleService_ResumeAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentSchedule",
+      "status": "completed"
+    },
+    "AgentScheduleService_UpdateAgentSchedule": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentSchedule",
+      "status": "completed"
+    },
+    "AgentService_ArchiveAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentService_CreateAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentService_DeleteAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "AgentService_GetAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentService_ListAgentFeedback": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "AgentService_ListAgentWebhookDeliveries": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "AgentService_ListAgents": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "AgentService_PublishAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentService_UnarchiveAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentService_UnpublishAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentService_UpdateAgent": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Agent",
+      "status": "completed"
+    },
+    "AgentVariationService_AddAgentVariationAssignment": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::VariationAssignment_Tool",
+      "status": "completed"
+    },
+    "AgentVariationService_AddAgentVariationMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::VariationMemoryLayerAssignment",
+      "status": "completed"
+    },
+    "AgentVariationService_CreateAgentVariation": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentVariation",
+      "status": "completed"
+    },
+    "AgentVariationService_DeleteAgentVariation": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "AgentVariationService_GetAgentVariation": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentVariation",
+      "status": "completed"
+    },
+    "AgentVariationService_ListAgentVariations": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "AgentVariationService_RemoveAgentVariationAssignment": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "AgentVariationService_RemoveAgentVariationMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "AgentVariationService_UpdateAgentVariation": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::AgentVariation",
+      "status": "completed"
+    },
+    "AgentVariationService_UpdateAgentVariationMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::VariationMemoryLayerAssignment",
+      "status": "completed"
+    },
+    "GlobalAPIKeyService_DisableGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; global credential state mutation not executed after destructive shared-key sweep was rejected by execution policy"
+    },
+    "GlobalAPIKeyService_EnableGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; global credential state mutation not executed after destructive shared-key sweep was rejected by execution policy"
+    },
+    "GlobalAPIKeyService_GetGlobalAPIKey": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::APIKey",
+      "status": "completed"
+    },
+    "GlobalAPIKeyService_RotateGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; global credential rotation not executed after destructive shared-key sweep was rejected by execution policy"
+    },
+    "MemoryService_CreateMemoryEntry": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::MemoryEntryDetail",
+      "status": "completed"
+    },
+    "MemoryService_CreateMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::MemoryLayer",
+      "status": "completed"
+    },
+    "MemoryService_DeleteMemoryEntry": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "MemoryService_DeleteMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "MemoryService_GetMemoryEntry": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::MemoryEntryDetail",
+      "status": "completed"
+    },
+    "MemoryService_GetMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::MemoryLayer",
+      "status": "completed"
+    },
+    "MemoryService_ListMemoryEntries": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "MemoryService_ListMemoryLayers": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "MemoryService_UpdateMemoryEntry": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::MemoryEntryDetail",
+      "status": "completed"
+    },
+    "MemoryService_UpdateMemoryLayer": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::MemoryLayer",
+      "status": "completed"
+    },
+    "ModelService_DisableModel": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; shared model-state mutation not executed after shared-state sweep was rejected by execution policy"
+    },
+    "ModelService_EnableModel": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; shared model-state mutation not executed after shared-state sweep was rejected by execution policy"
+    },
+    "ModelService_GetModel": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Model",
+      "status": "completed"
+    },
+    "ModelService_ListModels": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ModelService_SwapModelOnVariations": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; shared model-assignment mutation not executed after shared-state sweep was rejected by execution policy"
+    },
+    "ObjectiveEventStreamsService_StreamObjectiveEvents": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; SSE Last-Event-ID replay decoded a later persisted event",
+      "status": "completed"
+    },
+    "ObjectiveService_ApproveToolCall": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; approved GenerateCurseWord after durable pause in objective state STATE_RUNNING; immediate response status was TOOL_CALL_STATUS_UNSPECIFIED",
+      "status": "completed"
+    },
+    "ObjectiveService_CancelObjective": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; cancelled a separate RUNNING objective; immediate response state was STATE_RUNNING",
+      "status": "completed"
+    },
+    "ObjectiveService_CompactObjective": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; compacted the continued MCP objective after multiple user/assistant/tool events",
+      "status": "completed"
+    },
+    "ObjectiveService_ContinueObjective": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; continued the WAITING objective and decoded its persisted user-message event",
+      "status": "completed"
+    },
+    "ObjectiveService_CreateObjective": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; created owned deny objective",
+      "status": "completed"
+    },
+    "ObjectiveService_CreateObjectiveFeedback": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; submitted feedback after the approved MCP call completed",
+      "status": "completed"
+    },
+    "ObjectiveService_DenyToolCall": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; denied independent GenerateCurseWord after durable pause in objective state STATE_RUNNING; immediate response status was TOOL_CALL_STATUS_UNSPECIFIED",
+      "status": "completed"
+    },
+    "ObjectiveService_GetObjective": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Objective",
+      "status": "completed"
+    },
+    "ObjectiveService_GetObjectiveDiagnostics": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::GetObjectiveDiagnosticsResponse",
+      "status": "completed"
+    },
+    "ObjectiveService_GetObjectiveTask": {
+      "evidence": "fixture unavailable from safe list/read discovery: task_id",
+      "status": "blocked"
+    },
+    "ObjectiveService_GetObjectiveToolCall": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; retrieved the approved faker MCP call after adapter execution completed",
+      "status": "completed"
+    },
+    "ObjectiveService_ListObjectiveContextWindows": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ObjectiveService_ListObjectiveEvents": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ObjectiveService_ListObjectiveFeedback": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ObjectiveService_ListObjectiveTasks": {
+      "evidence": "installed gem; HTTP 501; endpoint not implemented; see API contract log; response body not retained",
+      "status": "blocked"
+    },
+    "ObjectiveService_ListObjectiveToolCalls": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ObjectiveService_ListObjectiveTools": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ObjectiveService_ListObjectives": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ObjectiveService_SetToolCallContent": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; supplied text content to an independently approved bare tool call",
+      "status": "completed"
+    },
+    "ProfilesService_Whoami": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Profile",
+      "status": "completed"
+    },
+    "SearchService_SearchToolsOrToolSets": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::SearchToolsOrToolSetsResponse",
+      "status": "completed"
+    },
+    "TenantService_DeleteTenant": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tenant",
+      "status": "completed"
+    },
+    "TenantService_GetTenant": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tenant",
+      "status": "completed"
+    },
+    "TenantService_ListTenantSubjects": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "TenantService_ListTenants": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ToolService_ArchiveToolSet": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSet",
+      "status": "completed"
+    },
+    "ToolService_CreateTool": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tool",
+      "status": "completed"
+    },
+    "ToolService_CreateToolSet": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSet",
+      "status": "completed"
+    },
+    "ToolService_CreateToolSetSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSetSecret",
+      "status": "completed"
+    },
+    "ToolService_DeleteTool": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "ToolService_DeleteToolSet": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "ToolService_DeleteToolSetSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "ToolService_GetTool": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tool",
+      "status": "completed"
+    },
+    "ToolService_GetToolSet": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSet",
+      "status": "completed"
+    },
+    "ToolService_GetToolSetOpenAPISpec": {
+      "evidence": "real api.cadenya.com: installed Ruby gem specialized fixture succeeded; Petstore URL adapter returned and decoded its consumed OpenAPI document",
+      "status": "completed"
+    },
+    "ToolService_GetToolSetSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSetSecret",
+      "status": "completed"
+    },
+    "ToolService_ListToolSetEvents": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ToolService_ListToolSetSecrets": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ToolService_ListToolSetUsage": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ToolService_ListToolSets": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ToolService_ListTools": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "ToolService_OmitTool": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tool",
+      "status": "completed"
+    },
+    "ToolService_RestoreTool": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tool",
+      "status": "completed"
+    },
+    "ToolService_UnarchiveToolSet": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSet",
+      "status": "completed"
+    },
+    "ToolService_UpdateTool": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Tool",
+      "status": "completed"
+    },
+    "ToolService_UpdateToolSet": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSet",
+      "status": "completed"
+    },
+    "ToolService_UpdateToolSetSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::ToolSetSecret",
+      "status": "completed"
+    },
+    "UploadService_CreateUpload": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Upload",
+      "status": "completed"
+    },
+    "UploadService_GetUpload": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Upload",
+      "status": "completed"
+    },
+    "WidgetService_ArchiveWidget": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Widget",
+      "status": "completed"
+    },
+    "WidgetService_CreateWidget": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Widget",
+      "status": "completed"
+    },
+    "WidgetService_DeleteWidget": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "WidgetService_GetWidget": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Widget",
+      "status": "completed"
+    },
+    "WidgetService_ListWidgets": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "WidgetService_UnarchiveWidget": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Widget",
+      "status": "completed"
+    },
+    "WidgetService_UpdateWidget": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::Widget",
+      "status": "completed"
+    },
+    "WidgetSessionService_CreateWidgetSession": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::WidgetSession",
+      "status": "completed"
+    },
+    "WidgetSessionService_DeleteTenantWidgetSessions": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::DeleteTenantWidgetSessionsResponse",
+      "status": "completed"
+    },
+    "WidgetSessionService_DeleteWidgetSession": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "WidgetSessionService_GetWidgetSession": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::WidgetSession",
+      "status": "completed"
+    },
+    "WidgetSessionService_ListWidgetSessions": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "WidgetSessionService_RevokeWidgetSession": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::WidgetSession",
+      "status": "completed"
+    },
+    "WorkspaceAdminService_AddWorkspaceMember": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; membership mutation not executed; current credential lacks admin authorization as independently confirmed by live HTTP 403 admin reads"
+    },
+    "WorkspaceAdminService_ArchiveWorkspace": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; workspace-admin mutation not executed; current credential lacks admin authorization as independently confirmed by live HTTP 403 admin reads"
+    },
+    "WorkspaceAdminService_CreateWorkspace": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; workspace-admin mutation not executed; current credential lacks admin authorization as independently confirmed by live HTTP 403 admin reads"
+    },
+    "WorkspaceAdminService_GetWorkspace": {
+      "evidence": "installed gem; HTTP 403; authorization prerequisite; response body not retained",
+      "status": "blocked"
+    },
+    "WorkspaceAdminService_ListAccountWorkspaces": {
+      "evidence": "installed gem; HTTP 403; authorization prerequisite; response body not retained",
+      "status": "blocked"
+    },
+    "WorkspaceAdminService_ListProfiles": {
+      "evidence": "installed gem; HTTP 403; authorization prerequisite; response body not retained",
+      "status": "blocked"
+    },
+    "WorkspaceAdminService_ListWorkspaceMembers": {
+      "evidence": "installed gem; HTTP 403; authorization prerequisite; response body not retained",
+      "status": "blocked"
+    },
+    "WorkspaceAdminService_RemoveWorkspaceMember": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; membership mutation not executed; current credential lacks admin authorization as independently confirmed by live HTTP 403 admin reads"
+    },
+    "WorkspaceAdminService_UpdateWorkspace": {
+      "status": "blocked",
+      "evidence": "current installed ruby artifact; workspace-admin mutation not executed; current credential lacks admin authorization as independently confirmed by live HTTP 403 admin reads"
+    },
+    "WorkspaceSecretService_CreateWorkspaceSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::WorkspaceSecret",
+      "status": "completed"
+    },
+    "WorkspaceSecretService_DeleteWorkspaceSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded NilClass",
+      "status": "completed"
+    },
+    "WorkspaceSecretService_GetWorkspaceSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::WorkspaceSecret",
+      "status": "completed"
+    },
+    "WorkspaceSecretService_ListWorkspaceSecrets": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    },
+    "WorkspaceSecretService_UpdateWorkspaceSecret": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Types::WorkspaceSecret",
+      "status": "completed"
+    },
+    "WorkspaceService_ListWorkspaces": {
+      "evidence": "installed gem; HTTP 2xx; decoded Cadenya::Page",
+      "status": "completed"
+    }
+  },
+  "schemaVersion": 1,
+  "sdk": "ruby"
+}

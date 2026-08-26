@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "operations": {
+    "AccountService_GetAccount": {
+      "typescript": { "status": "completed", "evidence": "e2e/live.mjs; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "go": { "status": "completed", "evidence": "e2e/live-go/main.go; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "python": { "status": "completed", "evidence": "e2e/live-python.py; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "ruby": { "status": "completed", "evidence": "e2e/live-ruby.rb; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "cli": { "status": "completed", "evidence": "e2e/live-cli.sh; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" }
+    },
+    "AgentService_CreateAgent": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs; full real API flow and cleanup passed on 2026-08-13 (PROGRESS.md batch 16)" }
+    },
+    "AgentService_DeleteAgent": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs cleanup; full real API flow and cleanup passed on 2026-08-13 (PROGRESS.md batch 16)" }
+    },
+    "AgentService_ListAgents": {
+      "typescript": { "status": "completed", "evidence": "e2e/live.mjs; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "go": { "status": "completed", "evidence": "e2e/live-go/main.go; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "python": { "status": "completed", "evidence": "e2e/live-python.py; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "ruby": { "status": "completed", "evidence": "e2e/live-ruby.rb; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" }
+    },
+    "AgentService_PublishAgent": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs; full real API flow and cleanup passed on 2026-08-13 (PROGRESS.md batch 16)" }
+    },
+    "AgentVariationService_AddAgentVariationAssignment": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs; toolId and toolSetId union branches both passed against real API on 2026-08-13" }
+    },
+    "AgentVariationService_ListAgentVariations": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs; full real API flow passed on 2026-08-13 (PROGRESS.md batch 16)" }
+    },
+    "ModelService_ListModels": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs required a non-empty real model list; passed on 2026-08-13 (PROGRESS.md batch 16)" },
+      "go": { "status": "attempted", "evidence": "e2e/live-go/main.go called the real endpoint, but its passing contract allows any APIError as a skip" },
+      "python": { "status": "attempted", "evidence": "e2e/live-python.py called the real endpoint, but its passing contract allows any APIError as a skip" },
+      "ruby": { "status": "attempted", "evidence": "e2e/live-ruby.rb called the real endpoint, but its passing contract allows any APIError as a skip" }
+    },
+    "AIProviderKeyService_ListAIProviderKeys": {
+      "go": { "status": "completed", "evidence": "e2e/live-decode.mjs; real API 2xx decoded successfully through generated Go SDK/CLI after empty optional-union fix on 2026-08-13" },
+      "python": { "status": "completed", "evidence": "e2e/live-decode.mjs; real API 2xx decoded successfully through installed generated Python wheel after empty optional-union fix on 2026-08-13" },
+      "ruby": { "status": "completed", "evidence": "e2e/live-decode.mjs; real API 2xx decoded successfully through generated Ruby SDK after empty optional-union fix on 2026-08-13" },
+      "cli": { "status": "completed", "evidence": "e2e/live-decode.mjs; real API 2xx decoded successfully through generated CLI after empty optional-union fix on 2026-08-13" }
+    },
+    "ModelService_GetModel": {
+      "go": { "status": "completed", "evidence": "e2e/live-decode.mjs; list-derived real model decoded successfully through generated Go SDK/CLI after empty optional-union fix on 2026-08-13" },
+      "python": { "status": "completed", "evidence": "e2e/live-decode.mjs; list-derived real model decoded successfully through installed generated Python wheel after empty optional-union fix on 2026-08-13" },
+      "ruby": { "status": "completed", "evidence": "e2e/live-decode.mjs; list-derived real model decoded successfully through generated Ruby SDK after empty optional-union fix on 2026-08-13" },
+      "cli": { "status": "completed", "evidence": "e2e/live-decode.mjs; list-derived real model decoded successfully through generated CLI after empty optional-union fix on 2026-08-13" }
+    },
+    "ObjectiveEventStreamsService_StreamObjectiveEvents": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs consumed real SSE through final assistant response; passed on 2026-08-13 (PROGRESS.md batch 16)" }
+    },
+    "ObjectiveService_CreateObjective": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs dispatched and completed a real tool-using objective on 2026-08-13" }
+    },
+    "ObjectiveService_GetObjective": {
+      "typescript": { "status": "attempted", "evidence": "e2e/live.mjs asserted typed APIError from a deliberately missing live objective; success response remains unverified" },
+      "go": { "status": "attempted", "evidence": "e2e/live-go/main.go asserted typed APIError from a deliberately missing live objective; success response remains unverified" },
+      "python": { "status": "attempted", "evidence": "e2e/live-python.py asserted typed APIError from a deliberately missing live objective; success response remains unverified" },
+      "ruby": { "status": "attempted", "evidence": "e2e/live-ruby.rb asserted typed APIError from a deliberately missing live objective; success response remains unverified" },
+      "cli": { "status": "attempted", "evidence": "e2e/live-cli.sh asserted nonzero exit from a deliberately missing live objective; success response remains unverified" }
+    },
+    "ObjectiveService_ListObjectiveToolCalls": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs asserted two completed persisted tool calls against real API on 2026-08-13" }
+    },
+    "ObjectiveService_ListObjectives": {
+      "typescript": { "status": "completed", "evidence": "e2e/live.mjs; real pagination pass documented in PROGRESS.md on 2026-08-13" },
+      "go": { "status": "completed", "evidence": "e2e/live-go/main.go; real pagination pass documented in PROGRESS.md on 2026-08-13" },
+      "python": { "status": "completed", "evidence": "e2e/live-python.py; real pagination pass documented in PROGRESS.md on 2026-08-13" },
+      "ruby": { "status": "completed", "evidence": "e2e/live-ruby.rb; real pagination pass documented in PROGRESS.md on 2026-08-13" },
+      "cli": { "status": "completed", "evidence": "e2e/live-cli.sh; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" }
+    },
+    "ObjectiveService_SetToolCallContent": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs answered two live bare-tool calls and observed both results on 2026-08-13" }
+    },
+    "ToolService_CreateTool": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs created two real bare tools on 2026-08-13" }
+    },
+    "ToolService_CreateToolSet": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs created two real bare tool sets on 2026-08-13" }
+    },
+    "ToolService_DeleteTool": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs cleanup deleted both live test-owned tools; full cleanup passed on 2026-08-13" }
+    },
+    "ToolService_DeleteToolSet": {
+      "typescript": { "status": "completed", "evidence": "e2e/live-flow.mjs cleanup deleted both live test-owned tool sets; full cleanup passed on 2026-08-13" }
+    },
+    "WorkspaceService_ListWorkspaces": {
+      "typescript": { "status": "completed", "evidence": "e2e/live.mjs; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "go": { "status": "completed", "evidence": "e2e/live-go/main.go; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "python": { "status": "completed", "evidence": "e2e/live-python.py; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "ruby": { "status": "completed", "evidence": "e2e/live-ruby.rb; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" },
+      "cli": { "status": "completed", "evidence": "e2e/live-cli.sh; real api.cadenya.com pass documented in PROGRESS.md on 2026-08-13" }
+    }
+  }
+}

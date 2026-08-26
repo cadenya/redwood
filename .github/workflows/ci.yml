@@ -1,0 +1,176 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  REDWOOD_SPEC_URL: https://openapi.cadenya.com/api-spec.yml
+
+jobs:
+  rust-checks:
+    name: Rust checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal --component rustfmt,clippy
+          rustup toolchain install 1.85.0 --profile minimal
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features --locked -- -D warnings
+      - name: Test
+        run: cargo test --locked
+      - name: Check minimum supported Rust version
+        run: cargo +1.85.0 check --locked
+      - name: Build and smoke-test Redwood
+        run: |
+          cargo build --release --locked --bin redwood
+          target/release/redwood --version
+          target/release/redwood --help > /dev/null
+
+  generate:
+    name: Generate live contract
+    needs: rust-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - uses: Swatinem/rust-cache@v2
+      - name: Build Redwood
+        run: cargo build --release --locked --bin redwood
+      - name: Generate every target from the published contract
+        run: scripts/generate-live-spec.sh
+      - name: Upload generated artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-sdks
+          path: gen
+          # The generated Ruby suite relies on the `.rspec` dotfile.
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+  generated-tests:
+    name: Generated ${{ matrix.target }}
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [typescript, go, python, ruby, cli]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: generated-sdks
+          path: gen
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.22.x"
+          cache: false
+      - if: matrix.target == 'python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - if: matrix.target == 'ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+      - if: matrix.target == 'cli'
+        name: Install Rust toolchain for CLI generator E2E
+        run: rustup toolchain install stable --profile minimal
+      - name: Test generated ${{ matrix.target }} artifact
+        run: scripts/test-generated.sh "${{ matrix.target }}"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-${{ matrix.target }}
+          path: e2e/conformance/results-${{ matrix.target }}.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  cross-language-e2e:
+    name: Cross-language artifact checks
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: generated-sdks
+          path: gen
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.22.x"
+          cache: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+      - name: Install generated TypeScript dependencies
+        working-directory: gen/typescript
+        run: npm install --no-audit --no-fund && npm run build
+      - name: Install generated Ruby dependencies
+        working-directory: gen/ruby
+        run: bundle install
+      - name: Audit package artifacts and generated samples
+        run: |
+          node e2e/artifacts.mjs
+          node e2e/openapi-samples.mjs
+          node e2e/union-empty.mjs
+          node e2e/ruby-stream-close.mjs
+          ruby -Igen/ruby/lib e2e/ruby-stream-status.rb
+
+  release-snapshot:
+    name: GoReleaser snapshot
+    needs: rust-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: "0.15.2"
+      - name: Install cargo-zigbuild
+        run: cargo install cargo-zigbuild --locked
+      - name: Build release snapshot
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --snapshot --clean --skip=publish --config .github/goreleaser.yaml
+      - name: Smoke-test Linux x86-64 binary
+        run: |
+          bin="$(find dist -type f -name redwood -path '*x86_64-unknown-linux-gnu*' | head -1)"
+          test -n "${bin}"
+          "${bin}" --version
+          "${bin}" --help > /dev/null

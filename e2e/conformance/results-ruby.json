@@ -1,0 +1,575 @@
+{
+  "target": "ruby",
+  "total": 142,
+  "passed": 142,
+  "results": [
+    {
+      "id": "AccountService_GetAccount",
+      "status": "pass"
+    },
+    {
+      "id": "AccountService_RotateChallengeToken",
+      "status": "pass"
+    },
+    {
+      "id": "AccountService_RotateWebhookSigningKey",
+      "status": "pass"
+    },
+    {
+      "id": "GlobalAPIKeyService_GetGlobalAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "GlobalAPIKeyService_DisableGlobalAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "GlobalAPIKeyService_EnableGlobalAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "GlobalAPIKeyService_RotateGlobalAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_ListAPIKeys",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_CreateAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_GetAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_DeleteAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_UpdateAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_DisableAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_EnableAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "APIKeyService_RotateAPIKey",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_ListProfiles",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_ListAccountWorkspaces",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_CreateWorkspace",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_GetWorkspace",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_ArchiveWorkspace",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_UpdateWorkspace",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_ListWorkspaceMembers",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_AddWorkspaceMember",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceAdminService_RemoveWorkspaceMember",
+      "status": "pass"
+    },
+    {
+      "id": "ProfilesService_Whoami",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceService_ListWorkspaces",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_ListAgents",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_CreateAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_ListAgentFeedback",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_ListAgentWebhookDeliveries",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_GetAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_DeleteAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_UpdateAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_ArchiveAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_PublishAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_UnarchiveAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentService_UnpublishAgent",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_ListAgentSchedules",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_CreateAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_GetAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_DeleteAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_UpdateAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_ArchiveAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_PauseAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentScheduleService_ResumeAgentSchedule",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_ListAgentVariations",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_CreateAgentVariation",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_GetAgentVariation",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_DeleteAgentVariation",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_UpdateAgentVariation",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_AddAgentVariationAssignment",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_RemoveAgentVariationAssignment",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_AddAgentVariationMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_RemoveAgentVariationMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "AgentVariationService_UpdateAgentVariationMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "AIProviderKeyService_ListAIProviderKeys",
+      "status": "pass"
+    },
+    {
+      "id": "AIProviderKeyService_CreateAIProviderKey",
+      "status": "pass"
+    },
+    {
+      "id": "AIProviderKeyService_GetAIProviderKey",
+      "status": "pass"
+    },
+    {
+      "id": "AIProviderKeyService_DeleteAIProviderKey",
+      "status": "pass"
+    },
+    {
+      "id": "AIProviderKeyService_UpdateAIProviderKey",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_ListMemoryLayers",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_CreateMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_GetMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_DeleteMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_UpdateMemoryLayer",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_ListMemoryEntries",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_CreateMemoryEntry",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_GetMemoryEntry",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_DeleteMemoryEntry",
+      "status": "pass"
+    },
+    {
+      "id": "MemoryService_UpdateMemoryEntry",
+      "status": "pass"
+    },
+    {
+      "id": "ModelService_ListModels",
+      "status": "pass"
+    },
+    {
+      "id": "ModelService_GetModel",
+      "status": "pass"
+    },
+    {
+      "id": "ModelService_DisableModel",
+      "status": "pass"
+    },
+    {
+      "id": "ModelService_EnableModel",
+      "status": "pass"
+    },
+    {
+      "id": "ModelService_SwapModelOnVariations",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectives",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_CreateObjective",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_GetObjective",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectiveContextWindows",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_GetObjectiveDiagnostics",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectiveEvents",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveEventStreamsService_StreamObjectiveEvents",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectiveFeedback",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_CreateObjectiveFeedback",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectiveTasks",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_GetObjectiveTask",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectiveToolCalls",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_GetObjectiveToolCall",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ApproveToolCall",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_DenyToolCall",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_SetToolCallContent",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ListObjectiveTools",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_CancelObjective",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_CompactObjective",
+      "status": "pass"
+    },
+    {
+      "id": "ObjectiveService_ContinueObjective",
+      "status": "pass"
+    },
+    {
+      "id": "SearchService_SearchToolsOrToolSets",
+      "status": "pass"
+    },
+    {
+      "id": "TenantService_ListTenants",
+      "status": "pass"
+    },
+    {
+      "id": "TenantService_GetTenant",
+      "status": "pass"
+    },
+    {
+      "id": "TenantService_DeleteTenant",
+      "status": "pass"
+    },
+    {
+      "id": "TenantService_ListTenantSubjects",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_ListToolSets",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_CreateToolSet",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_GetToolSet",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_DeleteToolSet",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_UpdateToolSet",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_ArchiveToolSet",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_UnarchiveToolSet",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_ListToolSetEvents",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_GetToolSetOpenAPISpec",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_ListToolSetUsage",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_ListToolSetSecrets",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_CreateToolSetSecret",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_GetToolSetSecret",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_DeleteToolSetSecret",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_UpdateToolSetSecret",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_ListTools",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_CreateTool",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_GetTool",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_DeleteTool",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_UpdateTool",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_OmitTool",
+      "status": "pass"
+    },
+    {
+      "id": "ToolService_RestoreTool",
+      "status": "pass"
+    },
+    {
+      "id": "UploadService_CreateUpload",
+      "status": "pass"
+    },
+    {
+      "id": "UploadService_GetUpload",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetSessionService_ListWidgetSessions",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetSessionService_CreateWidgetSession",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetSessionService_DeleteTenantWidgetSessions",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetSessionService_GetWidgetSession",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetSessionService_DeleteWidgetSession",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetSessionService_RevokeWidgetSession",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_ListWidgets",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_CreateWidget",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_GetWidget",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_DeleteWidget",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_UpdateWidget",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_ArchiveWidget",
+      "status": "pass"
+    },
+    {
+      "id": "WidgetService_UnarchiveWidget",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceSecretService_ListWorkspaceSecrets",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceSecretService_CreateWorkspaceSecret",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceSecretService_GetWorkspaceSecret",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceSecretService_DeleteWorkspaceSecret",
+      "status": "pass"
+    },
+    {
+      "id": "WorkspaceSecretService_UpdateWorkspaceSecret",
+      "status": "pass"
+    }
+  ]
+}

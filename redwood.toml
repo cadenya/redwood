@@ -1,0 +1,297 @@
+# Spec-wide generator policy. Every setting is optional; redwood derives
+# sensible defaults from the OpenAPI document itself.
+
+[api]
+name = "Cadenya"
+base_url = "https://api.cadenya.com"
+# Params that may be set once at client construction (or via env var,
+# e.g. CADENYA_WORKSPACE_ID) instead of on every call.
+client_params = ["workspaceId"]
+
+# Method-name overrides, keyed by operationId, for when inference is not
+# what you want:
+# [methods]
+# "AccountService_GetAccount" = "whoami"
+
+# Resource renames. A dotted target nests the resource under a parent
+# accessor (one level): client.agents.variations, `cadenya agents variations`.
+# Type names keep deriving from the original identity, so they stay unique.
+[resources]
+agent_variations = "agents.variations"
+agent_schedules = "agents.schedules"
+tools = "tool_sets.tools"
+tool_set_secrets = "tool_sets.secrets"
+memory_entries = "memory_layers.entries"
+
+# Type re-labels, for generation artifacts that deserve friendlier names
+# (protobuf-shaped names, awkward contextual enums). Applied across every
+# backend and validated: unknown sources and colliding targets are errors.
+# [mapping]
+# "AgentVariationSpec_CompactionConfig" = "CompactionConfig"
+
+# ---- per-language configuration (single-file; replaces <lang>.config.toml) ----
+
+[lang.typescript]
+repository = "https://github.com/cadenya/cadenya-typescript"
+license = "Apache-2.0"
+package_name = "@cadenya/cadenya"
+package_version = "1.0.1"
+
+[lang.go]
+module_path = "go.cadenya.com/cadenya-go"
+package_name = "cadenya"
+sdk_version = "1.0.0"
+
+[lang.go.special_casings]
+openai = "OpenAI"
+openrouter = "OpenRouter"
+
+[lang.python]
+license = "Apache-2.0"
+package_name = "cadenya"
+package_version = "1.0.0"
+homepage = "https://cadenya.com"
+
+[lang.ruby]
+license = "Apache-2.0"
+gem_name = "cadenya"
+package_version = "1.0.0"
+homepage = "https://cadenya.com"
+
+[lang.cli]
+module_path = "go.cadenya.com/cadenya-cli"
+binary_name = "cadenya"
+sdk_module = "go.cadenya.com/cadenya-go"
+# The generated SDK lives next door during development.
+sdk_replace = "../go"
+version = "1.0.0"
+
+# Top-level spellings for nested commands users expect at the root.
+[lang.cli.aliases]
+whoami = "profiles whoami"
+
+[lang.cli.install]
+homebrew_tap = "cadenya/tools"
+chocolatey_package = "cadenya"
+releases_url = "https://github.com/cadenya/cadenya-cli/releases"
+
+[lang.cli.special_casings]
+openai = "OpenAI"
+openrouter = "OpenRouter"
+
+# The frozen public positional contract: path placeholders in order,
+# minus the client-defaultable workspaceId. Explicit [] means "no
+# positionals" — every operation is listed so the surface cannot drift
+# with the inference heuristic.
+[positional]
+"delete /v1/account/workspaces/{workspaceId}" = []
+"delete /v1/account/workspaces/{workspaceId}/members/{profileId}" = ["profileId"]
+"delete /v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}" = ["agentId", "id"]
+"delete /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}" = ["agentId", "id"]
+"delete /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/assignments/{id}" = ["agentId", "variationId", "id"]
+"delete /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/memory_layer_assignments/{id}" = ["agentId", "variationId", "id"]
+"delete /v1/workspaces/{workspaceId}/agents/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/ai_provider_keys/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/api_keys/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/memory_layers/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries/{id}" = ["memoryLayerId", "id"]
+"delete /v1/workspaces/{workspaceId}/tenants/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/tool_sets/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets/{id}" = ["toolSetId", "id"]
+"delete /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}" = ["toolSetId", "id"]
+"delete /v1/workspaces/{workspaceId}/widget_sessions" = []
+"delete /v1/workspaces/{workspaceId}/widget_sessions/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/widgets/{id}" = ["id"]
+"delete /v1/workspaces/{workspaceId}/workspace_secrets/{id}" = ["id"]
+"get /v1/account" = []
+"get /v1/account/global_api_key" = []
+"get /v1/account/profiles" = []
+"get /v1/account/workspaces" = []
+"get /v1/account/workspaces/{workspaceId}" = []
+"get /v1/account/workspaces/{workspaceId}/members" = []
+"get /v1/whoami" = []
+"get /v1/workspaces" = []
+"get /v1/workspaces/{workspaceId}/agents" = []
+"get /v1/workspaces/{workspaceId}/agents/{agentId}/feedback" = ["agentId"]
+"get /v1/workspaces/{workspaceId}/agents/{agentId}/schedules" = ["agentId"]
+"get /v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}" = ["agentId", "id"]
+"get /v1/workspaces/{workspaceId}/agents/{agentId}/variations" = ["agentId"]
+"get /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}" = ["agentId", "id"]
+"get /v1/workspaces/{workspaceId}/agents/{agentId}/webhook_deliveries" = ["agentId"]
+"get /v1/workspaces/{workspaceId}/agents/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/ai_provider_keys" = []
+"get /v1/workspaces/{workspaceId}/ai_provider_keys/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/api_keys" = []
+"get /v1/workspaces/{workspaceId}/api_keys/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/memory_layers" = []
+"get /v1/workspaces/{workspaceId}/memory_layers/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries" = ["memoryLayerId"]
+"get /v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries/{id}" = ["memoryLayerId", "id"]
+"get /v1/workspaces/{workspaceId}/models" = []
+"get /v1/workspaces/{workspaceId}/models/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/objectives" = []
+"get /v1/workspaces/{workspaceId}/objectives/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/context_windows" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/diagnostics" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/events" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/events:stream" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/feedback" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tasks" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tasks/{id}" = ["objectiveId", "id"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}" = ["objectiveId", "toolCallId"]
+"get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tools" = ["objectiveId"]
+"get /v1/workspaces/{workspaceId}/search/tools_or_tool_sets" = []
+"get /v1/workspaces/{workspaceId}/tenants" = []
+"get /v1/workspaces/{workspaceId}/tenants/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/tenants/{tenantId}/subjects" = ["tenantId"]
+"get /v1/workspaces/{workspaceId}/tool_sets" = []
+"get /v1/workspaces/{workspaceId}/tool_sets/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/events" = ["toolSetId"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/openapi_spec" = ["toolSetId"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets" = ["toolSetId"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets/{id}" = ["toolSetId", "id"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools" = ["toolSetId"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}" = ["toolSetId", "id"]
+"get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/usage" = ["toolSetId"]
+"get /v1/workspaces/{workspaceId}/uploads/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/widget_sessions" = []
+"get /v1/workspaces/{workspaceId}/widget_sessions/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/widgets" = []
+"get /v1/workspaces/{workspaceId}/widgets/{id}" = ["id"]
+"get /v1/workspaces/{workspaceId}/workspace_secrets" = []
+"get /v1/workspaces/{workspaceId}/workspace_secrets/{id}" = ["id"]
+"patch /v1/account/workspaces/{workspaceId}" = []
+"patch /v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}" = ["agentId", "id"]
+"patch /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}" = ["agentId", "id"]
+"patch /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/memory_layer_assignments/{id}" = ["agentId", "variationId", "id"]
+"patch /v1/workspaces/{workspaceId}/agents/{id}" = ["id"]
+"patch /v1/workspaces/{workspaceId}/ai_provider_keys/{id}" = ["id"]
+"patch /v1/workspaces/{workspaceId}/api_keys/{id}" = ["id"]
+"patch /v1/workspaces/{workspaceId}/memory_layers/{id}" = ["id"]
+"patch /v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries/{id}" = ["memoryLayerId", "id"]
+"patch /v1/workspaces/{workspaceId}/tool_sets/{id}" = ["id"]
+"patch /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets/{id}" = ["toolSetId", "id"]
+"patch /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}" = ["toolSetId", "id"]
+"patch /v1/workspaces/{workspaceId}/widgets/{id}" = ["id"]
+"patch /v1/workspaces/{workspaceId}/workspace_secrets/{id}" = ["id"]
+"post /v1/account/global_api_key:disable" = []
+"post /v1/account/global_api_key:enable" = []
+"post /v1/account/global_api_key:rotate" = []
+"post /v1/account/workspaces" = []
+"post /v1/account/workspaces/{workspaceId}/members" = []
+"post /v1/account:rotateChallengeToken" = []
+"post /v1/account:rotateWebhookSigningKey" = []
+"post /v1/workspaces/{workspaceId}/agents" = []
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/schedules" = ["agentId"]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}:archive" = ["agentId", "id"]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}:pause" = ["agentId", "id"]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}:resume" = ["agentId", "id"]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/variations" = ["agentId"]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/assignments" = ["agentId", "variationId"]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/memory_layer_assignments" = ["agentId", "variationId"]
+"post /v1/workspaces/{workspaceId}/agents/{id}:archive" = ["id"]
+"post /v1/workspaces/{workspaceId}/agents/{id}:publish" = ["id"]
+"post /v1/workspaces/{workspaceId}/agents/{id}:unarchive" = ["id"]
+"post /v1/workspaces/{workspaceId}/agents/{id}:unpublish" = ["id"]
+"post /v1/workspaces/{workspaceId}/ai_provider_keys" = []
+"post /v1/workspaces/{workspaceId}/api_keys" = []
+"post /v1/workspaces/{workspaceId}/api_keys/{id}:disable" = ["id"]
+"post /v1/workspaces/{workspaceId}/api_keys/{id}:enable" = ["id"]
+"post /v1/workspaces/{workspaceId}/api_keys/{id}:rotate" = ["id"]
+"post /v1/workspaces/{workspaceId}/memory_layers" = []
+"post /v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries" = ["memoryLayerId"]
+"post /v1/workspaces/{workspaceId}/models/{id}:disable" = ["id"]
+"post /v1/workspaces/{workspaceId}/models/{id}:enable" = ["id"]
+"post /v1/workspaces/{workspaceId}/models:swapModelOnVariations" = []
+"post /v1/workspaces/{workspaceId}/objectives" = []
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}/feedback" = ["objectiveId"]
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}:approve" = ["objectiveId", "toolCallId"]
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}:deny" = ["objectiveId", "toolCallId"]
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}:setContent" = ["objectiveId", "toolCallId"]
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}:cancel" = ["objectiveId"]
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}:compact" = ["objectiveId"]
+"post /v1/workspaces/{workspaceId}/objectives/{objectiveId}:continue" = ["objectiveId"]
+"post /v1/workspaces/{workspaceId}/tool_sets" = []
+"post /v1/workspaces/{workspaceId}/tool_sets/{id}:archive" = ["id"]
+"post /v1/workspaces/{workspaceId}/tool_sets/{id}:unarchive" = ["id"]
+"post /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets" = ["toolSetId"]
+"post /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools" = ["toolSetId"]
+"post /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}:omit" = ["toolSetId", "id"]
+"post /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}:restore" = ["toolSetId", "id"]
+"post /v1/workspaces/{workspaceId}/uploads" = []
+"post /v1/workspaces/{workspaceId}/widget_sessions" = []
+"post /v1/workspaces/{workspaceId}/widget_sessions/{id}:revoke" = ["id"]
+"post /v1/workspaces/{workspaceId}/widgets" = []
+"post /v1/workspaces/{workspaceId}/widgets/{id}:archive" = ["id"]
+"post /v1/workspaces/{workspaceId}/widgets/{id}:unarchive" = ["id"]
+"post /v1/workspaces/{workspaceId}/workspace_secrets" = []
+
+[lang.cli.display]
+default = "table"
+columns = [
+  { header = "ID", path = ".metadata.id" },
+  { header = "EXTERNAL ID", path = ".metadata.externalId" },
+  { header = "NAME", path = ".metadata.name" },
+  { header = "CREATED", path = ".metadata.createdAt" },
+  { header = "STATE", path = ".state" },
+]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/agents"]
+columns = [
+  { header = "VARIATION MODE", path = ".spec.variationSelectionMode" },
+]
+
+[lang.cli.display.methods."get /v1/account/profiles"]
+columns = [{ header = "TYPE", path = ".spec.type" }]
+
+[lang.cli.display.methods."get /v1/account/workspaces/{workspaceId}/members"]
+columns = [{ header = "PROFILE", path = ".profileId" }, { header = "ACTOR", path = ".actorId" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/agents/{agentId}/schedules"]
+columns = [{ header = "SCHEDULE", path = ".spec.schedule" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/memory_layers"]
+columns = [{ header = "TYPE", path = ".spec.type" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries"]
+columns = [{ header = "KEY", path = ".spec.key" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/models"]
+columns = [{ header = "PROVIDER", path = ".spec.provider" }, { header = "FAMILY", path = ".spec.family" }]
+
+# Objective events: the discriminated payload's tag plus its compact JSON,
+# cut to 30 chars in table mode (extended shows the whole document).
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/events"]
+columns = [
+  { header = "TYPE", path = ".data.type" },
+  { header = "WINDOW", path = ".contextWindowId" },
+  { header = "DATA", path = ".data", truncate = 30 },
+]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls"]
+columns = [{ header = "STATUS", path = ".status" }, { header = "EXECUTION", path = ".executionStatus" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/usage"]
+columns = [{ header = "ASSIGNED", path = ".assignedAt" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools"]
+columns = [{ header = "APPROVAL", path = ".spec.requiresApproval" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/widget_sessions"]
+columns = [{ header = "WIDGET", path = ".spec.widgetId" }]
+
+[lang.cli.display.methods."get /v1/workspaces/{workspaceId}/widgets"]
+columns = [{ header = "AGENT", path = ".spec.agentId" }]
+
+[sse]
+skip_events = ["ping", "open"]
+
+# CLI browser login (ENG-617): RFC 8628 device authorization against the
+# webui-hosted endpoints. Endpoints deploy with ENG-619; until then
+# `cadenya auth login` fails fast with an HTTP error.
+[lang.cli.auth]
+device_authorization_endpoint = "https://app.cadenya.com/api/cli/oauth/device_authorization"
+token_endpoint = "https://app.cadenya.com/api/cli/oauth/token"
+client_id = "cadenya-cli"
+workspaces_param = "workspaceId"

@@ -1,0 +1,59 @@
+// Authorized preproduction mutation sweep for the generated TypeScript SDK.
+// Creates uniquely named owned fixtures and cleans them up in dependency order.
+
+import assert from 'node:assert/strict';
+import { counts, loadLiveEnvironment, readReport, resourceId, safeFailure, writeReport } from './common-node.mjs';
+if (process.env.CADENYA_LIVE_MATRIX_MUTATIONS !== 'typescript') {
+  console.error('refusing mutation sweep: set CADENYA_LIVE_MATRIX_MUTATIONS=typescript');
+  process.exit(2);
+}
+loadLiveEnvironment();
+const {default:Cadenya}=await import('../../gen/typescript/dist/index.js');
+const client=new Cadenya(); const RUN=`live-ts-${Date.now().toString(36)}`; const opts=()=>({signal:AbortSignal.timeout(30_000)});
+const path=new URL('./results-typescript.json',import.meta.url); const prior=readReport(path,'typescript'); const operations=prior.operations;
+const done=(id)=>operations[id]={status:'completed',evidence:`real api.cadenya.com: TypeScript owned-fixture mutation succeeded (${RUN}); response body not persisted`};
+const fail=(id,e)=>operations[id]={status:'failed',evidence:`real TypeScript mutation failed: ${safeFailure(e)}; no response body persisted`};
+const block=(id,why)=>operations[id]={status:'blocked',evidence:`TypeScript mutation wave: ${why}`};
+async function op(id,fn){try{const v=await fn();done(id);return v}catch(e){fail(id,e)}}
+const id=resourceId;
+let apiKey,agent,variation,schedule,layer,entry,set,tool,toolSecret,assignment,memoryAssignment,widget,session,workspaceSecret,upload,fatal;
+try {
+  apiKey=await op('APIKeyService_CreateAPIKey',()=>client.apiKeys.create({metadata:{name:`${RUN}-key`},spec:{description:'live matrix',permissions:[]}},opts()));
+  if(apiKey){const x=id(apiKey);await op('APIKeyService_UpdateAPIKey',()=>client.apiKeys.update(x,{metadata:{name:`${RUN}-key-updated`},updateMask:'metadata.name'},opts()));await op('APIKeyService_DisableAPIKey',()=>client.apiKeys.disable(x,undefined,opts()));await op('APIKeyService_EnableAPIKey',()=>client.apiKeys.enable(x,undefined,opts()));await op('APIKeyService_RotateAPIKey',()=>client.apiKeys.rotate(x,undefined,opts()));}
+
+  const models=await client.models.list({limit:1},opts()); const modelId=id(models.items[0]); assert.ok(modelId,'model fixture');
+  agent=await op('AgentService_CreateAgent',()=>client.agents.create({metadata:{name:`${RUN}-agent`},spec:{variationSelectionMode:'VARIATION_SELECTION_MODE_UNSPECIFIED'}},opts()));
+  if(agent){const aid=id(agent);variation=await op('AgentVariationService_CreateAgentVariation',()=>client.agents.variations.create(aid,{metadata:{name:`${RUN}-variation`},spec:{systemPromptTemplate:'live matrix',modelConfig:{modelId}}},opts()));if(variation)await op('AgentVariationService_UpdateAgentVariation',()=>client.agents.variations.update(aid,id(variation),{metadata:{name:`${RUN}-variation-updated`},updateMask:'metadata.name'},opts()));await op('AgentService_UpdateAgent',()=>client.agents.update(aid,{metadata:{name:`${RUN}-agent-updated`},updateMask:'metadata.name'},opts()));schedule=await op('AgentScheduleService_CreateAgentSchedule',()=>client.agents.schedules.create(aid,{metadata:{name:`${RUN}-schedule`},spec:{schedule:{calendars:[{minute:[{start:0}],hour:[{start:0}],dayOfMonth:[{start:29}],month:[{start:2}]}],timezone:'UTC'},firstUserMessage:'live matrix schedule'}},opts()));if(schedule){const sid=id(schedule);await op('AgentScheduleService_GetAgentSchedule',()=>client.agents.schedules.retrieve(aid,sid,undefined,opts()));await op('AgentScheduleService_UpdateAgentSchedule',()=>client.agents.schedules.update(aid,sid,{metadata:{name:`${RUN}-schedule-updated`},updateMask:'metadata.name'},opts()));await op('AgentScheduleService_PauseAgentSchedule',()=>client.agents.schedules.pause(aid,sid,undefined,opts()));await op('AgentScheduleService_ResumeAgentSchedule',()=>client.agents.schedules.resume(aid,sid,undefined,opts()));await op('AgentScheduleService_ArchiveAgentSchedule',()=>client.agents.schedules.archive(aid,sid,undefined,opts()));}}
+
+  layer=await op('MemoryService_CreateMemoryLayer',()=>client.memoryLayers.create({metadata:{name:`${RUN}-layer`},spec:{type:'MEMORY_LAYER_TYPE_SKILLS',description:'live matrix'}},opts()));
+  if(layer){const lid=id(layer);await op('MemoryService_UpdateMemoryLayer',()=>client.memoryLayers.update(lid,{metadata:{name:`${RUN}-layer-updated`},updateMask:'metadata.name'},opts()));entry=await op('MemoryService_CreateMemoryEntry',()=>client.memoryLayers.entries.create(lid,{metadata:{name:`${RUN}-entry`},spec:{type:'content',content:'live matrix',key:`${RUN}-key`}},opts()));if(entry)await op('MemoryService_UpdateMemoryEntry',()=>client.memoryLayers.entries.update(lid,id(entry),{spec:{content:'live matrix updated'},updateMask:'spec.content'},opts()));}
+
+  set=await op('ToolService_CreateToolSet',()=>client.toolSets.create({metadata:{name:`${RUN}-set`},spec:{description:'live matrix',adapter:{type:'bare',bare:{}}}},opts()));
+  if(set){const sid=id(set);await op('ToolService_UpdateToolSet',()=>client.toolSets.update(sid,{metadata:{name:`${RUN}-set-updated`},updateMask:'metadata.name'},opts()));tool=await op('ToolService_CreateTool',()=>client.toolSets.tools.create(sid,{metadata:{name:`${RUN}-tool`},spec:{description:'live matrix',requiresApproval:false,parameters:{type:'object'},config:{type:'bare',bare:{}}}},opts()));if(tool){const tid=id(tool);await op('ToolService_UpdateTool',()=>client.toolSets.tools.update(sid,tid,{metadata:{name:`${RUN}-tool-updated`},updateMask:'metadata.name'},opts()));await op('ToolService_OmitTool',()=>client.toolSets.tools.omit(sid,tid,undefined,opts()));await op('ToolService_RestoreTool',()=>client.toolSets.tools.restore(sid,tid,undefined,opts()));}toolSecret=await op('ToolService_CreateToolSetSecret',()=>client.toolSets.secrets.create(sid,{metadata:{name:`${RUN}-secret`},spec:{value:'live-matrix-secret'}},opts()));if(toolSecret)await op('ToolService_UpdateToolSetSecret',()=>client.toolSets.secrets.update(sid,id(toolSecret),{spec:{value:'live-matrix-secret-updated'},updateMask:'spec.value'},opts()));}
+
+  if(agent&&variation&&tool){const aid=id(agent),vid=id(variation);assignment=await op('AgentVariationService_AddAgentVariationAssignment',()=>client.agents.variations.addAssignment(aid,vid,{body:{type:'toolId',toolId:id(tool)}},opts()));}
+  if(agent&&variation&&layer){const aid=id(agent),vid=id(variation);memoryAssignment=await op('AgentVariationService_AddAgentVariationMemoryLayer',()=>client.agents.variations.addMemoryLayer(aid,vid,{memoryLayerId:id(layer),position:1},opts()));if(memoryAssignment){const mid=memoryAssignment.id;await op('AgentVariationService_UpdateAgentVariationMemoryLayer',()=>client.agents.variations.updateMemoryLayer(aid,vid,mid,{position:2},opts()));}}
+  if(agent){const aid=id(agent);await op('AgentService_PublishAgent',()=>client.agents.publish(aid,undefined,opts()));widget=await op('WidgetService_CreateWidget',()=>client.widgets.create({metadata:{name:`${RUN}-widget`},spec:{agentId:aid,variationId:id(variation),originAllowlist:['https://example.test']}},opts()));if(widget){const wid=id(widget);await op('WidgetService_GetWidget',()=>client.widgets.retrieve(wid,undefined,opts()));await op('WidgetService_UpdateWidget',()=>client.widgets.update(wid,{metadata:{name:`${RUN}-widget-updated`},updateMask:'metadata.name'},opts()));session=await op('WidgetSessionService_CreateWidgetSession',()=>client.widgetSessions.create({spec:{widgetId:wid}},opts()));if(session){await op('WidgetSessionService_GetWidgetSession',()=>client.widgetSessions.retrieve(id(session),undefined,opts()));await op('WidgetSessionService_RevokeWidgetSession',()=>client.widgetSessions.revoke(id(session),undefined,opts()));}await op('WidgetSessionService_CreateWidgetSession',()=>client.widgetSessions.create({spec:{widgetId:wid,tenant:{id:`${RUN}-tenant`}}},opts()));await op('WidgetSessionService_DeleteTenantWidgetSessions',()=>client.widgetSessions.deleteTenant({tenantId:`external_id:${RUN}-tenant`},opts()));await op('TenantService_DeleteTenant',()=>client.tenants.delete(`external_id:${RUN}-tenant`,undefined,opts()));await op('WidgetService_ArchiveWidget',()=>client.widgets.archive(wid,undefined,opts()));await op('WidgetService_UnarchiveWidget',()=>client.widgets.unarchive(wid,undefined,opts()));}await op('AgentService_UnpublishAgent',()=>client.agents.unpublish(aid,undefined,opts()));await op('AgentService_ArchiveAgent',()=>client.agents.archive(aid,undefined,opts()));await op('AgentService_UnarchiveAgent',()=>client.agents.unarchive(aid,undefined,opts()));}
+  workspaceSecret=await op('WorkspaceSecretService_CreateWorkspaceSecret',()=>client.workspaceSecrets.create({metadata:{name:`${RUN}-workspace-secret`},spec:{value:'live-matrix-secret'}},opts()));if(workspaceSecret){await op('WorkspaceSecretService_GetWorkspaceSecret',()=>client.workspaceSecrets.retrieve(id(workspaceSecret),undefined,opts()));await op('WorkspaceSecretService_UpdateWorkspaceSecret',()=>client.workspaceSecrets.update(id(workspaceSecret),{spec:{value:'live-matrix-updated'},updateMask:'spec.value'},opts()));}
+  upload=await op('UploadService_CreateUpload',()=>client.uploads.create({metadata:{name:`${RUN}-upload`},spec:{filename:'one-byte.txt',contentType:'text/plain',sizeBytes:'1'}},opts()));if(upload)await op('UploadService_GetUpload',()=>client.uploads.retrieve(id(upload),undefined,opts()));
+} catch(error) {
+  fatal=error;
+} finally {
+  if(memoryAssignment&&agent&&variation)await op('AgentVariationService_RemoveAgentVariationMemoryLayer',()=>client.agents.variations.removeMemoryLayer(id(agent),id(variation),memoryAssignment.id,undefined,opts()));
+  if(assignment&&agent&&variation)await op('AgentVariationService_RemoveAgentVariationAssignment',()=>client.agents.variations.removeAssignment(id(agent),id(variation),assignment.id,undefined,opts()));
+  if(session)await op('WidgetSessionService_DeleteWidgetSession',()=>client.widgetSessions.delete(id(session),undefined,opts()));
+  if(widget)await op('WidgetService_DeleteWidget',()=>client.widgets.delete(id(widget),undefined,opts()));
+  if(toolSecret&&set)await op('ToolService_DeleteToolSetSecret',()=>client.toolSets.secrets.delete(id(set),id(toolSecret),undefined,opts()));
+  if(tool&&set)await op('ToolService_DeleteTool',()=>client.toolSets.tools.delete(id(set),id(tool),undefined,opts()));
+  if(set){await op('ToolService_ArchiveToolSet',()=>client.toolSets.archive(id(set),undefined,opts()));await op('ToolService_UnarchiveToolSet',()=>client.toolSets.unarchive(id(set),undefined,opts()));await op('ToolService_DeleteToolSet',()=>client.toolSets.delete(id(set),undefined,opts()));}
+  if(entry&&layer)await op('MemoryService_DeleteMemoryEntry',()=>client.memoryLayers.entries.delete(id(layer),id(entry),undefined,opts()));
+  if(layer)await op('MemoryService_DeleteMemoryLayer',()=>client.memoryLayers.delete(id(layer),undefined,opts()));
+  if(schedule&&agent)await op('AgentScheduleService_DeleteAgentSchedule',()=>client.agents.schedules.delete(id(agent),id(schedule),undefined,opts()));
+  if(variation&&agent)await op('AgentVariationService_DeleteAgentVariation',()=>client.agents.variations.delete(id(agent),id(variation),undefined,opts()));
+  if(agent)await op('AgentService_DeleteAgent',()=>client.agents.delete(id(agent),undefined,opts()));
+  if(workspaceSecret)await op('WorkspaceSecretService_DeleteWorkspaceSecret',()=>client.workspaceSecrets.delete(id(workspaceSecret),undefined,opts()));
+  if(apiKey)await op('APIKeyService_DeleteAPIKey',()=>client.apiKeys.delete(id(apiKey),undefined,opts()));
+}
+prior.operations=operations;writeReport(path,prior);
+const summary=counts(prior);console.log(JSON.stringify(summary));
+if(fatal){console.error(`mutation harness failed outside an operation: ${String(fatal?.message??fatal).replace(/\s+/g,' ').slice(0,180)}`);process.exitCode=1}

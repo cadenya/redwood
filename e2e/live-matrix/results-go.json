@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "sdk": "go",
+  "executedAt": "2026-08-14T05:21:47Z",
+  "operations": {
+    "AIProviderKeyService_CreateAIProviderKey": {
+      "status": "blocked",
+      "evidence": "GO_LIVE_PROVIDER_API_KEY is unset; no provider credential mutation was sent."
+    },
+    "AIProviderKeyService_DeleteAIProviderKey": {
+      "status": "blocked",
+      "evidence": "GO_LIVE_PROVIDER_API_KEY is unset; no provider credential mutation was sent."
+    },
+    "AIProviderKeyService_GetAIProviderKey": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived AIProviderKey metadata; credential/body not persisted."
+    },
+    "AIProviderKeyService_ListAIProviderKeys": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded provider-key page; credential/body not persisted."
+    },
+    "AIProviderKeyService_UpdateAIProviderKey": {
+      "status": "blocked",
+      "evidence": "GO_LIVE_PROVIDER_API_KEY is unset; no provider credential mutation was sent."
+    },
+    "APIKeyService_CreateAPIKey": {
+      "status": "completed",
+      "evidence": "Created uniquely named Go-owned API key; decoded metadata; token not inspected/persisted."
+    },
+    "APIKeyService_DeleteAPIKey": {
+      "status": "completed",
+      "evidence": "Deleted the owned API-key fixture."
+    },
+    "APIKeyService_DisableAPIKey": {
+      "status": "completed",
+      "evidence": "Disabled owned API key and decoded response."
+    },
+    "APIKeyService_EnableAPIKey": {
+      "status": "completed",
+      "evidence": "Enabled owned API key and decoded response."
+    },
+    "APIKeyService_GetAPIKey": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived APIKey metadata; no token/body persisted."
+    },
+    "APIKeyService_ListAPIKeys": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded API-key page; no token/body persisted."
+    },
+    "APIKeyService_RotateAPIKey": {
+      "status": "completed",
+      "evidence": "Rotated owned API key and decoded response; new token not inspected/persisted."
+    },
+    "APIKeyService_UpdateAPIKey": {
+      "status": "completed",
+      "evidence": "Updated owned API-key description and decoded response."
+    },
+    "AccountService_GetAccount": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded Account with metadata and info; body not persisted."
+    },
+    "AccountService_RotateChallengeToken": {
+      "status": "blocked",
+      "evidence": "The coordinated shared-state mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "AccountService_RotateWebhookSigningKey": {
+      "status": "blocked",
+      "evidence": "The coordinated shared-state mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "AgentScheduleService_ArchiveAgentSchedule": {
+      "status": "completed",
+      "evidence": "Archived owned schedule and decoded response."
+    },
+    "AgentScheduleService_CreateAgentSchedule": {
+      "status": "completed",
+      "evidence": "Created owned long-interval schedule and decoded metadata."
+    },
+    "AgentScheduleService_DeleteAgentSchedule": {
+      "status": "completed",
+      "evidence": "Deleted owned schedule."
+    },
+    "AgentScheduleService_GetAgentSchedule": {
+      "status": "completed",
+      "evidence": "Retrieved owned schedule and decoded metadata."
+    },
+    "AgentScheduleService_ListAgentSchedules": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded schedule page for a list-derived agent."
+    },
+    "AgentScheduleService_PauseAgentSchedule": {
+      "status": "completed",
+      "evidence": "Paused owned schedule and decoded response."
+    },
+    "AgentScheduleService_ResumeAgentSchedule": {
+      "status": "completed",
+      "evidence": "Resumed owned schedule and decoded response."
+    },
+    "AgentScheduleService_UpdateAgentSchedule": {
+      "status": "completed",
+      "evidence": "Updated owned schedule name and decoded response."
+    },
+    "AgentService_ArchiveAgent": {
+      "status": "completed",
+      "evidence": "Archived owned agent and decoded response."
+    },
+    "AgentService_CreateAgent": {
+      "status": "completed",
+      "evidence": "Created uniquely named owned agent with default variation and decoded metadata."
+    },
+    "AgentService_DeleteAgent": {
+      "status": "completed",
+      "evidence": "Deleted owned agent fixture."
+    },
+    "AgentService_GetAgent": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived Agent metadata."
+    },
+    "AgentService_ListAgentFeedback": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded feedback page for a list-derived agent (zero items is valid)."
+    },
+    "AgentService_ListAgentWebhookDeliveries": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded webhook-delivery page for a list-derived agent (zero items is valid)."
+    },
+    "AgentService_ListAgents": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded agent page and captured an in-memory fixture when available."
+    },
+    "AgentService_PublishAgent": {
+      "status": "completed",
+      "evidence": "Published owned agent and decoded response."
+    },
+    "AgentService_UnarchiveAgent": {
+      "status": "completed",
+      "evidence": "Unarchived owned agent and decoded response."
+    },
+    "AgentService_UnpublishAgent": {
+      "status": "completed",
+      "evidence": "Unpublished owned agent and decoded response."
+    },
+    "AgentService_UpdateAgent": {
+      "status": "completed",
+      "evidence": "Updated owned agent description and decoded response."
+    },
+    "AgentVariationService_AddAgentVariationAssignment": {
+      "status": "completed",
+      "evidence": "Assigned owned tool to owned variation through whole-body union and decoded assignment."
+    },
+    "AgentVariationService_AddAgentVariationMemoryLayer": {
+      "status": "completed",
+      "evidence": "Attached owned memory layer to owned variation and decoded assignment."
+    },
+    "AgentVariationService_CreateAgentVariation": {
+      "status": "completed",
+      "evidence": "Created second owned agent variation and decoded metadata."
+    },
+    "AgentVariationService_DeleteAgentVariation": {
+      "status": "completed",
+      "evidence": "Deleted owned extra variation."
+    },
+    "AgentVariationService_GetAgentVariation": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived AgentVariation metadata."
+    },
+    "AgentVariationService_ListAgentVariations": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded variation page for a list-derived agent."
+    },
+    "AgentVariationService_RemoveAgentVariationAssignment": {
+      "status": "completed",
+      "evidence": "Removed owned tool assignment."
+    },
+    "AgentVariationService_RemoveAgentVariationMemoryLayer": {
+      "status": "completed",
+      "evidence": "Removed owned memory-layer assignment."
+    },
+    "AgentVariationService_UpdateAgentVariation": {
+      "status": "completed",
+      "evidence": "Updated owned variation description and decoded response."
+    },
+    "AgentVariationService_UpdateAgentVariationMemoryLayer": {
+      "status": "completed",
+      "evidence": "Updated owned memory assignment position and decoded response."
+    },
+    "GlobalAPIKeyService_DisableGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "The coordinated global-credential mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "GlobalAPIKeyService_EnableGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "The coordinated global-credential mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "GlobalAPIKeyService_GetGlobalAPIKey": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded global APIKey metadata; token/body not persisted."
+    },
+    "GlobalAPIKeyService_RotateGlobalAPIKey": {
+      "status": "blocked",
+      "evidence": "The coordinated global-credential mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "MemoryService_CreateMemoryEntry": {
+      "status": "completed",
+      "evidence": "Created owned inline memory entry and decoded metadata."
+    },
+    "MemoryService_CreateMemoryLayer": {
+      "status": "completed",
+      "evidence": "Created uniquely named owned skills memory layer and decoded metadata."
+    },
+    "MemoryService_DeleteMemoryEntry": {
+      "status": "completed",
+      "evidence": "Deleted owned memory-entry fixture."
+    },
+    "MemoryService_DeleteMemoryLayer": {
+      "status": "completed",
+      "evidence": "Deleted owned memory-layer fixture."
+    },
+    "MemoryService_GetMemoryEntry": {
+      "status": "completed",
+      "evidence": "Retrieved owned memory entry and decoded detail metadata."
+    },
+    "MemoryService_GetMemoryLayer": {
+      "status": "completed",
+      "evidence": "Retrieved owned memory layer and decoded metadata."
+    },
+    "MemoryService_ListMemoryEntries": {
+      "status": "completed",
+      "evidence": "Listed entries in owned memory layer and decoded page."
+    },
+    "MemoryService_ListMemoryLayers": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded memory-layer page."
+    },
+    "MemoryService_UpdateMemoryEntry": {
+      "status": "completed",
+      "evidence": "Updated owned memory-entry content and decoded response."
+    },
+    "MemoryService_UpdateMemoryLayer": {
+      "status": "completed",
+      "evidence": "Updated owned memory-layer description and decoded response."
+    },
+    "ModelService_DisableModel": {
+      "status": "blocked",
+      "evidence": "The coordinated shared-model mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "ModelService_EnableModel": {
+      "status": "blocked",
+      "evidence": "The coordinated shared-model mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "ModelService_GetModel": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived Model metadata."
+    },
+    "ModelService_ListModels": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded model page and captured an in-memory fixture when available."
+    },
+    "ModelService_SwapModelOnVariations": {
+      "status": "blocked",
+      "evidence": "The coordinated shared-model mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "ObjectiveEventStreamsService_StreamObjectiveEvents": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; SSE Last-Event-ID replay decoded a later persisted event"
+    },
+    "ObjectiveService_ApproveToolCall": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; approved a Faker call and observed completed MCP execution"
+    },
+    "ObjectiveService_CancelObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; cancelled a separate objective after observing RUNNING"
+    },
+    "ObjectiveService_CompactObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; compacted an owned waiting objective after completed MCP execution"
+    },
+    "ObjectiveService_ContinueObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; continued an owned waiting objective"
+    },
+    "ObjectiveService_CreateObjective": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; created and dispatched an owned specialized objective"
+    },
+    "ObjectiveService_CreateObjectiveFeedback": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; submitted feedback after completed MCP execution"
+    },
+    "ObjectiveService_DenyToolCall": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; denied an independent Faker call and observed persisted denial"
+    },
+    "ObjectiveService_GetObjective": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived Objective metadata."
+    },
+    "ObjectiveService_GetObjectiveDiagnostics": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded diagnostics response for a list-derived objective."
+    },
+    "ObjectiveService_GetObjectiveTask": {
+      "status": "blocked",
+      "evidence": "No list-derived objective task fixture was available; no request was sent."
+    },
+    "ObjectiveService_GetObjectiveToolCall": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived ObjectiveToolCallWithResult metadata."
+    },
+    "ObjectiveService_ListObjectiveContextWindows": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded context-window page for a list-derived objective."
+    },
+    "ObjectiveService_ListObjectiveEvents": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded event page for a list-derived objective."
+    },
+    "ObjectiveService_ListObjectiveFeedback": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded feedback page for a list-derived objective (zero items is valid)."
+    },
+    "ObjectiveService_ListObjectiveTasks": {
+      "status": "blocked",
+      "evidence": "Real API returned HTTP 501 / API code 12; the generated SDK request reached the endpoint, but upstream does not implement the success path."
+    },
+    "ObjectiveService_ListObjectiveToolCalls": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded tool-call page for a list-derived objective."
+    },
+    "ObjectiveService_ListObjectiveTools": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded objective-tool snapshot page for a list-derived objective (zero items is valid)."
+    },
+    "ObjectiveService_ListObjectives": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded objective page and captured an in-memory fixture when available."
+    },
+    "ObjectiveService_SetToolCallContent": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; supplied text content to an independent bare tool call"
+    },
+    "ProfilesService_Whoami": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded current Profile metadata; body not persisted."
+    },
+    "SearchService_SearchToolsOrToolSets": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded search response for a non-sensitive fixed query; body not persisted."
+    },
+    "TenantService_DeleteTenant": {
+      "status": "completed",
+      "evidence": "Deleted the unique tenant asserted only by this Go run and decoded response."
+    },
+    "TenantService_GetTenant": {
+      "status": "completed",
+      "evidence": "Retrieved unique run-owned tenant and decoded metadata."
+    },
+    "TenantService_ListTenantSubjects": {
+      "status": "completed",
+      "evidence": "Listed subjects for unique run-owned tenant and decoded page."
+    },
+    "TenantService_ListTenants": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded tenant page."
+    },
+    "ToolService_ArchiveToolSet": {
+      "status": "completed",
+      "evidence": "Archived owned tool set and decoded response."
+    },
+    "ToolService_CreateTool": {
+      "status": "completed",
+      "evidence": "Created uniquely named owned bare tool and decoded metadata."
+    },
+    "ToolService_CreateToolSet": {
+      "status": "completed",
+      "evidence": "Created uniquely named owned bare tool set and decoded metadata."
+    },
+    "ToolService_CreateToolSetSecret": {
+      "status": "completed",
+      "evidence": "Created owned tool-set secret; value not persisted."
+    },
+    "ToolService_DeleteTool": {
+      "status": "completed",
+      "evidence": "Deleted owned tool fixture."
+    },
+    "ToolService_DeleteToolSet": {
+      "status": "completed",
+      "evidence": "Deleted owned tool-set fixture."
+    },
+    "ToolService_DeleteToolSetSecret": {
+      "status": "completed",
+      "evidence": "Deleted owned tool-set secret."
+    },
+    "ToolService_GetTool": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived Tool metadata."
+    },
+    "ToolService_GetToolSet": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded list-derived ToolSet metadata."
+    },
+    "ToolService_GetToolSetOpenAPISpec": {
+      "status": "completed",
+      "evidence": "real api.cadenya.com: Go specialized fixture succeeded; Petstore URL adapter returned a decoded consumed OpenAPI document"
+    },
+    "ToolService_GetToolSetSecret": {
+      "status": "completed",
+      "evidence": "Retrieved owned tool-set-secret metadata; value/body not persisted."
+    },
+    "ToolService_ListToolSetEvents": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded event page for a list-derived tool set (zero items is valid)."
+    },
+    "ToolService_ListToolSetSecrets": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded secret-metadata page for a list-derived tool set; values/body not persisted."
+    },
+    "ToolService_ListToolSetUsage": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded usage page for a list-derived tool set (zero items is valid)."
+    },
+    "ToolService_ListToolSets": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded tool-set page."
+    },
+    "ToolService_ListTools": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded tool page for a list-derived tool set."
+    },
+    "ToolService_OmitTool": {
+      "status": "completed",
+      "evidence": "Omitted owned tool and decoded response."
+    },
+    "ToolService_RestoreTool": {
+      "status": "completed",
+      "evidence": "Restored owned tool and decoded response."
+    },
+    "ToolService_UnarchiveToolSet": {
+      "status": "completed",
+      "evidence": "Unarchived owned tool set and decoded response."
+    },
+    "ToolService_UpdateTool": {
+      "status": "completed",
+      "evidence": "Updated owned tool description and decoded response."
+    },
+    "ToolService_UpdateToolSet": {
+      "status": "completed",
+      "evidence": "Updated owned tool-set description and decoded response."
+    },
+    "ToolService_UpdateToolSetSecret": {
+      "status": "completed",
+      "evidence": "Updated owned tool-set secret; value not persisted."
+    },
+    "UploadService_CreateUpload": {
+      "status": "completed",
+      "evidence": "Created uniquely named one-byte upload and decoded presigned-upload metadata; URL/body not persisted."
+    },
+    "UploadService_GetUpload": {
+      "status": "completed",
+      "evidence": "Real API 200; retrieved the owned upload and decoded metadata; URL/body not persisted."
+    },
+    "WidgetService_ArchiveWidget": {
+      "status": "completed",
+      "evidence": "Archived owned widget and decoded response."
+    },
+    "WidgetService_CreateWidget": {
+      "status": "completed",
+      "evidence": "Created uniquely named owned widget and decoded metadata."
+    },
+    "WidgetService_DeleteWidget": {
+      "status": "completed",
+      "evidence": "Deleted owned widget fixture."
+    },
+    "WidgetService_GetWidget": {
+      "status": "completed",
+      "evidence": "Retrieved owned widget and decoded metadata."
+    },
+    "WidgetService_ListWidgets": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded widget page."
+    },
+    "WidgetService_UnarchiveWidget": {
+      "status": "completed",
+      "evidence": "Unarchived owned widget and decoded response."
+    },
+    "WidgetService_UpdateWidget": {
+      "status": "completed",
+      "evidence": "Updated owned widget origins and decoded response."
+    },
+    "WidgetSessionService_CreateWidgetSession": {
+      "status": "completed",
+      "evidence": "Created owned widget session with unique tenant/subject and decoded metadata; token/body not persisted."
+    },
+    "WidgetSessionService_DeleteTenantWidgetSessions": {
+      "status": "completed",
+      "evidence": "Deleted all sessions for the unique owned tenant and decoded response."
+    },
+    "WidgetSessionService_DeleteWidgetSession": {
+      "status": "completed",
+      "evidence": "Deleted owned widget session."
+    },
+    "WidgetSessionService_GetWidgetSession": {
+      "status": "completed",
+      "evidence": "Retrieved owned widget session and decoded metadata; token/body not persisted."
+    },
+    "WidgetSessionService_ListWidgetSessions": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded widget-session page; token/body not persisted."
+    },
+    "WidgetSessionService_RevokeWidgetSession": {
+      "status": "completed",
+      "evidence": "Revoked owned widget session and decoded response."
+    },
+    "WorkspaceAdminService_AddWorkspaceMember": {
+      "status": "blocked",
+      "evidence": "The coordinated workspace-admin mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "WorkspaceAdminService_ArchiveWorkspace": {
+      "status": "blocked",
+      "evidence": "The coordinated workspace-admin mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "WorkspaceAdminService_CreateWorkspace": {
+      "status": "blocked",
+      "evidence": "The coordinated workspace-admin mutation command was rejected by the execution safety gate; the sandboxed dry attempt was denied network access and no live request was sent."
+    },
+    "WorkspaceAdminService_GetWorkspace": {
+      "status": "blocked",
+      "evidence": "Real API returned HTTP 403 / API code 7; no body, credential, or identifier persisted."
+    },
+    "WorkspaceAdminService_ListAccountWorkspaces": {
+      "status": "blocked",
+      "evidence": "Real API returned HTTP 403 / API code 7; no body, credential, or identifier persisted."
+    },
+    "WorkspaceAdminService_ListProfiles": {
+      "status": "blocked",
+      "evidence": "Real API returned HTTP 403 / API code 7; no body, credential, or identifier persisted."
+    },
+    "WorkspaceAdminService_ListWorkspaceMembers": {
+      "status": "blocked",
+      "evidence": "Real API returned HTTP 403 / API code 7; no body, credential, or identifier persisted."
+    },
+    "WorkspaceAdminService_RemoveWorkspaceMember": {
+      "status": "blocked",
+      "evidence": "The coordinated workspace-admin mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "WorkspaceAdminService_UpdateWorkspace": {
+      "status": "blocked",
+      "evidence": "The coordinated workspace-admin mutation command was rejected by the execution safety gate; no live request was sent."
+    },
+    "WorkspaceSecretService_CreateWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "Created uniquely named Go-owned workspace secret; value not persisted."
+    },
+    "WorkspaceSecretService_DeleteWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "Deleted owned workspace-secret fixture."
+    },
+    "WorkspaceSecretService_GetWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "Retrieved owned workspace-secret metadata; value/body not persisted."
+    },
+    "WorkspaceSecretService_ListWorkspaceSecrets": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded workspace-secret metadata page; values/body not persisted."
+    },
+    "WorkspaceSecretService_UpdateWorkspaceSecret": {
+      "status": "completed",
+      "evidence": "Updated owned workspace secret; value not persisted."
+    },
+    "WorkspaceService_ListWorkspaces": {
+      "status": "completed",
+      "evidence": "Real API 200; decoded workspace page (zero items is valid)."
+    }
+  }
+}

@@ -1,0 +1,2640 @@
+{
+  "schemaVersion": 1,
+  "sdk": "go",
+  "generatedFrom": [
+    "api-spec.yml operationId inventory",
+    "gen/manifest/manifest.json request/response metadata",
+    "gen/go/conformance/main.go exact generated SDK invocations"
+  ],
+  "statusPolicy": {
+    "completed": "A checked-in program called the real api.cadenya.com success path with the generated Go SDK and asserted/decoded its response.",
+    "attempted": "A checked-in program made a real call, but its assertion did not prove the operation success path (for example, a deliberate 404 or accepted APIError skip).",
+    "not-tested": "Mock conformance may pass, but no qualifying real-API success-path evidence is recorded."
+  },
+  "templatePolicy": [
+    "Templates are deliberately not executable with their mock-only sample values.",
+    "Use CADENYA_API_KEY and CADENYA_WORKSPACE_ID from the environment; never print them.",
+    "Replace resource identifiers with fixtures owned by the current matrix run.",
+    "Every call must receive a bounded context; every SSE stream must be closed.",
+    "Register cleanup before each state-changing request and run cleanup in reverse order under a separate bounded context.",
+    "A non-2xx APIError is a failed live test, not evidence that the SDK operation works."
+  ],
+  "sharedHelpers": "func decode[T any](raw string) *T {\n\tvar value T\n\tif err := json.Unmarshal([]byte(raw), &value); err != nil {\n\t\tpanic(err)\n\t}\n\treturn &value\n}",
+  "operationCount": 142,
+  "operations": {
+    "AccountService_GetAccount": {
+      "operationId": "AccountService_GetAccount",
+      "httpMethod": "GET",
+      "path": "/v1/account",
+      "resource": "accounts",
+      "method": "retrieve",
+      "liveStatus": "completed",
+      "evidence": "e2e/live-go/main.go: accounts.retrieve success",
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Accounts().Retrieve(ctx)\nreturn err"
+    },
+    "AccountService_RotateChallengeToken": {
+      "operationId": "AccountService_RotateChallengeToken",
+      "httpMethod": "POST",
+      "path": "/v1/account:rotateChallengeToken",
+      "resource": "accounts",
+      "method": "rotate_challenge_token",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Accounts().RotateChallengeToken(ctx)\nreturn err"
+    },
+    "AccountService_RotateWebhookSigningKey": {
+      "operationId": "AccountService_RotateWebhookSigningKey",
+      "httpMethod": "POST",
+      "path": "/v1/account:rotateWebhookSigningKey",
+      "resource": "accounts",
+      "method": "rotate_webhook_signing_key",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Accounts().RotateWebhookSigningKey(ctx)\nreturn err"
+    },
+    "GlobalAPIKeyService_GetGlobalAPIKey": {
+      "operationId": "GlobalAPIKeyService_GetGlobalAPIKey",
+      "httpMethod": "GET",
+      "path": "/v1/account/global_api_key",
+      "resource": "api_keys",
+      "method": "retrieve_global",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().RetrieveGlobal(ctx)\nreturn err"
+    },
+    "GlobalAPIKeyService_DisableGlobalAPIKey": {
+      "operationId": "GlobalAPIKeyService_DisableGlobalAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/account/global_api_key:disable",
+      "resource": "api_keys",
+      "method": "disable_global",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().DisableGlobal(ctx)\nreturn err"
+    },
+    "GlobalAPIKeyService_EnableGlobalAPIKey": {
+      "operationId": "GlobalAPIKeyService_EnableGlobalAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/account/global_api_key:enable",
+      "resource": "api_keys",
+      "method": "enable_global",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().EnableGlobal(ctx)\nreturn err"
+    },
+    "GlobalAPIKeyService_RotateGlobalAPIKey": {
+      "operationId": "GlobalAPIKeyService_RotateGlobalAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/account/global_api_key:rotate",
+      "resource": "api_keys",
+      "method": "rotate_global",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().RotateGlobal(ctx)\nreturn err"
+    },
+    "APIKeyService_ListAPIKeys": {
+      "operationId": "APIKeyService_ListAPIKeys",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/api_keys",
+      "resource": "api_keys",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().List(ctx, decode[sdk.APIKeyListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "APIKeyService_CreateAPIKey": {
+      "operationId": "APIKeyService_CreateAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/api_keys",
+      "resource": "api_keys",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().Create(ctx, decode[sdk.APIKeyCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "APIKeyService_GetAPIKey": {
+      "operationId": "APIKeyService_GetAPIKey",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/api_keys/{id}",
+      "resource": "api_keys",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().Retrieve(ctx, \"sample\", decode[sdk.APIKeyRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "APIKeyService_DeleteAPIKey": {
+      "operationId": "APIKeyService_DeleteAPIKey",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/api_keys/{id}",
+      "resource": "api_keys",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.APIKeys().Delete(ctx, \"sample\", decode[sdk.APIKeyDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "APIKeyService_UpdateAPIKey": {
+      "operationId": "APIKeyService_UpdateAPIKey",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/api_keys/{id}",
+      "resource": "api_keys",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().Update(ctx, \"sample\", decode[sdk.APIKeyUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "APIKeyService_DisableAPIKey": {
+      "operationId": "APIKeyService_DisableAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/api_keys/{id}:disable",
+      "resource": "api_keys",
+      "method": "disable",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().Disable(ctx, \"sample\", decode[sdk.APIKeyDisableParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "APIKeyService_EnableAPIKey": {
+      "operationId": "APIKeyService_EnableAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/api_keys/{id}:enable",
+      "resource": "api_keys",
+      "method": "enable",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().Enable(ctx, \"sample\", decode[sdk.APIKeyEnableParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "APIKeyService_RotateAPIKey": {
+      "operationId": "APIKeyService_RotateAPIKey",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/api_keys/{id}:rotate",
+      "resource": "api_keys",
+      "method": "rotate",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.APIKeys().Rotate(ctx, \"sample\", decode[sdk.APIKeyRotateParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceAdminService_ListProfiles": {
+      "operationId": "WorkspaceAdminService_ListProfiles",
+      "httpMethod": "GET",
+      "path": "/v1/account/profiles",
+      "resource": "workspace_admin",
+      "method": "list_profiles",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().ListProfiles(ctx, decode[sdk.WorkspaceAdminListProfilesParams](`{\"cursor\":\"sample\",\"labels\":\"sample\",\"limit\":1,\"query\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceAdminService_ListAccountWorkspaces": {
+      "operationId": "WorkspaceAdminService_ListAccountWorkspaces",
+      "httpMethod": "GET",
+      "path": "/v1/account/workspaces",
+      "resource": "workspace_admin",
+      "method": "list_account",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().ListAccount(ctx, decode[sdk.WorkspaceAdminListAccountParams](`{\"cursor\":\"sample\",\"includeArchived\":true,\"labels\":\"sample\",\"limit\":1}`))\nreturn err"
+    },
+    "WorkspaceAdminService_CreateWorkspace": {
+      "operationId": "WorkspaceAdminService_CreateWorkspace",
+      "httpMethod": "POST",
+      "path": "/v1/account/workspaces",
+      "resource": "workspace_admin",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().Create(ctx, decode[sdk.WorkspaceAdminCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{}}`))\nreturn err"
+    },
+    "WorkspaceAdminService_GetWorkspace": {
+      "operationId": "WorkspaceAdminService_GetWorkspace",
+      "httpMethod": "GET",
+      "path": "/v1/account/workspaces/{workspaceId}",
+      "resource": "workspace_admin",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().Retrieve(ctx, decode[sdk.WorkspaceAdminRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceAdminService_ArchiveWorkspace": {
+      "operationId": "WorkspaceAdminService_ArchiveWorkspace",
+      "httpMethod": "DELETE",
+      "path": "/v1/account/workspaces/{workspaceId}",
+      "resource": "workspace_admin",
+      "method": "archive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.WorkspaceAdmin().Archive(ctx, decode[sdk.WorkspaceAdminArchiveParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "WorkspaceAdminService_UpdateWorkspace": {
+      "operationId": "WorkspaceAdminService_UpdateWorkspace",
+      "httpMethod": "PATCH",
+      "path": "/v1/account/workspaces/{workspaceId}",
+      "resource": "workspace_admin",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().Update(ctx, decode[sdk.WorkspaceAdminUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceAdminService_ListWorkspaceMembers": {
+      "operationId": "WorkspaceAdminService_ListWorkspaceMembers",
+      "httpMethod": "GET",
+      "path": "/v1/account/workspaces/{workspaceId}/members",
+      "resource": "workspace_admin",
+      "method": "list_members",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().ListMembers(ctx, decode[sdk.WorkspaceAdminListMembersParams](`{\"cursor\":\"sample\",\"limit\":1,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceAdminService_AddWorkspaceMember": {
+      "operationId": "WorkspaceAdminService_AddWorkspaceMember",
+      "httpMethod": "POST",
+      "path": "/v1/account/workspaces/{workspaceId}/members",
+      "resource": "workspace_admin",
+      "method": "add_member",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.profileId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceAdmin().AddMember(ctx, decode[sdk.WorkspaceAdminAddMemberParams](`{\"email\":\"sample\",\"profileId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceAdminService_RemoveWorkspaceMember": {
+      "operationId": "WorkspaceAdminService_RemoveWorkspaceMember",
+      "httpMethod": "DELETE",
+      "path": "/v1/account/workspaces/{workspaceId}/members/{profileId}",
+      "resource": "workspace_admin",
+      "method": "remove_member",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.WorkspaceAdmin().RemoveMember(ctx, \"sample\", decode[sdk.WorkspaceAdminRemoveMemberParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "ProfilesService_Whoami": {
+      "operationId": "ProfilesService_Whoami",
+      "httpMethod": "GET",
+      "path": "/v1/whoami",
+      "resource": "profiles",
+      "method": "whoami",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Profiles().Whoami(ctx)\nreturn err"
+    },
+    "WorkspaceService_ListWorkspaces": {
+      "operationId": "WorkspaceService_ListWorkspaces",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces",
+      "resource": "workspaces",
+      "method": "list",
+      "liveStatus": "completed",
+      "evidence": "e2e/live-go/main.go: workspaces.list success",
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Workspaces().List(ctx, decode[sdk.WorkspaceListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_ListAgents": {
+      "operationId": "AgentService_ListAgents",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents",
+      "resource": "agents",
+      "method": "list",
+      "liveStatus": "completed",
+      "evidence": "e2e/live-go/main.go: agents.list success",
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().List(ctx, decode[sdk.AgentListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"state\":\"STATE_UNSPECIFIED\",\"variationSelectionMode\":\"VARIATION_SELECTION_MODE_UNSPECIFIED\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_CreateAgent": {
+      "operationId": "AgentService_CreateAgent",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents",
+      "resource": "agents",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Create(ctx, decode[sdk.AgentCreateParams](`{\"defaultVariation\":{\"metadata\":{\"name\":\"sample\"},\"spec\":{}},\"metadata\":{\"name\":\"sample\"},\"spec\":{\"variationSelectionMode\":\"VARIATION_SELECTION_MODE_UNSPECIFIED\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_ListAgentFeedback": {
+      "operationId": "AgentService_ListAgentFeedback",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/feedback",
+      "resource": "agents",
+      "method": "list_feedback",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentVariationId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().ListFeedback(ctx, \"sample\", decode[sdk.AgentListFeedbackParams](`{\"agentVariationId\":\"sample\",\"createdAfter\":\"2026-01-01T00:00:00Z\",\"createdBefore\":\"2026-01-01T00:00:00Z\",\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"query\":\"sample\",\"sentiment\":\"FEEDBACK_SENTIMENT_UNSPECIFIED\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_ListAgentWebhookDeliveries": {
+      "operationId": "AgentService_ListAgentWebhookDeliveries",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/webhook_deliveries",
+      "resource": "agents",
+      "method": "list_webhook_deliveries",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.objectiveId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().ListWebhookDeliveries(ctx, \"sample\", decode[sdk.AgentListWebhookDeliveriesParams](`{\"cursor\":\"sample\",\"eventType\":\"OBJECTIVE_EVENT_TYPE_UNSPECIFIED\",\"labels\":\"sample\",\"limit\":1,\"objectiveId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_GetAgent": {
+      "operationId": "AgentService_GetAgent",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}",
+      "resource": "agents",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Retrieve(ctx, \"sample\", decode[sdk.AgentRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_DeleteAgent": {
+      "operationId": "AgentService_DeleteAgent",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}",
+      "resource": "agents",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Agents().Delete(ctx, \"sample\", decode[sdk.AgentDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "AgentService_UpdateAgent": {
+      "operationId": "AgentService_UpdateAgent",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}",
+      "resource": "agents",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Update(ctx, \"sample\", decode[sdk.AgentUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"variationSelectionMode\":\"VARIATION_SELECTION_MODE_UNSPECIFIED\"},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_ArchiveAgent": {
+      "operationId": "AgentService_ArchiveAgent",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}:archive",
+      "resource": "agents",
+      "method": "archive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Archive(ctx, \"sample\", decode[sdk.AgentArchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_PublishAgent": {
+      "operationId": "AgentService_PublishAgent",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}:publish",
+      "resource": "agents",
+      "method": "publish",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Publish(ctx, \"sample\", decode[sdk.AgentPublishParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_UnarchiveAgent": {
+      "operationId": "AgentService_UnarchiveAgent",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}:unarchive",
+      "resource": "agents",
+      "method": "unarchive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Unarchive(ctx, \"sample\", decode[sdk.AgentUnarchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentService_UnpublishAgent": {
+      "operationId": "AgentService_UnpublishAgent",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{id}:unpublish",
+      "resource": "agents",
+      "method": "unpublish",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Unpublish(ctx, \"sample\", decode[sdk.AgentUnpublishParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_ListAgentSchedules": {
+      "operationId": "AgentScheduleService_ListAgentSchedules",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules",
+      "resource": "agents.schedules",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().List(ctx, \"sample\", decode[sdk.AgentScheduleListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_CreateAgentSchedule": {
+      "operationId": "AgentScheduleService_CreateAgentSchedule",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules",
+      "resource": "agents.schedules",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "scheduled workflow side effect",
+      "lifecycle": "use a disabled/future-dated owned schedule; clean it up before it can dispatch",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().Create(ctx, \"sample\", decode[sdk.AgentScheduleCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"schedule\":{}},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_GetAgentSchedule": {
+      "operationId": "AgentScheduleService_GetAgentSchedule",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}",
+      "resource": "agents.schedules",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().Retrieve(ctx, \"sample\", \"sample\", decode[sdk.AgentScheduleRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_DeleteAgentSchedule": {
+      "operationId": "AgentScheduleService_DeleteAgentSchedule",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}",
+      "resource": "agents.schedules",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "scheduled workflow side effect",
+      "lifecycle": "use a disabled/future-dated owned schedule; clean it up before it can dispatch",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Agents().Schedules().Delete(ctx, \"sample\", \"sample\", decode[sdk.AgentScheduleDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "AgentScheduleService_UpdateAgentSchedule": {
+      "operationId": "AgentScheduleService_UpdateAgentSchedule",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}",
+      "resource": "agents.schedules",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "scheduled workflow side effect",
+      "lifecycle": "use a disabled/future-dated owned schedule; clean it up before it can dispatch",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().Update(ctx, \"sample\", \"sample\", decode[sdk.AgentScheduleUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"schedule\":{}},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_ArchiveAgentSchedule": {
+      "operationId": "AgentScheduleService_ArchiveAgentSchedule",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}:archive",
+      "resource": "agents.schedules",
+      "method": "archive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "scheduled workflow side effect",
+      "lifecycle": "use a disabled/future-dated owned schedule; clean it up before it can dispatch",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().Archive(ctx, \"sample\", \"sample\", decode[sdk.AgentScheduleArchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_PauseAgentSchedule": {
+      "operationId": "AgentScheduleService_PauseAgentSchedule",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}:pause",
+      "resource": "agents.schedules",
+      "method": "pause",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "scheduled workflow side effect",
+      "lifecycle": "use a disabled/future-dated owned schedule; clean it up before it can dispatch",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().Pause(ctx, \"sample\", \"sample\", decode[sdk.AgentSchedulePauseParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentScheduleService_ResumeAgentSchedule": {
+      "operationId": "AgentScheduleService_ResumeAgentSchedule",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/schedules/{id}:resume",
+      "resource": "agents.schedules",
+      "method": "resume",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "scheduled workflow side effect",
+      "lifecycle": "use a disabled/future-dated owned schedule; clean it up before it can dispatch",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Schedules().Resume(ctx, \"sample\", \"sample\", decode[sdk.AgentScheduleResumeParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_ListAgentVariations": {
+      "operationId": "AgentVariationService_ListAgentVariations",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations",
+      "resource": "agents.variations",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().List(ctx, \"sample\", decode[sdk.AgentVariationListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_CreateAgentVariation": {
+      "operationId": "AgentVariationService_CreateAgentVariation",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations",
+      "resource": "agents.variations",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().Create(ctx, \"sample\", decode[sdk.AgentVariationCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_GetAgentVariation": {
+      "operationId": "AgentVariationService_GetAgentVariation",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}",
+      "resource": "agents.variations",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().Retrieve(ctx, \"sample\", \"sample\", decode[sdk.AgentVariationRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_DeleteAgentVariation": {
+      "operationId": "AgentVariationService_DeleteAgentVariation",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}",
+      "resource": "agents.variations",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Agents().Variations().Delete(ctx, \"sample\", \"sample\", decode[sdk.AgentVariationDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "AgentVariationService_UpdateAgentVariation": {
+      "operationId": "AgentVariationService_UpdateAgentVariation",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}",
+      "resource": "agents.variations",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().Update(ctx, \"sample\", \"sample\", decode[sdk.AgentVariationUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_AddAgentVariationAssignment": {
+      "operationId": "AgentVariationService_AddAgentVariationAssignment",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/assignments",
+      "resource": "agents.variations",
+      "method": "add_assignment",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.toolId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().AddAssignment(ctx, \"sample\", \"sample\", decode[sdk.AgentVariationAddAssignmentParams](`{\"body\":{\"toolId\":\"sample\",\"type\":\"toolId\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_RemoveAgentVariationAssignment": {
+      "operationId": "AgentVariationService_RemoveAgentVariationAssignment",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/assignments/{id}",
+      "resource": "agents.variations",
+      "method": "remove_assignment",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Agents().Variations().RemoveAssignment(ctx, \"sample\", \"sample\", \"sample\", decode[sdk.AgentVariationRemoveAssignmentParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "AgentVariationService_AddAgentVariationMemoryLayer": {
+      "operationId": "AgentVariationService_AddAgentVariationMemoryLayer",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/memory_layer_assignments",
+      "resource": "agents.variations",
+      "method": "add_memory_layer",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.memoryLayerId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().AddMemoryLayer(ctx, \"sample\", \"sample\", decode[sdk.AgentVariationAddMemoryLayerParams](`{\"memoryLayerId\":\"sample\",\"position\":1,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AgentVariationService_RemoveAgentVariationMemoryLayer": {
+      "operationId": "AgentVariationService_RemoveAgentVariationMemoryLayer",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/memory_layer_assignments/{id}",
+      "resource": "agents.variations",
+      "method": "remove_memory_layer",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Agents().Variations().RemoveMemoryLayer(ctx, \"sample\", \"sample\", \"sample\", decode[sdk.AgentVariationRemoveMemoryLayerParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "AgentVariationService_UpdateAgentVariationMemoryLayer": {
+      "operationId": "AgentVariationService_UpdateAgentVariationMemoryLayer",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/memory_layer_assignments/{id}",
+      "resource": "agents.variations",
+      "method": "update_memory_layer",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Agents().Variations().UpdateMemoryLayer(ctx, \"sample\", \"sample\", \"sample\", decode[sdk.AgentVariationUpdateMemoryLayerParams](`{\"position\":1,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AIProviderKeyService_ListAIProviderKeys": {
+      "operationId": "AIProviderKeyService_ListAIProviderKeys",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/ai_provider_keys",
+      "resource": "ai_provider_keys",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.AIProviderKeys().List(ctx, decode[sdk.AIProviderKeyListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"promotional\":true,\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AIProviderKeyService_CreateAIProviderKey": {
+      "operationId": "AIProviderKeyService_CreateAIProviderKey",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/ai_provider_keys",
+      "resource": "ai_provider_keys",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.AIProviderKeys().Create(ctx, decode[sdk.AIProviderKeyCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AIProviderKeyService_GetAIProviderKey": {
+      "operationId": "AIProviderKeyService_GetAIProviderKey",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/ai_provider_keys/{id}",
+      "resource": "ai_provider_keys",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.AIProviderKeys().Retrieve(ctx, \"sample\", decode[sdk.AIProviderKeyRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "AIProviderKeyService_DeleteAIProviderKey": {
+      "operationId": "AIProviderKeyService_DeleteAIProviderKey",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/ai_provider_keys/{id}",
+      "resource": "ai_provider_keys",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.AIProviderKeys().Delete(ctx, \"sample\", decode[sdk.AIProviderKeyDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "AIProviderKeyService_UpdateAIProviderKey": {
+      "operationId": "AIProviderKeyService_UpdateAIProviderKey",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/ai_provider_keys/{id}",
+      "resource": "ai_provider_keys",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.AIProviderKeys().Update(ctx, \"sample\", decode[sdk.AIProviderKeyUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_ListMemoryLayers": {
+      "operationId": "MemoryService_ListMemoryLayers",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers",
+      "resource": "memory_layers",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().List(ctx, decode[sdk.MemoryLayerListParams](`{\"agentId\":\"sample\",\"cursor\":\"sample\",\"episodicKeyPrefix\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"type\":\"MEMORY_LAYER_TYPE_UNSPECIFIED\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_CreateMemoryLayer": {
+      "operationId": "MemoryService_CreateMemoryLayer",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers",
+      "resource": "memory_layers",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Create(ctx, decode[sdk.MemoryLayerCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"type\":\"MEMORY_LAYER_TYPE_UNSPECIFIED\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_GetMemoryLayer": {
+      "operationId": "MemoryService_GetMemoryLayer",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{id}",
+      "resource": "memory_layers",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Retrieve(ctx, \"sample\", decode[sdk.MemoryLayerRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_DeleteMemoryLayer": {
+      "operationId": "MemoryService_DeleteMemoryLayer",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{id}",
+      "resource": "memory_layers",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.MemoryLayers().Delete(ctx, \"sample\", decode[sdk.MemoryLayerDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "MemoryService_UpdateMemoryLayer": {
+      "operationId": "MemoryService_UpdateMemoryLayer",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{id}",
+      "resource": "memory_layers",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Update(ctx, \"sample\", decode[sdk.MemoryLayerUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"type\":\"MEMORY_LAYER_TYPE_UNSPECIFIED\"},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_ListMemoryEntries": {
+      "operationId": "MemoryService_ListMemoryEntries",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries",
+      "resource": "memory_layers.entries",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Entries().List(ctx, \"sample\", decode[sdk.MemoryEntryListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_CreateMemoryEntry": {
+      "operationId": "MemoryService_CreateMemoryEntry",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries",
+      "resource": "memory_layers.entries",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Entries().Create(ctx, \"sample\", decode[sdk.MemoryEntryCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"content\":\"sample\",\"type\":\"content\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_GetMemoryEntry": {
+      "operationId": "MemoryService_GetMemoryEntry",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries/{id}",
+      "resource": "memory_layers.entries",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Entries().Retrieve(ctx, \"sample\", \"sample\", decode[sdk.MemoryEntryRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "MemoryService_DeleteMemoryEntry": {
+      "operationId": "MemoryService_DeleteMemoryEntry",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries/{id}",
+      "resource": "memory_layers.entries",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.MemoryLayers().Entries().Delete(ctx, \"sample\", \"sample\", decode[sdk.MemoryEntryDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "MemoryService_UpdateMemoryEntry": {
+      "operationId": "MemoryService_UpdateMemoryEntry",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/memory_layers/{memoryLayerId}/entries/{id}",
+      "resource": "memory_layers.entries",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.MemoryLayers().Entries().Update(ctx, \"sample\", \"sample\", decode[sdk.MemoryEntryUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ModelService_ListModels": {
+      "operationId": "ModelService_ListModels",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/models",
+      "resource": "models",
+      "method": "list",
+      "liveStatus": "attempted",
+      "evidence": "e2e/live-go/main.go calls the endpoint, but treats APIError as a skip; no retained output proves its success branch ran",
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.aiProviderKeyId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Models().List(ctx, decode[sdk.ModelListParams](`{\"aiProviderKeyId\":\"sample\",\"cursor\":\"sample\",\"includeInfo\":true,\"isAssigned\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"state\":\"STATE_UNSPECIFIED\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ModelService_GetModel": {
+      "operationId": "ModelService_GetModel",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/models/{id}",
+      "resource": "models",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Models().Retrieve(ctx, \"sample\", decode[sdk.ModelRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ModelService_DisableModel": {
+      "operationId": "ModelService_DisableModel",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/models/{id}:disable",
+      "resource": "models",
+      "method": "disable",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Models().Disable(ctx, \"sample\", decode[sdk.ModelDisableParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ModelService_EnableModel": {
+      "operationId": "ModelService_EnableModel",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/models/{id}:enable",
+      "resource": "models",
+      "method": "enable",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Models().Enable(ctx, \"sample\", decode[sdk.ModelEnableParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ModelService_SwapModelOnVariations": {
+      "operationId": "ModelService_SwapModelOnVariations",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/models:swapModelOnVariations",
+      "resource": "models",
+      "method": "swap_on_variations",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Models().SwapOnVariations(ctx, decode[sdk.ModelSwapOnVariationsParams](`{\"modelSwaps\":[{}],\"workspaceId\":\"sample\"}`))"
+    },
+    "ObjectiveService_ListObjectives": {
+      "operationId": "ObjectiveService_ListObjectives",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives",
+      "resource": "objectives",
+      "method": "list",
+      "liveStatus": "completed",
+      "evidence": "e2e/live-go/main.go: objectives.list + pagination success",
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentId",
+        "fixture.agentScheduleId",
+        "fixture.parentObjectiveId",
+        "fixture.profileId",
+        "fixture.subjectId",
+        "fixture.tenantId",
+        "fixture.widgetId",
+        "fixture.widgetSessionId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().List(ctx, decode[sdk.ObjectiveListParams](`{\"agentId\":\"sample\",\"agentScheduleId\":\"sample\",\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"parentObjectiveId\":\"sample\",\"profileId\":\"sample\",\"sortOrder\":\"sample\",\"state\":\"STATE_UNSPECIFIED\",\"subjectId\":\"sample\",\"tenantId\":\"sample\",\"widgetId\":\"sample\",\"widgetSessionId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_CreateObjective": {
+      "operationId": "ObjectiveService_CreateObjective",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives",
+      "resource": "objectives",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentId",
+        "fixture.id",
+        "fixture.memoryLayerId",
+        "fixture.variationId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().Create(ctx, decode[sdk.ObjectiveCreateParams](`{\"agentId\":\"sample\",\"episodicMemory\":{\"key\":\"sample\"},\"firstUserMessage\":\"sample\",\"firstUserMessageData\":{},\"memoryCascade\":[{\"memoryLayerId\":\"sample\"}],\"metadata\":{},\"pinnedParameters\":{},\"secrets\":[{}],\"subject\":{\"id\":\"sample\"},\"systemPromptData\":{},\"tenant\":{\"id\":\"sample\"},\"variationId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_GetObjective": {
+      "operationId": "ObjectiveService_GetObjective",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{id}",
+      "resource": "objectives",
+      "method": "retrieve",
+      "liveStatus": "attempted",
+      "evidence": "e2e/live-go/main.go asserted a typed APIError for a deliberately missing objective; the success path was not exercised",
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().Retrieve(ctx, \"sample\", decode[sdk.ObjectiveRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ListObjectiveContextWindows": {
+      "operationId": "ObjectiveService_ListObjectiveContextWindows",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/context_windows",
+      "resource": "objectives",
+      "method": "list_context_windows",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ListContextWindows(ctx, \"sample\", decode[sdk.ObjectiveListContextWindowsParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_GetObjectiveDiagnostics": {
+      "operationId": "ObjectiveService_GetObjectiveDiagnostics",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/diagnostics",
+      "resource": "objectives",
+      "method": "retrieve_diagnostics",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().RetrieveDiagnostics(ctx, \"sample\", decode[sdk.ObjectiveRetrieveDiagnosticsParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ListObjectiveEvents": {
+      "operationId": "ObjectiveService_ListObjectiveEvents",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/events",
+      "resource": "objectives",
+      "method": "list_events",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.sinceEventId",
+        "fixture.windowId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ListEvents(ctx, \"sample\", decode[sdk.ObjectiveListEventsParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"sinceEventId\":\"sample\",\"sortOrder\":\"sample\",\"windowId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveEventStreamsService_StreamObjectiveEvents": {
+      "operationId": "ObjectiveEventStreamsService_StreamObjectiveEvents",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/events:stream",
+      "resource": "objectives",
+      "method": "stream_events",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": "an ad-hoc real-API transport probe passed during review, but no checked-in reproducible result identifies its fixture and assertions",
+      "executionGate": "workflow-fixture-only",
+      "safety": "long-lived read tied to an objective fixture",
+      "lifecycle": "use a bounded context; close the stream; preserve LastEventID for resume testing",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nstream, err := client.Objectives().StreamEvents(ctx, \"sample\", decode[sdk.ObjectiveStreamEventsParams](`{\"workspaceId\":\"sample\"}`))\nif err != nil {\n\treturn err\n}\ndefer stream.Close()\nif !stream.Next() {\n\tif err := stream.Err(); err != nil {\n\t\treturn err\n\t}\n\treturn errors.New(\"objective event stream ended before an event\")\n}\nreturn nil"
+    },
+    "ObjectiveService_ListObjectiveFeedback": {
+      "operationId": "ObjectiveService_ListObjectiveFeedback",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/feedback",
+      "resource": "objectives",
+      "method": "list_feedback",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ListFeedback(ctx, \"sample\", decode[sdk.ObjectiveListFeedbackParams](`{\"cursor\":\"sample\",\"labels\":\"sample\",\"limit\":1,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_CreateObjectiveFeedback": {
+      "operationId": "ObjectiveService_CreateObjectiveFeedback",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/feedback",
+      "resource": "objectives",
+      "method": "create_feedback",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().CreateFeedback(ctx, \"sample\", decode[sdk.ObjectiveCreateFeedbackParams](`{\"data\":{},\"metadata\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ListObjectiveTasks": {
+      "operationId": "ObjectiveService_ListObjectiveTasks",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tasks",
+      "resource": "objectives",
+      "method": "list_tasks",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ListTasks(ctx, \"sample\", decode[sdk.ObjectiveListTasksParams](`{\"cursor\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_GetObjectiveTask": {
+      "operationId": "ObjectiveService_GetObjectiveTask",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tasks/{id}",
+      "resource": "objectives",
+      "method": "retrieve_task",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().RetrieveTask(ctx, \"sample\", \"sample\", decode[sdk.ObjectiveRetrieveTaskParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ListObjectiveToolCalls": {
+      "operationId": "ObjectiveService_ListObjectiveToolCalls",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls",
+      "resource": "objectives",
+      "method": "list_tool_calls",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ListToolCalls(ctx, \"sample\", decode[sdk.ObjectiveListToolCallsParams](`{\"cursor\":\"sample\",\"executionStatus\":\"TOOL_CALL_EXECUTION_STATUS_UNSPECIFIED\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"status\":\"TOOL_CALL_STATUS_UNSPECIFIED\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_GetObjectiveToolCall": {
+      "operationId": "ObjectiveService_GetObjectiveToolCall",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}",
+      "resource": "objectives",
+      "method": "retrieve_tool_call",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().RetrieveToolCall(ctx, \"sample\", \"sample\", decode[sdk.ObjectiveRetrieveToolCallParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ApproveToolCall": {
+      "operationId": "ObjectiveService_ApproveToolCall",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}:approve",
+      "resource": "objectives",
+      "method": "approve_tool_call",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ApproveToolCall(ctx, \"sample\", \"sample\", decode[sdk.ObjectiveApproveToolCallParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_DenyToolCall": {
+      "operationId": "ObjectiveService_DenyToolCall",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}:deny",
+      "resource": "objectives",
+      "method": "deny_tool_call",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().DenyToolCall(ctx, \"sample\", \"sample\", decode[sdk.ObjectiveDenyToolCallParams](`{\"memo\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_SetToolCallContent": {
+      "operationId": "ObjectiveService_SetToolCallContent",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tool_calls/{toolCallId}:setContent",
+      "resource": "objectives",
+      "method": "set_tool_call_content",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().SetToolCallContent(ctx, \"sample\", \"sample\", decode[sdk.ObjectiveSetToolCallContentParams](`{\"content\":[{\"text\":{\"text\":\"sample\"},\"type\":\"text\"}],\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ListObjectiveTools": {
+      "operationId": "ObjectiveService_ListObjectiveTools",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}/tools",
+      "resource": "objectives",
+      "method": "list_tools",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().ListTools(ctx, \"sample\", decode[sdk.ObjectiveListToolsParams](`{\"cursor\":\"sample\",\"limit\":1,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_CancelObjective": {
+      "operationId": "ObjectiveService_CancelObjective",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}:cancel",
+      "resource": "objectives",
+      "method": "cancel",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().Cancel(ctx, \"sample\", decode[sdk.ObjectiveCancelParams](`{\"reason\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_CompactObjective": {
+      "operationId": "ObjectiveService_CompactObjective",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}:compact",
+      "resource": "objectives",
+      "method": "compact",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().Compact(ctx, \"sample\", decode[sdk.ObjectiveCompactParams](`{\"compactionConfig\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ObjectiveService_ContinueObjective": {
+      "operationId": "ObjectiveService_ContinueObjective",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/objectives/{objectiveId}:continue",
+      "resource": "objectives",
+      "method": "continue",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Objectives().Continue(ctx, \"sample\", decode[sdk.ObjectiveContinueParams](`{\"enqueue\":true,\"message\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "SearchService_SearchToolsOrToolSets": {
+      "operationId": "SearchService_SearchToolsOrToolSets",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/search/tools_or_tool_sets",
+      "resource": "tool_search",
+      "method": "search_or_sets",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSearch().SearchOrSets(ctx, decode[sdk.ToolSearchSearchOrSetsParams](`{\"query\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "TenantService_ListTenants": {
+      "operationId": "TenantService_ListTenants",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tenants",
+      "resource": "tenants",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Tenants().List(ctx, decode[sdk.TenantListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "TenantService_GetTenant": {
+      "operationId": "TenantService_GetTenant",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tenants/{id}",
+      "resource": "tenants",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Tenants().Retrieve(ctx, \"sample\", decode[sdk.TenantRetrieveParams](`{\"includeInfo\":true,\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "TenantService_DeleteTenant": {
+      "operationId": "TenantService_DeleteTenant",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/tenants/{id}",
+      "resource": "tenants",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Tenants().Delete(ctx, \"sample\", decode[sdk.TenantDeleteParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "TenantService_ListTenantSubjects": {
+      "operationId": "TenantService_ListTenantSubjects",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tenants/{tenantId}/subjects",
+      "resource": "tenants",
+      "method": "list_subjects",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Tenants().ListSubjects(ctx, \"sample\", decode[sdk.TenantListSubjectsParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"limit\":1,\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_ListToolSets": {
+      "operationId": "ToolService_ListToolSets",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets",
+      "resource": "tool_sets",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().List(ctx, decode[sdk.ToolSetListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"state\":\"STATE_UNSPECIFIED\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_CreateToolSet": {
+      "operationId": "ToolService_CreateToolSet",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets",
+      "resource": "tool_sets",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Create(ctx, decode[sdk.ToolSetCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_GetToolSet": {
+      "operationId": "ToolService_GetToolSet",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{id}",
+      "resource": "tool_sets",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Retrieve(ctx, \"sample\", decode[sdk.ToolSetRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_DeleteToolSet": {
+      "operationId": "ToolService_DeleteToolSet",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{id}",
+      "resource": "tool_sets",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.ToolSets().Delete(ctx, \"sample\", decode[sdk.ToolSetDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "ToolService_UpdateToolSet": {
+      "operationId": "ToolService_UpdateToolSet",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{id}",
+      "resource": "tool_sets",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Update(ctx, \"sample\", decode[sdk.ToolSetUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_ArchiveToolSet": {
+      "operationId": "ToolService_ArchiveToolSet",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{id}:archive",
+      "resource": "tool_sets",
+      "method": "archive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Archive(ctx, \"sample\", decode[sdk.ToolSetArchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_UnarchiveToolSet": {
+      "operationId": "ToolService_UnarchiveToolSet",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{id}:unarchive",
+      "resource": "tool_sets",
+      "method": "unarchive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Unarchive(ctx, \"sample\", decode[sdk.ToolSetUnarchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_ListToolSetEvents": {
+      "operationId": "ToolService_ListToolSetEvents",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/events",
+      "resource": "tool_sets",
+      "method": "list_events",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().ListEvents(ctx, \"sample\", decode[sdk.ToolSetListEventsParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_GetToolSetOpenAPISpec": {
+      "operationId": "ToolService_GetToolSetOpenAPISpec",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/openapi_spec",
+      "resource": "tool_sets",
+      "method": "retrieve_open_api_spec",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().RetrieveOpenAPISpec(ctx, \"sample\", decode[sdk.ToolSetRetrieveOpenAPISpecParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_ListToolSetUsage": {
+      "operationId": "ToolService_ListToolSetUsage",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/usage",
+      "resource": "tool_sets",
+      "method": "list_usage",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.toolId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().ListUsage(ctx, \"sample\", decode[sdk.ToolSetListUsageParams](`{\"cursor\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\",\"toolId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_ListToolSetSecrets": {
+      "operationId": "ToolService_ListToolSetSecrets",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets",
+      "resource": "tool_sets.secrets",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Secrets().List(ctx, \"sample\", decode[sdk.ToolSetSecretListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_CreateToolSetSecret": {
+      "operationId": "ToolService_CreateToolSetSecret",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets",
+      "resource": "tool_sets.secrets",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Secrets().Create(ctx, \"sample\", decode[sdk.ToolSetSecretCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_GetToolSetSecret": {
+      "operationId": "ToolService_GetToolSetSecret",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets/{id}",
+      "resource": "tool_sets.secrets",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Secrets().Retrieve(ctx, \"sample\", \"sample\", decode[sdk.ToolSetSecretRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_DeleteToolSetSecret": {
+      "operationId": "ToolService_DeleteToolSetSecret",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets/{id}",
+      "resource": "tool_sets.secrets",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.ToolSets().Secrets().Delete(ctx, \"sample\", \"sample\", decode[sdk.ToolSetSecretDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "ToolService_UpdateToolSetSecret": {
+      "operationId": "ToolService_UpdateToolSetSecret",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/secrets/{id}",
+      "resource": "tool_sets.secrets",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Secrets().Update(ctx, \"sample\", \"sample\", decode[sdk.ToolSetSecretUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_ListTools": {
+      "operationId": "ToolService_ListTools",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools",
+      "resource": "tool_sets.tools",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Tools().List(ctx, \"sample\", decode[sdk.ToolListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"names\":[\"sample\"],\"prefix\":\"sample\",\"query\":\"sample\",\"requiresApproval\":true,\"sortOrder\":\"sample\",\"states\":[\"STATE_UNSPECIFIED\"],\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_CreateTool": {
+      "operationId": "ToolService_CreateTool",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools",
+      "resource": "tool_sets.tools",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Tools().Create(ctx, \"sample\", decode[sdk.ToolCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"config\":{\"http\":{\"requestMethod\":\"HTTP_METHOD_UNSPECIFIED\"},\"type\":\"http\"},\"description\":\"sample\",\"parameters\":{},\"requiresApproval\":true},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_GetTool": {
+      "operationId": "ToolService_GetTool",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}",
+      "resource": "tool_sets.tools",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Tools().Retrieve(ctx, \"sample\", \"sample\", decode[sdk.ToolRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_DeleteTool": {
+      "operationId": "ToolService_DeleteTool",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}",
+      "resource": "tool_sets.tools",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.ToolSets().Tools().Delete(ctx, \"sample\", \"sample\", decode[sdk.ToolDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "ToolService_UpdateTool": {
+      "operationId": "ToolService_UpdateTool",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}",
+      "resource": "tool_sets.tools",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Tools().Update(ctx, \"sample\", \"sample\", decode[sdk.ToolUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"config\":{\"http\":{\"requestMethod\":\"HTTP_METHOD_UNSPECIFIED\"},\"type\":\"http\"},\"description\":\"sample\",\"parameters\":{},\"requiresApproval\":true},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_OmitTool": {
+      "operationId": "ToolService_OmitTool",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}:omit",
+      "resource": "tool_sets.tools",
+      "method": "omit",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Tools().Omit(ctx, \"sample\", \"sample\", decode[sdk.ToolOmitParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "ToolService_RestoreTool": {
+      "operationId": "ToolService_RestoreTool",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/tool_sets/{toolSetId}/tools/{id}:restore",
+      "resource": "tool_sets.tools",
+      "method": "restore",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.ToolSets().Tools().Restore(ctx, \"sample\", \"sample\", decode[sdk.ToolRestoreParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "UploadService_CreateUpload": {
+      "operationId": "UploadService_CreateUpload",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/uploads",
+      "resource": "uploads",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "workflow-fixture-only",
+      "safety": "persistent workflow side effect",
+      "lifecycle": "use a uniquely labeled acceptance fixture; history may not be deletable",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Uploads().Create(ctx, decode[sdk.UploadCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"contentType\":\"sample\",\"filename\":\"sample\",\"sizeBytes\":\"sample\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "UploadService_GetUpload": {
+      "operationId": "UploadService_GetUpload",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/uploads/{id}",
+      "resource": "uploads",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Uploads().Retrieve(ctx, \"sample\", decode[sdk.UploadRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetSessionService_ListWidgetSessions": {
+      "operationId": "WidgetSessionService_ListWidgetSessions",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/widget_sessions",
+      "resource": "widget_sessions",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.subjectId",
+        "fixture.tenantId",
+        "fixture.widgetId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WidgetSessions().List(ctx, decode[sdk.WidgetSessionListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\",\"state\":\"STATE_UNSPECIFIED\",\"subjectId\":\"sample\",\"tenantId\":\"sample\",\"widgetId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetSessionService_CreateWidgetSession": {
+      "operationId": "WidgetSessionService_CreateWidgetSession",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/widget_sessions",
+      "resource": "widget_sessions",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.widgetId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WidgetSessions().Create(ctx, decode[sdk.WidgetSessionCreateParams](`{\"metadata\":{},\"secrets\":[{}],\"spec\":{\"widgetId\":\"sample\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetSessionService_DeleteTenantWidgetSessions": {
+      "operationId": "WidgetSessionService_DeleteTenantWidgetSessions",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/widget_sessions",
+      "resource": "widget_sessions",
+      "method": "delete_tenant",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.tenantId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WidgetSessions().DeleteTenant(ctx, decode[sdk.WidgetSessionDeleteTenantParams](`{\"tenantId\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetSessionService_GetWidgetSession": {
+      "operationId": "WidgetSessionService_GetWidgetSession",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/widget_sessions/{id}",
+      "resource": "widget_sessions",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WidgetSessions().Retrieve(ctx, \"sample\", decode[sdk.WidgetSessionRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetSessionService_DeleteWidgetSession": {
+      "operationId": "WidgetSessionService_DeleteWidgetSession",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/widget_sessions/{id}",
+      "resource": "widget_sessions",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.WidgetSessions().Delete(ctx, \"sample\", decode[sdk.WidgetSessionDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "WidgetSessionService_RevokeWidgetSession": {
+      "operationId": "WidgetSessionService_RevokeWidgetSession",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/widget_sessions/{id}:revoke",
+      "resource": "widget_sessions",
+      "method": "revoke",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WidgetSessions().Revoke(ctx, \"sample\", decode[sdk.WidgetSessionRevokeParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetService_ListWidgets": {
+      "operationId": "WidgetService_ListWidgets",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/widgets",
+      "resource": "widgets",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentId"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Widgets().List(ctx, decode[sdk.WidgetListParams](`{\"agentId\":\"sample\",\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetService_CreateWidget": {
+      "operationId": "WidgetService_CreateWidget",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/widgets",
+      "resource": "widgets",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Widgets().Create(ctx, decode[sdk.WidgetCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"agentId\":\"sample\"},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetService_GetWidget": {
+      "operationId": "WidgetService_GetWidget",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/widgets/{id}",
+      "resource": "widgets",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "safe-read",
+      "safety": "read-only",
+      "lifecycle": "existing fixture only; do not log sensitive response fields",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Widgets().Retrieve(ctx, \"sample\", decode[sdk.WidgetRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetService_DeleteWidget": {
+      "operationId": "WidgetService_DeleteWidget",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/widgets/{id}",
+      "resource": "widgets",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "destructive",
+      "lifecycle": "delete only a fixture created and recorded by this matrix run",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.Widgets().Delete(ctx, \"sample\", decode[sdk.WidgetDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "WidgetService_UpdateWidget": {
+      "operationId": "WidgetService_UpdateWidget",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/widgets/{id}",
+      "resource": "widgets",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "fixture.agentId",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Widgets().Update(ctx, \"sample\", decode[sdk.WidgetUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{\"agentId\":\"sample\"},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetService_ArchiveWidget": {
+      "operationId": "WidgetService_ArchiveWidget",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/widgets/{id}:archive",
+      "resource": "widgets",
+      "method": "archive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Widgets().Archive(ctx, \"sample\", decode[sdk.WidgetArchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WidgetService_UnarchiveWidget": {
+      "operationId": "WidgetService_UnarchiveWidget",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/widgets/{id}:unarchive",
+      "resource": "widgets",
+      "method": "unarchive",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "owned-fixture-only",
+      "safety": "state-changing",
+      "lifecycle": "mutate only an owned fixture; register compensating cleanup before the call",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.Widgets().Unarchive(ctx, \"sample\", decode[sdk.WidgetUnarchiveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceSecretService_ListWorkspaceSecrets": {
+      "operationId": "WorkspaceSecretService_ListWorkspaceSecrets",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/workspace_secrets",
+      "resource": "workspace_secrets",
+      "method": "list",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceSecrets().List(ctx, decode[sdk.WorkspaceSecretListParams](`{\"cursor\":\"sample\",\"includeInfo\":true,\"labels\":\"sample\",\"limit\":1,\"prefix\":\"sample\",\"query\":\"sample\",\"sortOrder\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceSecretService_CreateWorkspaceSecret": {
+      "operationId": "WorkspaceSecretService_CreateWorkspaceSecret",
+      "httpMethod": "POST",
+      "path": "/v1/workspaces/{workspaceId}/workspace_secrets",
+      "resource": "workspace_secrets",
+      "method": "create",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceSecrets().Create(ctx, decode[sdk.WorkspaceSecretCreateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceSecretService_GetWorkspaceSecret": {
+      "operationId": "WorkspaceSecretService_GetWorkspaceSecret",
+      "httpMethod": "GET",
+      "path": "/v1/workspaces/{workspaceId}/workspace_secrets/{id}",
+      "resource": "workspace_secrets",
+      "method": "retrieve",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-sensitive-read",
+      "safety": "read-only but response may contain secret or account material",
+      "lifecycle": "do not print or persist the response body",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceSecrets().Retrieve(ctx, \"sample\", decode[sdk.WorkspaceSecretRetrieveParams](`{\"workspaceId\":\"sample\"}`))\nreturn err"
+    },
+    "WorkspaceSecretService_DeleteWorkspaceSecret": {
+      "operationId": "WorkspaceSecretService_DeleteWorkspaceSecret",
+      "httpMethod": "DELETE",
+      "path": "/v1/workspaces/{workspaceId}/workspace_secrets/{id}",
+      "resource": "workspace_secrets",
+      "method": "delete",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\nreturn client.WorkspaceSecrets().Delete(ctx, \"sample\", decode[sdk.WorkspaceSecretDeleteParams](`{\"workspaceId\":\"sample\"}`))"
+    },
+    "WorkspaceSecretService_UpdateWorkspaceSecret": {
+      "operationId": "WorkspaceSecretService_UpdateWorkspaceSecret",
+      "httpMethod": "PATCH",
+      "path": "/v1/workspaces/{workspaceId}/workspace_secrets/{id}",
+      "resource": "workspace_secrets",
+      "method": "update",
+      "liveStatus": "not-tested",
+      "evidence": null,
+      "nonQualifyingEvidence": null,
+      "executionGate": "manual-only",
+      "safety": "privileged-or-secret mutation",
+      "lifecycle": "operator-approved; capture and restore state where possible",
+      "dependencies": [
+        "CADENYA_API_KEY",
+        "CADENYA_WORKSPACE_ID",
+        "contract-valid request body"
+      ],
+      "snippet": "// LIVE TEMPLATE: replace every mock-only \"sample\" ID/value with the\n// recorded owned fixture or a contract-valid value before executing.\n_, err := client.WorkspaceSecrets().Update(ctx, \"sample\", decode[sdk.WorkspaceSecretUpdateParams](`{\"metadata\":{\"name\":\"sample\"},\"spec\":{},\"updateMask\":\"sample\",\"workspaceId\":\"sample\"}`))\nreturn err"
+    }
+  }
+}
