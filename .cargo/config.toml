@@ -1,0 +1,8 @@
+# Reserve Mach-O load-command space for the signature that GoReleaser/Quill
+# adds after cross-compilation. Without this, the x86_64 binary can leave no
+# room for LC_CODE_SIGNATURE even though the unsigned binary links correctly.
+[target.aarch64-apple-darwin]
+rustflags = ["-C", "link-arg=-Wl,-headerpad_max_install_names"]
+
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-Wl,-headerpad_max_install_names"]
