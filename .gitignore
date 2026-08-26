@@ -1,6 +1,7 @@
 /target
 /gen
 /dist
+/.zig-cache/
 node_modules
 .env*
 # Conformance environments live under the OS temp dir, but never let one
