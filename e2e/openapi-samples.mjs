@@ -23,13 +23,14 @@ const docJson = execFileSync('ruby', ['-ryaml', '-rjson', '-e',
   join(root, 'gen/openapi/openapi.yml')], { encoding: 'utf8', timeout: 120_000, maxBuffer: 256 * 1024 * 1024 });
 const doc = JSON.parse(docJson);
 
-const samples = { typescript: [], go: [], python: [], ruby: [], shell: [] };
+const samples = { typescript: [], go: [], python: [], ruby: [], bash: [], shell: [] };
 for (const [path, item] of Object.entries(doc.paths ?? {})) {
   for (const [method, op] of Object.entries(item)) {
     if (!op || typeof op !== 'object' || !op['x-codeSamples']) continue;
     for (const s of op['x-codeSamples']) {
       samples[s.lang]?.push({
         id: op.operationId,
+        label: s.label,
         source: s.source,
         method: method.toUpperCase(),
         // Path params become a wildcard: values in samples are sampler-chosen.
@@ -42,6 +43,10 @@ const counts = Object.fromEntries(Object.entries(samples).map(([k, v]) => [k, v.
 console.log('sample counts:', JSON.stringify(counts));
 if (Object.values(counts).some((c) => c !== counts.typescript)) {
   console.error('uneven sample coverage');
+  process.exit(1);
+}
+if (samples.bash.some((s) => s.label !== 'CLI') || samples.shell.some((s) => s.label !== 'curl')) {
+  console.error('unexpected bash/shell sample labels');
   process.exit(1);
 }
 
@@ -233,7 +238,7 @@ function runRubyLane(entries, label) {
   }
 }
 
-// ---- CLI: run every sample through the built binary ------------------------
+// ---- CLI/cURL: execute every command against a loopback server -------------
 // A loopback server captures the attempted request; any exit-2 usage error is
 // a sample failure, and the captured method+path must match the operation.
 // Sample text is tokenized as argv (quotes + line continuations), never run
@@ -312,9 +317,49 @@ async function runCliLane(entries) {
   return bad;
 }
 {
-  const bad = await runCliLane(samples.shell);
-  if (bad.length === 0) console.log(`ok  cli: ${samples.shell.length}/${samples.shell.length} samples execute through the built binary`);
+  const bad = await runCliLane(samples.bash);
+  if (bad.length === 0) console.log(`ok  cli: ${samples.bash.length}/${samples.bash.length} samples execute through the built binary`);
   else { failures++; console.log(`FAIL cli samples:\n${bad.slice(0, 12).join('\n')}`); }
+}
+
+async function runCurlLane(entries) {
+  let captured = null;
+  const server = createServer((req, res) => {
+    captured = { method: req.method, path: req.url.split('?')[0] };
+    req.resume();
+    res.statusCode = 200;
+    res.setHeader('content-type', 'application/json');
+    res.end('{}');
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const bad = [];
+  try {
+    for (const s of entries) {
+      const argv = shellSplit(s.source);
+      if (argv[0] !== 'curl') { bad.push(`${s.id}: missing curl prefix`); continue; }
+      const urlIndex = argv.indexOf('--url') + 1;
+      if (urlIndex === 0 || !argv[urlIndex]) { bad.push(`${s.id}: missing --url`); continue; }
+      const sampleUrl = new URL(argv[urlIndex]);
+      argv[urlIndex] = `${base}${sampleUrl.pathname}${sampleUrl.search}`;
+      captured = null;
+      const r = await runArgv('curl', argv.slice(1), {
+        ...process.env, CADENYA_API_KEY: 'probe', CADENYA_WORKSPACE_ID: 'sample',
+      });
+      if (r.status !== 0) { bad.push(`${s.id}: curl exited ${r.status}: ${r.stderr.split('\n')[0]}`); continue; }
+      if (!captured) { bad.push(`${s.id}: no request reached the capture server`); continue; }
+      if (captured.method !== s.method) { bad.push(`${s.id}: attempted ${captured.method} != ${s.method}`); continue; }
+      if (!new RegExp(s.pathRegex).test(captured.path)) bad.push(`${s.id}: attempted path ${captured.path} !~ ${s.pathRegex}`);
+    }
+  } finally {
+    server.close();
+  }
+  return bad;
+}
+{
+  const bad = await runCurlLane(samples.shell);
+  if (bad.length === 0) console.log(`ok  curl: ${samples.shell.length}/${samples.shell.length} samples execute against the API shape`);
+  else { failures++; console.log(`FAIL curl samples:\n${bad.slice(0, 12).join('\n')}`); }
 }
 
 // ---- negative controls: the gate itself must be able to fail ---------------
@@ -329,7 +374,7 @@ async function runCliLane(entries) {
   const rb = samples.ruby[0];
   controls.push(['ruby nonexistent method', () =>
     runRubyLane([{ ...rb, source: rb.source.replace(/client\.(\w+)\.(\w+)\(/, 'client.$1.no_such_method(') }], 'nc').ok]);
-  const sh = samples.shell.find((s) => s.source.includes('--'));
+  const sh = samples.bash.find((s) => s.source.includes('--'));
   controls.push(['cli unknown flag', async () =>
     (await runCliLane([{ ...sh, source: sh.source.replace('cadenya ', 'cadenya ').trimEnd() + " --no-such-flag 'x'" }])).length === 0]);
   controls.push(['cli nonexistent command', async () =>

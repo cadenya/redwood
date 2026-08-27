@@ -204,7 +204,8 @@ impl OpenApiBackend {
             ("go", "Go", self.go_sample(api, resource, op, &plan)),
             ("python", "Python", self.py_sample(api, resource, op, &plan)),
             ("ruby", "Ruby", self.rb_sample(api, resource, op, &plan)),
-            ("shell", "CLI", self.cli_sample(api, resource, op, &plan)),
+            ("bash", "CLI", self.cli_sample(api, resource, op, &plan)),
+            ("shell", "curl", self.curl_sample(api, op, &plan)),
         ];
         let list: Vec<Value> = entries
             .into_iter()
@@ -507,9 +508,113 @@ impl OpenApiBackend {
         }
         line
     }
+
+    // ---- cURL ---------------------------------------------------------------
+
+    fn curl_sample(&self, api: &Api, op: &Operation, plan: &Plan) -> String {
+        let mut path = op.path.clone();
+        for p in op.positionals.iter().chain(op.path_params.iter()) {
+            path = path.replace(
+                &format!("{{{}}}", p.wire_name),
+                &percent_encode(&sample_id(&p.wire_name)),
+            );
+        }
+
+        let mut query = Vec::new();
+        for p in op.query_params.iter().filter(|p| p.required) {
+            let value = wire_sample(api, &p.ty);
+            let values = match value {
+                serde_json::Value::Array(items) => items,
+                other => vec![other],
+            };
+            for value in values {
+                query.push(format!(
+                    "{}={}",
+                    percent_encode(&p.wire_name),
+                    percent_encode(&curl_scalar(&value))
+                ));
+            }
+        }
+
+        let mut url = format!("{}{}", api.base_url.trim_end_matches('/'), path);
+        if !query.is_empty() {
+            url.push('?');
+            url.push_str(&query.join("&"));
+        }
+
+        let mut line = format!(
+            "curl --request {} \\\n  --url {}",
+            op.http_method.as_str(),
+            shell_single_quote(&url)
+        );
+        match &api.auth {
+            Auth::Bearer => line.push_str(&format!(
+                " \\\n  --header \"Authorization: Bearer ${{{}}}\"",
+                api.api_key_env
+            )),
+            Auth::ApiKeyHeader(header) => line.push_str(&format!(
+                " \\\n  --header \"{}: ${{{}}}\"",
+                shell_double_quote_content(header),
+                api.api_key_env
+            )),
+            Auth::None => {}
+        }
+
+        let body = if let Some(ty) = plan.whole_body {
+            Some(wire_sample(api, ty))
+        } else if !plan.body.is_empty() {
+            let mut object = serde_json::Map::new();
+            for field in &plan.body {
+                object.insert(field.wire_name.clone(), wire_sample(api, &field.ty));
+            }
+            Some(serde_json::Value::Object(object))
+        } else {
+            None
+        };
+        if let Some(body) = body {
+            line.push_str(" \\\n  --header 'Content-Type: application/json'");
+            line.push_str(&format!(
+                " \\\n  --data {}",
+                shell_single_quote(&body.to_string())
+            ));
+        }
+        line
+    }
 }
 
 // ---- value renderers --------------------------------------------------------
+
+fn curl_scalar(value: &serde_json::Value) -> String {
+    match value {
+        serde_json::Value::String(value) => value.clone(),
+        other => other.to_string(),
+    }
+}
+
+fn percent_encode(value: &str) -> String {
+    let mut encoded = String::new();
+    for byte in value.bytes() {
+        if byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'.' | b'_' | b'~') {
+            encoded.push(char::from(byte));
+        } else {
+            use std::fmt::Write;
+            write!(encoded, "%{byte:02X}").expect("writing to a String cannot fail");
+        }
+    }
+    encoded
+}
+
+fn shell_single_quote(value: &str) -> String {
+    format!("'{}'", value.replace('\'', "'\"'\"'"))
+}
+
+fn shell_double_quote_content(value: &str) -> String {
+    value
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('`', "\\`")
+        .replace('$', "\\$")
+}
 
 /// serde_json value as a TypeScript literal (JSON is valid TS).
 fn ts_value(v: &serde_json::Value) -> String {
