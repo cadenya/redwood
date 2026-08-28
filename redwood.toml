@@ -70,6 +70,25 @@ version = "1.0.0"
 [lang.cli.aliases]
 whoami = "profiles whoami"
 
+# Request-body flags ([lang.cli.body]): every scalar field of a body is a
+# flag named by its wire path with `metadata`/`spec` dropped; unions
+# collapse onto their arms (--mcp-url selects the mcp adapter). Renames
+# shorten the long configuration prefixes on agents and variations.
+[lang.cli.body.rename."post /v1/workspaces/{workspaceId}/agents"]
+"defaultVariation.spec.modelConfig" = "model"
+"defaultVariation.spec.compactionConfig" = "compaction"
+"defaultVariation.spec.progressiveDiscovery" = "discovery"
+
+[lang.cli.body.rename."post /v1/workspaces/{workspaceId}/agents/{agentId}/variations"]
+"spec.modelConfig" = "model"
+"spec.compactionConfig" = "compaction"
+"spec.progressiveDiscovery" = "discovery"
+
+[lang.cli.body.rename."patch /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{id}"]
+"spec.modelConfig" = "model"
+"spec.compactionConfig" = "compaction"
+"spec.progressiveDiscovery" = "discovery"
+
 [lang.cli.install]
 homebrew_tap = "cadenya/tools"
 chocolatey_package = "cadenya"

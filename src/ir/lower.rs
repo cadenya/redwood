@@ -618,7 +618,7 @@ impl<'a> Lowerer<'a> {
         }
 
         let positionals = extract_positional(&mut path_params, &resource);
-        let (body_fields, whole_body) = self.lower_body(op)?;
+        let (body_fields, whole_body, update_mask) = self.lower_body(op)?;
         let response = self.lower_response(op)?;
         let pagination = self.detect_pagination(&query_params, &response);
 
@@ -642,6 +642,7 @@ impl<'a> Lowerer<'a> {
             query_params,
             body_fields,
             whole_body,
+            update_mask,
             response,
             pagination,
         })
@@ -651,15 +652,18 @@ impl<'a> Lowerer<'a> {
     /// (excluding readOnly fields — the server populates those from the
     /// path); union/array/scalar bodies can't flatten and become a
     /// `whole_body` type instead.
-    fn lower_body(&mut self, op: &openapi::Operation) -> Result<(Vec<Field>, Option<Ty>)> {
+    fn lower_body(
+        &mut self,
+        op: &openapi::Operation,
+    ) -> Result<(Vec<Field>, Option<Ty>, Option<String>)> {
         let Some(body) = &op.request_body else {
-            return Ok((Vec::new(), None));
+            return Ok((Vec::new(), None, None));
         };
         let Some(media) = body.content.get("application/json") else {
-            return Ok((Vec::new(), None));
+            return Ok((Vec::new(), None, None));
         };
         let Some(schema) = &media.schema else {
-            return Ok((Vec::new(), None));
+            return Ok((Vec::new(), None, None));
         };
         let (owner, resolved): (String, &openapi::Schema) = match &schema.reference {
             Some(r) => {
@@ -686,12 +690,25 @@ impl<'a> Lowerer<'a> {
             );
         if !flattenable {
             let ty = self.lower_ty(schema, &owner)?;
-            return Ok((Vec::new(), Some(ty)));
+            return Ok((Vec::new(), Some(ty), None));
         }
+        // A `format: field-mask` string is the partial-update mask: recorded
+        // by wire name so body-assembling surfaces can derive it from the
+        // paths they set.
+        let update_mask = resolved
+            .properties
+            .iter()
+            .find(|(_, p)| {
+                p.format.as_deref() == Some("field-mask")
+                    && p.primary_type() == Some("string")
+                    && !field_read_only(p)
+            })
+            .map(|(name, _)| name.clone());
         let all = self.lower_object_fields(&owner, &resolved)?;
         Ok((
             all.fields.into_iter().filter(|f| !f.read_only).collect(),
             None,
+            update_mask,
         ))
     }
 

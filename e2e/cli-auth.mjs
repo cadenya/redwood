@@ -241,12 +241,15 @@ const run = (args) =>
   });
   await new Promise((r) => apiMock.listen(0, '127.0.0.1', r));
   const base = ['--base-url', `http://127.0.0.1:${apiMock.address().port}`];
-  const plain = await run([...base, 'widget-sessions', 'create', '--spec', '{}']);
+  // Required leaves are checked locally now, so the request must be
+  // complete for the API's own validation error to be what comes back.
+  const complete = ['widget-sessions', 'create', '--widget-id', 'w', '--tenant-id', 't', '--subject-id', 's'];
+  const plain = await run([...base, ...complete]);
   assert(plain.code === 1, `create exit ${plain.code}`);
   assert(plain.stderr.includes('validation failed'), `error line: ${plain.stderr}`);
   assert(plain.stderr.includes('details:') && plain.stderr.includes('spec.widgetId'),
     `details shown by default: ${plain.stderr}`);
-  const dbg = await run([...base, '--debug', 'widget-sessions', 'create', '--spec', '{}']);
+  const dbg = await run([...base, '--debug', ...complete]);
   apiMock.close();
   assert(dbg.stderr.includes('> POST ') && dbg.stderr.includes('< HTTP 400'),
     `debug dump present: ${dbg.stderr.slice(0, 400)}`);

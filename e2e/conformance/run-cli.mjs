@@ -1,5 +1,8 @@
 // CLI conformance runner: builds the generated CLI once, then drives it
 // per-operation against the mock, synthesizing argv from the manifest.
+// Every body-taking operation runs twice — once with each top-level field
+// as a document, once through the flattened typed flags — and both must
+// reach the mock as a valid request.
 
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -7,6 +10,7 @@ import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { startMock } from './mock.mjs';
+import { documentArgv, flattenedArgv, kebab } from './cli-argv.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -15,10 +19,39 @@ const manifest = JSON.parse(
 );
 const cliDir = new URL('../../gen/cli', import.meta.url).pathname;
 
-const kebab = (s) => s.replace(/_/g, '-').replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-
 // Build once; compile time must not eat the per-op timeout.
 const binary = join(mkdtempSync(join(tmpdir(), 'redwood-cli-conf-')), 'cadenya');
+
+async function runPass(baseURL, op, label, argv) {
+  let stdout;
+  try {
+    ({ stdout } = await execFileAsync(binary, argv, {
+      env: { ...process.env, CADENYA_API_KEY: 'conformance-key', CADENYA_BASE_URL: baseURL },
+      encoding: 'utf8',
+      timeout: 30_000,
+    }));
+  } catch (err) {
+    err.message = `[${label}] ${err.message}`;
+    throw err;
+  }
+  if (op.pagination) {
+    const parsed = JSON.parse(stdout);
+    if (!Array.isArray(parsed.items) || parsed.items.length !== 1) {
+      throw new Error(`[${label}] expected 1 item, got ${parsed.items?.length}`);
+    }
+  } else if (op.response.kind === 'sse') {
+    // Streams are NDJSON: every non-empty stdout line must parse as an
+    // independent JSON document (no indented multi-line values, no
+    // status text), one line per event served by the mock.
+    const lines = stdout.split('\n').filter((l) => l.trim() !== '');
+    if (lines.length !== 2) {
+      throw new Error(`[${label}] expected 2 NDJSON lines, got ${lines.length}`);
+    }
+    for (const line of lines) JSON.parse(line);
+  } else if (op.response.kind === 'json') {
+    JSON.parse(stdout);
+  }
+}
 
 async function main() {
   // No `go mod tidy`: generated modules must build clean as emitted — a
@@ -35,54 +68,40 @@ async function main() {
     // op.resource is a dotted accessor path; each segment is a subcommand.
     // Conformance asserts wire behavior, not rendering: force JSON output
     // regardless of the config's display default (streams accept it too).
-    const argv = ['--display', 'json', ...op.resource.split('.').map(kebab), kebab(op.method)];
-    for (const pos of op.positionals ?? []) argv.push(String(pos.sample));
-    const addFlag = (wireName, sample) => {
+    const base = ['--display', 'json', ...op.resource.split('.').map(kebab), kebab(op.method)];
+    for (const pos of op.positionals ?? []) base.push(String(pos.sample));
+    const paramArgv = [];
+    const addParam = (wireName, sample) => {
       const flag = kebab(wireName);
       if (Array.isArray(sample)) {
         for (const item of sample) {
-          argv.push(`--${flag}=${typeof item === 'string' ? item : JSON.stringify(item)}`);
+          paramArgv.push(`--${flag}=${typeof item === 'string' ? item : JSON.stringify(item)}`);
         }
       } else if (typeof sample === 'object' && sample !== null) {
-        argv.push(`--${flag}=${JSON.stringify(sample)}`);
+        paramArgv.push(`--${flag}=${JSON.stringify(sample)}`);
       } else {
-        argv.push(`--${flag}=${sample}`);
+        paramArgv.push(`--${flag}=${sample}`);
       }
     };
-    for (const p of op.pathParams ?? []) addFlag(p.name, p.sample);
-    for (const p of op.queryParams ?? []) addFlag(p.name, p.sample);
-    for (const f of op.bodyFields ?? []) addFlag(f.name, f.sample);
-    if (op.wholeBody) {
-      // A discriminated-union body is a choice of mutually exclusive flags:
-      // drive the first arm the way a user would, never an opaque --body.
-      const [arm] = op.wholeBody.choices ?? [];
-      if (arm) addFlag(arm.name, arm.sample);
-      else addFlag('body', op.wholeBody.sample);
+    for (const p of op.pathParams ?? []) addParam(p.name, p.sample);
+    for (const p of op.queryParams ?? []) addParam(p.name, p.sample);
+
+    const passes = [];
+    if (op.cli) {
+      // Flattened surface: typed flags for the first arm of every union.
+      passes.push({ label: 'flags', argv: [...base, ...paramArgv, ...flattenedArgv(op.cli)] });
+      if (!op.wholeBody) {
+        // Documents: each top-level field as one value on its flag.
+        passes.push({ label: 'documents', argv: [...base, ...paramArgv, ...documentArgv(op.bodyFields)] });
+      }
+    } else if (op.wholeBody) {
+      passes.push({ label: 'body', argv: [...base, ...paramArgv, `--body=${JSON.stringify(op.wholeBody.sample)}`] });
+    } else {
+      passes.push({ label: 'params', argv: [...base, ...paramArgv] });
     }
 
     try {
-      const { stdout } = await execFileAsync(binary, argv, {
-        env: { ...process.env, CADENYA_API_KEY: 'conformance-key', CADENYA_BASE_URL: baseURL },
-        encoding: 'utf8',
-        timeout: 30_000,
-      });
-      if (op.pagination) {
-        const parsed = JSON.parse(stdout);
-        if (!Array.isArray(parsed.items) || parsed.items.length !== 1) {
-          throw new Error(`expected 1 item, got ${parsed.items?.length}`);
-        }
-      } else if (op.response.kind === 'sse') {
-        // Streams are NDJSON: every non-empty stdout line must parse as an
-        // independent JSON document (no indented multi-line values, no
-        // status text), one line per event served by the mock.
-        const lines = stdout.split('\n').filter((l) => l.trim() !== '');
-        if (lines.length !== 2) {
-          throw new Error(`expected 2 NDJSON lines, got ${lines.length}`);
-        }
-        for (const line of lines) JSON.parse(line);
-      } else if (op.response.kind === 'json') {
-        JSON.parse(stdout);
-      }
+      for (const pass of passes) await runPass(baseURL, op, pass.label, pass.argv);
       results.push({ id: op.id, status: 'pass' });
     } catch (err) {
       const reason = `${err.message} ${err.stderr ?? ''}`.replace(/\s+/g, ' ').slice(0, 160);

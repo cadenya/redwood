@@ -11,7 +11,7 @@
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use serde_yaml::{Mapping, Value};
 
-use crate::backends::{cli as cli_backend, golang, python, ruby, Backend, FileSet};
+use crate::backends::{cli as cli_backend, cli_inputs, golang, python, ruby, Backend, FileSet};
 use crate::config::{CliConfig, GoConfig, PythonConfig, RubyConfig, TypeScriptConfig};
 use crate::ir::*;
 
@@ -490,20 +490,14 @@ impl OpenApiBackend {
         for p in &plan.named {
             push_flag(&mut line, &p.wire_name, &p.ty);
         }
-        for f in &plan.body {
-            push_flag(&mut line, &f.wire_name, &f.ty);
-        }
-        if let Some(ty) = plan.whole_body {
-            if let Some(choices) = api.body_choices(op) {
-                // The generated CLI exposes discriminated whole-body unions
-                // as one mutually exclusive typed flag per arm. Samples must
-                // exercise that public grammar, never the SDKs' opaque body
-                // parameter.
-                let choice = &choices[0];
-                push_flag(&mut line, &choice.wire_name, &choice.ty);
-            } else {
-                let value = wire_sample(api, ty);
-                line.push_str(&format!(" \\\n  --body '{value}'"));
+        let _ = (&plan.body, plan.whole_body);
+        // The body the way a user types it: every required input of the
+        // flattened surface (first arm of each union), so the sample is
+        // both minimal and accepted by the CLI's own preflight.
+        let opts = cli_inputs::plan_options(&self.cli_config, op);
+        if let Ok(Some(body)) = crate::ir::plan::body_plan(api, op, &opts) {
+            for arg in cli_inputs::sample_args(api, &body) {
+                line.push_str(&format!(" \\\n  {arg}"));
             }
         }
         line

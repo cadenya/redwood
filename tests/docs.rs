@@ -135,7 +135,7 @@ fn cli_docs_are_command_grammar() {
     assert!(api_md.contains("[--include-info[=true|false]]"));
     assert!(!api_md.contains("--include-info <value>"));
     assert!(api_md.contains("[--names <value>]..."));
-    assert!(api_md.contains("--content <JSON>..."));
+    assert!(api_md.contains("--content <doc>..."));
     // Commands, not method calls.
     assert!(!api_md.contains("client."));
     assert!(readme.contains("Exit codes"));
@@ -144,7 +144,7 @@ fn cli_docs_are_command_grammar() {
 
 #[test]
 fn manifest_ships_no_user_docs() {
-    let backend = redwood::backends::manifest::ManifestBackend;
+    let backend = redwood::backends::manifest::ManifestBackend::default();
     let files = backend.generate(&lowered()).expect("generates");
     assert!(!files.contains_key("api.md"));
     assert!(!files.contains_key("README.md"));

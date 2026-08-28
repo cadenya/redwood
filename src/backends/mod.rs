@@ -2,6 +2,7 @@
 //! depends only on `ir::Api` — never on the OpenAPI document.
 
 pub mod cli;
+pub mod cli_inputs;
 pub mod docs;
 pub mod golang;
 mod golang_testsuite;

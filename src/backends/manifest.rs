@@ -5,10 +5,18 @@
 
 use serde_json::{json, Map, Value};
 
+use crate::backends::cli_inputs;
 use crate::backends::{Backend, FileSet};
+use crate::config::CliConfig;
+use crate::ir::plan::{BodyPlan, InputKind};
 use crate::ir::*;
 
-pub struct ManifestBackend;
+/// The CLI configuration decides how body fields become flags; the manifest
+/// records the same plan so the CLI harness drives the flattened surface.
+#[derive(Default)]
+pub struct ManifestBackend {
+    pub cli: CliConfig,
+}
 
 impl Backend for ManifestBackend {
     fn name(&self) -> &'static str {
@@ -17,16 +25,21 @@ impl Backend for ManifestBackend {
 
     fn generate(&self, api: &Api) -> anyhow::Result<FileSet> {
         let mut files = FileSet::new();
-        files.insert("manifest.json".into(), render(api)?);
+        files.insert("manifest.json".into(), render_with(api, &self.cli)?);
         Ok(files)
     }
 }
 
 pub fn render(api: &Api) -> anyhow::Result<String> {
+    render_with(api, &CliConfig::default())
+}
+
+pub fn render_with(api: &Api, cli: &CliConfig) -> anyhow::Result<String> {
+    let plans = cli_inputs::plan_all(api, cli)?;
     let mut operations = Vec::new();
     for resource in &api.resources {
         for op in &resource.operations {
-            operations.push(operation_json(api, resource, op));
+            operations.push(operation_json(api, resource, op, plans.get(&op.id)));
         }
     }
     let webhooks: Vec<Value> = api
@@ -51,7 +64,12 @@ pub fn render(api: &Api) -> anyhow::Result<String> {
     Ok(serde_json::to_string_pretty(&doc)? + "\n")
 }
 
-fn operation_json(api: &Api, resource: &Resource, op: &Operation) -> Value {
+fn operation_json(
+    api: &Api,
+    resource: &Resource,
+    op: &Operation,
+    plan: Option<&BodyPlan>,
+) -> Value {
     let params_json = |params: &[Param]| -> Vec<Value> {
         params
             .iter()
@@ -68,13 +86,23 @@ fn operation_json(api: &Api, resource: &Resource, op: &Operation) -> Value {
         .body_fields
         .iter()
         .map(|f| {
+            // The CLI flag that takes this field whole (a document, or the
+            // field's own typed flag).
+            let cli_flag = plan.and_then(|p| {
+                p.inputs
+                    .iter()
+                    .find(|i| i.path.len() == 1 && i.path[0] == f.wire_name)
+                    .map(|i| i.flag.clone())
+            });
             json!({
                 "name": f.wire_name,
                 "required": f.required,
                 "sample": sample(api, &f.ty, 0, SampleDir::Input),
+                "cliFlag": cli_flag,
             })
         })
         .collect();
+    let cli_json = plan.map(|p| cli_plan_json(api, p));
     let (response_kind, response_sample) = match (&op.pagination, &op.response) {
         (Some(page), ResponseKind::Json(ty)) => ("paginated", page_response_sample(api, page, ty)),
         (None, ResponseKind::Json(ty)) => ("json", sample(api, ty, 0, SampleDir::Output)),
@@ -124,12 +152,84 @@ fn operation_json(api: &Api, resource: &Resource, op: &Operation) -> Value {
             body
         }),
         "response": { "kind": response_kind, "sample": response_sample },
+        // The flattened CLI surface: every input with a sample value the
+        // harness can pass, and the unions whose arms group them.
+        "cli": cli_json,
         "pagination": op.pagination.as_ref().map(|p| json!({
             "itemsField": p.items_field,
             "cursorParam": p.cursor_param,
             "nextCursorPath": p.next_cursor_path,
         })),
     })
+}
+
+/// The CLI body plan as JSON: inputs (flag, wire path, kind, sample, the
+/// chain of union arms containing them) and unions (flag, tags).
+fn cli_plan_json(api: &Api, plan: &BodyPlan) -> Value {
+    let inputs: Vec<Value> = plan
+        .inputs
+        .iter()
+        .map(|i| {
+            let (kind, sample_value) = match &i.kind {
+                InputKind::Leaf(ty) => ("leaf", sample(api, ty, 0, SampleDir::Input)),
+                InputKind::KvMap(ty) => (
+                    "kvMap",
+                    json!({"key": sample(api, ty, 0, SampleDir::Input)}),
+                ),
+                InputKind::ScalarList(ty) => {
+                    ("scalarList", json!([sample(api, ty, 0, SampleDir::Input)]))
+                }
+                InputKind::Doc(ty) => ("doc", sample(api, ty, 0, SampleDir::Input)),
+                InputKind::EntryDoc(ty) => ("entryDoc", sample(api, ty, 0, SampleDir::Input)),
+                InputKind::DocList(ty) => {
+                    ("docList", json!([sample(api, ty, 0, SampleDir::Input)]))
+                }
+                InputKind::ShorthandList { item, .. } => (
+                    "shorthandList",
+                    json!([sample(api, item, 0, SampleDir::Input)]),
+                ),
+                InputKind::UnionTag => (
+                    "unionTag",
+                    Value::String(
+                        i.union
+                            .and_then(|u| plan.unions[u].arms.first())
+                            .map(|a| a.tag.clone())
+                            .unwrap_or_default(),
+                    ),
+                ),
+            };
+            // Outermost first, so a harness can pick the first arm of each.
+            let mut arms = Vec::new();
+            let mut current = i.arm.clone();
+            while let Some(arm) = current {
+                let union = &plan.unions[arm.union];
+                arms.push(json!({"union": union.flag, "tag": arm.tag}));
+                current = union.parent_arm.clone();
+            }
+            arms.reverse();
+            json!({
+                "flag": i.flag,
+                "path": i.path,
+                "kind": kind,
+                "required": i.required,
+                "sample": sample_value,
+                "arms": arms,
+            })
+        })
+        .collect();
+    let unions: Vec<Value> = plan
+        .unions
+        .iter()
+        .map(|u| {
+            json!({
+                "flag": u.flag,
+                "path": u.path,
+                "tags": u.arms.iter().map(|a| a.tag.clone()).collect::<Vec<_>>(),
+                "inferable": u.inferable,
+            })
+        })
+        .collect();
+    json!({ "inputs": inputs, "unions": unions, "wholeBody": plan.whole_body })
 }
 
 /// Response body for a paginated op: one item, no next cursor (so drivers
@@ -278,7 +378,15 @@ fn sample(api: &Api, ty: &Ty, depth: usize, dir: SampleDir) -> Value {
                 }
                 Value::Object(map)
             }
-            Some(Shape::Enum(e)) => json!(e.values.first().cloned().unwrap_or_default()),
+            // The first SPECIFIED value: an `*_UNSPECIFIED` member is the
+            // protobuf zero, never a value a client should send.
+            Some(Shape::Enum(e)) => json!(e
+                .values
+                .iter()
+                .find(|v| !v.ends_with("_UNSPECIFIED"))
+                .or(e.values.first())
+                .cloned()
+                .unwrap_or_default()),
             Some(Shape::Union(u)) => {
                 if depth > MAX_DEPTH {
                     return json!({});
