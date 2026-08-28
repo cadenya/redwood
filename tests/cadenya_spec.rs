@@ -91,7 +91,8 @@ fn cli_lowers_oneof_body_to_mutually_exclusive_flags() {
         .nth(1)
         .expect("add-assignment command emitted");
     let add = add.split("\"remove-assignment\"").next().unwrap();
-    for flag in ["tool-id", "tool-set-id", "sub-agent-id"] {
+    // One typed flag per arm, plus the tag flag for the union itself.
+    for flag in ["type", "tool-id", "tool-set-id", "sub-agent-id"] {
         assert!(
             add.contains(&format!("&cli.StringFlag{{Name: \"{flag}\"")),
             "typed --{flag} flag"
@@ -101,19 +102,18 @@ fn cli_lowers_oneof_body_to_mutually_exclusive_flags() {
         !add.contains("Name: \"body\""),
         "no opaque --body flag: {add}"
     );
-    // Exactly-one enforcement is a usage error (exit 2) before any transport.
+    // The arm is inferred from the flag used; conflicts and a missing arm
+    // are usage errors raised by the runtime's union resolution.
+    assert!(add.contains("_body.resolveUnion(unionSpec{Flag: \"type\", Path: []string{}, Discriminator: \"type\", Required: true, Inferable: true"), "{add}");
     assert!(
-        add.contains("exactly one of --tool-id, --tool-set-id, --sub-agent-id"),
+        add.contains("{Tag: \"toolSetId\", Keys: []string{\"toolSetId\"}"),
         "{add}"
     );
-    assert!(add.contains("mutually exclusive"), "{add}");
-    // The chosen flag selects the variant: tag + payload field.
-    assert!(add.contains("\"type\": \"toolSetId\""), "{add}");
     assert!(
-        add.contains("body[\"toolSetId\"] = cmd.String(\"tool-set-id\")"),
+        add.contains("_body.set(\"tool-set-id\", []string{\"toolSetId\"}, _v)"),
         "{add}"
     );
-    assert!(add.contains("values[\"body\"] = body"), "{add}");
+    assert!(add.contains("values[\"body\"] = _body.body"), "{add}");
 
     let api_md = &files["api.md"];
     let usage = api_md
@@ -121,7 +121,7 @@ fn cli_lowers_oneof_body_to_mutually_exclusive_flags() {
         .find(|l| l.contains(" add-assignment "))
         .expect("add-assignment usage line");
     assert!(
-        usage.ends_with("(--tool-id <value> | --tool-set-id <value> | --sub-agent-id <value>)"),
+        usage.contains("--type <tool-id|tool-set-id|sub-agent-id> [--tool-id <value>] [--tool-set-id <value>] [--sub-agent-id <value>] [-f <doc>] [--dry-run]"),
         "{usage}"
     );
     assert!(!usage.contains("--body"), "{usage}");
@@ -258,4 +258,214 @@ fn cli_top_level_aliases_are_generated_and_validated() {
     .generate(&api())
     .expect_err("alias colliding with a resource must fail generation");
     assert!(err.to_string().contains("profiles"), "{err}");
+}
+
+// ---- body plans over the real spec ------------------------------------------
+
+fn plan_for(api: &ir::Api, id: &str) -> redwood::ir::plan::BodyPlan {
+    use redwood::ir::plan::{body_plan, PlanOptions};
+    let op = api
+        .resources
+        .iter()
+        .flat_map(|r| r.operations.iter())
+        .find(|o| o.id == id)
+        .unwrap_or_else(|| panic!("{id}"));
+    let opts = PlanOptions {
+        reserved: op
+            .path_params
+            .iter()
+            .chain(op.query_params.iter())
+            .map(|p| heck::ToKebabCase::to_kebab_case(p.wire_name.as_str()))
+            .collect(),
+        ..PlanOptions::default()
+    };
+    body_plan(api, op, &opts)
+        .expect("plans")
+        .expect("has a body")
+}
+
+#[test]
+fn every_body_plans_without_collisions() {
+    use redwood::ir::plan::{body_plan, PlanOptions};
+    let api = api();
+    let mut planned = 0;
+    for op in api.resources.iter().flat_map(|r| r.operations.iter()) {
+        let opts = PlanOptions {
+            reserved: op
+                .path_params
+                .iter()
+                .chain(op.query_params.iter())
+                .map(|p| heck::ToKebabCase::to_kebab_case(p.wire_name.as_str()))
+                .collect(),
+            ..PlanOptions::default()
+        };
+        if body_plan(&api, op, &opts)
+            .unwrap_or_else(|e| panic!("{}: {e}", op.id))
+            .is_some()
+        {
+            planned += 1;
+        }
+    }
+    assert!(
+        planned >= 40,
+        "expected every create/update/action body to plan, got {planned}"
+    );
+}
+
+#[test]
+fn tool_set_create_flattens_to_the_documented_inventory() {
+    use redwood::ir::plan::InputKind;
+    let api = api();
+    let plan = plan_for(&api, "ToolService_CreateToolSet");
+    let flags: Vec<&str> = plan.inputs.iter().map(|i| i.flag.as_str()).collect();
+    assert_eq!(
+        flags,
+        vec![
+            "metadata",
+            "name",
+            "external-id",
+            "label",
+            "spec",
+            "description",
+            "adapter",
+            "mcp",
+            "mcp-url",
+            "mcp-header",
+            "mcp-include-tools",
+            "mcp-include-tools-filter",
+            "mcp-include-tools-operator",
+            "mcp-exclude-tools",
+            "mcp-exclude-tools-filter",
+            "mcp-exclude-tools-operator",
+            "mcp-tool-approvals",
+            "mcp-tool-approvals-always",
+            "mcp-tool-approvals-only",
+            "mcp-tool-approvals-only-filter",
+            "mcp-tool-approvals-only-operator",
+            "mcp-just-in-time",
+            "mcp-just-in-time-enabled",
+            "mcp-just-in-time-fail-objective-on-tool-list-error",
+            "http",
+            "http-base-url",
+            "http-header",
+            "openapi",
+            "openapi-url",
+            "openapi-header",
+            "openapi-include-tools",
+            "openapi-include-tools-filter",
+            "openapi-include-tools-operator",
+            "openapi-exclude-tools",
+            "openapi-exclude-tools-filter",
+            "openapi-exclude-tools-operator",
+            "openapi-tool-approvals",
+            "openapi-tool-approvals-always",
+            "openapi-tool-approvals-only",
+            "openapi-tool-approvals-only-filter",
+            "openapi-tool-approvals-only-operator",
+            "openapi-base-url",
+            "openapi-server-name",
+            "openapi-upload-id",
+            "bare",
+            "bare-content-timeout",
+            "overlay",
+        ]
+    );
+    let by = |f: &str| plan.inputs.iter().find(|i| i.flag == f).unwrap();
+    assert!(matches!(
+        by("mcp-header").kind,
+        InputKind::KvMap(ir::Ty::String)
+    ));
+    assert!(matches!(by("overlay").kind, InputKind::DocList(_)));
+    assert!(matches!(
+        by("mcp-include-tools-filter").kind,
+        InputKind::DocList(_)
+    ));
+    assert!(matches!(by("adapter").kind, InputKind::UnionTag));
+    assert!(by("adapter").required);
+    assert!(
+        matches!(by("openapi").kind, InputKind::UnionTag),
+        "nested union keeps its segment"
+    );
+    let adapter = &plan.unions[by("adapter").union.unwrap()];
+    assert!(adapter.inferable);
+    let tags: Vec<&str> = adapter.arms.iter().map(|a| a.tag.as_str()).collect();
+    assert_eq!(tags, vec!["mcp", "http", "openapi", "bare"]);
+    assert_eq!(by("mcp-url").category, "adapter = mcp");
+    assert_eq!(by("openapi-url").category, "openapi = url");
+    let operator = by("mcp-include-tools-operator");
+    assert_eq!(
+        operator.enum_short.as_ref().unwrap(),
+        &vec![
+            ("and".to_string(), "OPERATOR_AND".to_string()),
+            ("or".to_string(), "OPERATOR_OR".to_string())
+        ]
+    );
+}
+
+#[test]
+fn provider_key_create_collapses_both_unions() {
+    let api = api();
+    let plan = plan_for(&api, "AIProviderKeyService_CreateAIProviderKey");
+    let flags: Vec<&str> = plan.inputs.iter().map(|i| i.flag.as_str()).collect();
+    for expected in [
+        "name",
+        "provider",
+        "credentials",
+        "api-key",
+        "header",
+        "config",
+        "openrouter-region",
+        "openai-organization-id",
+        "openai-project-id",
+        "openai-compatible-base-url",
+    ] {
+        assert!(
+            flags.contains(&expected),
+            "missing --{expected} in {flags:?}"
+        );
+    }
+    assert!(!flags.contains(&"credentials-api-key-api-key"));
+    let provider = plan.inputs.iter().find(|i| i.flag == "provider").unwrap();
+    let shorts: Vec<&str> = provider
+        .enum_short
+        .as_ref()
+        .unwrap()
+        .iter()
+        .map(|(s, _)| s.as_str())
+        .collect();
+    assert!(
+        shorts.contains(&"anthropic") && shorts.contains(&"openai-compatible"),
+        "{shorts:?}"
+    );
+}
+
+#[test]
+fn objective_create_uses_pair_and_shorthand_lists() {
+    use redwood::ir::plan::InputKind;
+    let api = api();
+    let plan = plan_for(&api, "ObjectiveService_CreateObjective");
+    let by = |f: &str| plan.inputs.iter().find(|i| i.flag == f).unwrap();
+    assert!(matches!(by("secret").kind, InputKind::ShorthandList { .. }));
+    assert!(by("secret").pair_form.is_some());
+    assert!(matches!(
+        by("memory-cascade").kind,
+        InputKind::ShorthandList { .. }
+    ));
+    assert!(matches!(
+        by("system-prompt-data").kind,
+        InputKind::EntryDoc(_)
+    ));
+    assert!(matches!(by("pinned-parameter").kind, InputKind::KvMap(_)));
+}
+
+#[test]
+fn update_bodies_carry_a_derivable_mask() {
+    let api = api();
+    let update = api
+        .resources
+        .iter()
+        .flat_map(|r| r.operations.iter())
+        .find(|o| o.id == "ToolService_UpdateToolSet")
+        .unwrap();
+    assert_eq!(update.update_mask.as_deref(), Some("updateMask"));
 }

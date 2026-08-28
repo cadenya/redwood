@@ -1,13 +1,16 @@
 //! CLI backend: a urfave/cli v3 command tree over the generated Go SDK.
-//! `<binary> <resource> <method> [own-id] [--flags]` — scalar params are typed
-//! flags, struct/union/map params take JSON strings, responses print as JSON.
+//! `<binary> <resource> <method> [own-id] [--flags]` — every scalar leaf of a
+//! request body is a typed flag (see `ir::plan`), subtrees also take
+//! YAML/JSON documents, and responses print as JSON, YAML, or tables.
 
 use std::fmt::Write as _;
 
 use heck::ToKebabCase;
 
+use crate::backends::cli_inputs::{self, Plans};
 use crate::backends::{Backend, FileSet};
 use crate::config::{CliAuthConfig, CliConfig};
+use crate::ir::plan::InputKind;
 use crate::ir::*;
 
 pub struct CliBackend {
@@ -39,6 +42,9 @@ impl Backend for CliBackend {
             }
         }
         let display = (default_mode, &self.config.display);
+        // Body plans: naming collisions and unused renames fail here, with
+        // the operation named, before any file is emitted.
+        let plans = cli_inputs::plan_all(api, &self.config)?;
         let module = self.module_path(api);
         let sdk_module = self.sdk_module(api);
         let binary = self.binary_name(api);
@@ -52,7 +58,9 @@ impl Backend for CliBackend {
             emit_main(api, &sdk_module, &binary, &self.config),
         );
         files.insert("helpers.go".into(), emit_helpers(api, &sdk_module));
-        files.insert("schemas.go".into(), emit_schemas(api, &binary));
+        files.insert("body.go".into(), RT_BODY.to_string());
+        files.insert("body_test.go".into(), RT_BODY_TEST.to_string());
+        files.insert("schemas.go".into(), emit_schemas(api, &binary, &plans));
         if let Some(auth) = &self.config.auth {
             validate_auth_config(api, auth)?;
             files.insert("auth.go".into(), emit_auth(api, &binary, auth));
@@ -66,13 +74,13 @@ impl Backend for CliBackend {
         for resource in &api.resources {
             files.insert(
                 format!("cmd_{}.go", resource.ident),
-                emit_resource_command(api, resource, &sdk_module, &display),
+                emit_resource_command(api, resource, &sdk_module, &display, &plans),
             );
         }
-        files.insert("api.md".into(), emit_api_md(api, &binary));
+        files.insert("api.md".into(), emit_api_md(api, &binary, &plans));
         files.insert(
             "README.md".into(),
-            emit_readme(api, &binary, &module, &self.config),
+            emit_readme(api, &binary, &module, &self.config, &plans),
         );
         Ok(files)
     }
@@ -81,9 +89,9 @@ impl Backend for CliBackend {
 // ---- docs --------------------------------------------------------------------
 
 /// Command-grammar reference: subcommand path, positional, and flags.
-fn emit_api_md(api: &Api, binary: &str) -> String {
+fn emit_api_md(api: &Api, binary: &str, plans: &Plans) -> String {
     let mut out = format!(
-        "# {binary} CLI reference\n\nJSON-valued flags accept a literal document, `@file`, or `-` (stdin; at most ONE flag per invocation may use it). See README.md for usage patterns.\n"
+        "# {binary} CLI reference\n\nRequest bodies are built from typed flags; any subtree also takes a YAML/JSON document (`@file`, `-` for stdin, or a literal; at most ONE input per invocation may read stdin) and `-f <doc>` supplies the whole body. Document flags are listed under `schema <command>`. See README.md for usage patterns.\n"
     );
     for resource in &api.resources {
         let cmd_path: String = resource
@@ -110,16 +118,8 @@ fn emit_api_md(api: &Api, binary: &str) -> String {
                 )
                 .unwrap();
             }
-            for f in &op.body_fields {
-                write!(
-                    line,
-                    " {}",
-                    flag_grammar(api, &f.wire_name, &f.ty, f.required)
-                )
-                .unwrap();
-            }
-            if op.whole_body.is_some() {
-                write!(line, " {}", body_grammar(api, op)).unwrap();
+            if let Some(plan) = plans.get(&op.id) {
+                write!(line, " {}", cli_inputs::body_grammar(plan)).unwrap();
             }
             if matches!((&op.pagination, &op.response), (None, ResponseKind::Sse(_))) {
                 write!(line, " [--last-event-id <id>]").unwrap();
@@ -153,33 +153,7 @@ fn flag_grammar(api: &Api, wire_name: &str, ty: &Ty, required: bool) -> String {
     }
 }
 
-/// Grammar for a whole request body: a discriminated union is a choice of
-/// mutually exclusive inputs, `(--a <value> | --b <JSON>)`; anything else is
-/// the opaque `--body <JSON>` document.
-fn body_grammar(api: &Api, op: &Operation) -> String {
-    match api.body_choices(op) {
-        Some(choices) => {
-            let arms: Vec<String> = choices
-                .iter()
-                .map(|c| flag_grammar(api, &c.wire_name, &c.ty, true))
-                .collect();
-            format!("({})", arms.join(" | "))
-        }
-        None => "--body <JSON>".to_string(),
-    }
-}
-
-/// `--a, --b, --c` for a body choice — the wording every exclusivity
-/// message and help line shares.
-fn choice_flag_list(choices: &[BodyChoice]) -> String {
-    choices
-        .iter()
-        .map(|c| format!("--{}", flag_name(&c.wire_name)))
-        .collect::<Vec<_>>()
-        .join(", ")
-}
-
-fn emit_readme(api: &Api, binary: &str, module: &str, config: &CliConfig) -> String {
+fn emit_readme(api: &Api, binary: &str, module: &str, config: &CliConfig, plans: &Plans) -> String {
     let name = &api.name;
     // Every example below is derived STRUCTURALLY from the IR - the
     // generator knows nothing about any particular schema.
@@ -215,29 +189,38 @@ fn emit_readme(api: &Api, binary: &str, module: &str, config: &CliConfig) -> Str
             )
         })
         .unwrap_or_else(|| "<resource> retrieve <id>".to_string());
-    let create_cmd = crate::backends::doc_example_op(api)
-        .map(|(r, o)| {
-            let flags: Vec<String> = o
-                .body_fields
-                .iter()
-                .filter(|f| f.required)
-                .take(2)
-                .map(|f| {
-                    format!(
-                        "--{} @{}.json",
-                        flag_name(&f.wire_name),
-                        flag_name(&f.wire_name)
-                    )
-                })
-                .collect();
-            format!(
-                "{} {} {}",
-                cmd_path(r),
-                command_name(&o.name),
-                flags.join(" ")
-            )
-        })
-        .unwrap_or_else(|| "<resource> create --spec @spec.json".to_string());
+    // The create example drives required scalar leaves from the plan; the
+    // same command with `-f` shows the document route.
+    let example = crate::backends::doc_example_op(api).map(|(r, o)| {
+        let leaves: Vec<String> = plans
+            .get(&o.id)
+            .map(|plan| {
+                plan.inputs
+                    .iter()
+                    .filter(|i| i.required && matches!(i.kind, InputKind::Leaf(_)))
+                    .take(3)
+                    .map(|i| format!("--{} <{}>", i.flag, i.flag))
+                    .collect()
+            })
+            .unwrap_or_default();
+        (format!("{} {}", cmd_path(r), command_name(&o.name)), leaves)
+    });
+    let create_cmd = match &example {
+        Some((cmd, leaves)) if !leaves.is_empty() => format!("{cmd} {}", leaves.join(" ")),
+        Some((cmd, _)) => format!("{cmd} -f body.yml"),
+        None => "<resource> create --name <name>".to_string(),
+    };
+    let create_file_cmd = match &example {
+        Some((cmd, _)) => format!("{cmd} -f body.yml"),
+        None => "<resource> create -f body.yml".to_string(),
+    };
+    let dry_run_cmd = match &example {
+        Some((cmd, leaves)) if !leaves.is_empty() => {
+            format!("{cmd} {} --dry-run > body.yml", leaves.join(" "))
+        }
+        Some((cmd, _)) => format!("{cmd} -f body.yml --dry-run"),
+        None => "<resource> create --name <name> --dry-run > body.yml".to_string(),
+    };
     let bool_flag = ops()
         .flat_map(|(_, o)| o.query_params.iter())
         .find(|q| matches!(classify(api, &q.ty), FlagKind::Bool))
@@ -415,11 +398,11 @@ Responses print as indented JSON. List commands print one page plus
 
 ## Discovering command schemas
 
-`{binary} schema` lists every command as one JSON object per line, and
-`{binary} schema {list_cmd}` prints that command's invocation contract:
-positional arguments, typed flags (enum values inline), and a full JSON
-Schema — `$defs` included — for every JSON-valued flag. Built for coding
-assistants and scripts that need to construct requests without guessing.
+`{binary} schema` lists every command, and `{binary} schema {list_cmd}`
+prints that command's invocation contract: positional arguments, every
+flag with its wire path and enum values, and a JSON Schema — `$defs`
+included — for every document input. Built for coding assistants and
+scripts that need to construct requests without guessing.
 
 ## Flag forms
 
@@ -428,26 +411,57 @@ Boolean flags take no space-separated value: `--{bool_flag}` enables,
 usage error — `false` would parse as a positional argument).
 
 Repeatable flags (shown as `[--flag <value>]...` in the reference) take
-one value per occurrence; comma splitting is disabled so values — JSON
-documents especially — may contain commas:
+one value per occurrence; comma splitting is disabled so values may
+contain commas:
 
 ```sh
 {binary} {repeat_cmd} --{repeat_flag} a --{repeat_flag} b
 ```
 
-## JSON and secret input
+Enum flags accept a short form (the value without its shared prefix,
+lowercase) as well as the wire value; `--help` lists the short forms.
 
-Every JSON-valued flag accepts a literal document, `@path/to/file.json`,
-or `-` to read stdin (`-` may be used by AT MOST ONE JSON argument per
-invocation — stdin is a single document). Keep secrets out of shell
-history. Repeatable JSON flags take one document per occurrence:
+## Request bodies
+
+Every scalar field of a request body is a flag, named by its path with
+the `metadata`/`spec` envelopes dropped. String maps are repeatable
+`KEY=VALUE` flags, scalar lists repeat a value, and a discriminated
+union collapses onto its arms: `--<arm>-<field>` flags select the arm,
+so the tag flag is only needed when none of the arm's fields are set.
 
 ```sh
 {binary} {create_cmd}
 ```
 
-A repeatable JSON flag (shown `[--flag <JSON>]...` in the reference)
-takes one document per occurrence.
+Three input sources layer, deepest wins — a whole-body file, a document
+for one subtree, and individual flags:
+
+```sh
+{binary} {create_file_cmd}                     # YAML or JSON, @path or - for stdin
+{binary} {create_file_cmd} --name staging      # a flag overrides the file
+```
+
+Document inputs (`<doc>` in the reference) take a YAML/JSON literal,
+`@path`, or `-` for stdin (at most one input per invocation reads stdin —
+plain string flags accept `@path`/`-` too, so secrets stay out of shell
+history; write `@@` for a literal leading `@`). Fields the request does not
+accept — `id`, timestamps, state from a pasted `get` — are dropped with a
+warning (`--strict` makes that an error), so `get --display yaml`, edit,
+`update -f` round-trips. Enum values inside documents accept short forms.
+
+Flat list items take `key=value,...` shorthand (`{{name, value}}` items
+also accept `NAME=VALUE`); untyped maps take `KEY=VALUE` for strings and
+`KEY:=JSON` for typed values. Anything deeper is a document.
+
+`--dry-run` prints the assembled body instead of sending it — the fastest
+way to learn the file format is to build with flags once and keep it:
+
+```sh
+{binary} {dry_run_cmd}
+```
+
+Partial updates derive their field mask from the flags and documents
+supplied; pass the mask flag explicitly to override.
 
 ## Streaming
 
@@ -464,8 +478,8 @@ cleanly. Ordinary single-response commands keep indented JSON.
 
 ## Display modes
 
-`--display json|table|extended` (root or per-command; json is ALWAYS the
-default so scripts stay stable). `table` renders the configured columns via
+`--display json|yaml|table|extended` (root or per-command). `yaml` prints
+the same document as YAML (handy with `update -f`). `table` renders the configured columns via
 aligned text for objects and list pages — a page shows only the current
 page, with the next cursor reported on stderr so stdout rows stay clean.
 `extended` prints the same columns as psql-style vertical records. Missing
@@ -547,9 +561,12 @@ fn validate_display_config(
     config: &crate::config::CliDisplayConfig,
 ) -> anyhow::Result<String> {
     let default_mode = config.default.clone().unwrap_or_else(|| "json".into());
-    if !matches!(default_mode.as_str(), "json" | "table" | "extended") {
+    if !matches!(
+        default_mode.as_str(),
+        "json" | "yaml" | "table" | "extended"
+    ) {
         anyhow::bail!(
-            "[lang.cli.display] default must be json, table, or extended (got {default_mode:?})"
+            "[lang.cli.display] default must be json, yaml, table, or extended (got {default_mode:?})"
         );
     }
     validate_columns("[lang.cli.display]", &config.columns)?;
@@ -819,8 +836,10 @@ fn emit_go_mod(module: &str, sdk_module: &str, config: &CliConfig) -> String {
     } else {
         ""
     };
+    // YAML for document inputs and `--display yaml` (JSON semantics: a
+    // YAML document converts to the JSON the API receives).
     let mut out = format!(
-        "module {module}\n\ngo 1.22\n\nrequire (\n\tgithub.com/urfave/cli/v3 v3.3.8{toml_dep}\n\t{sdk_module} v0.0.0\n)\n\nrequire github.com/tmaxmax/go-sse v0.11.0 // indirect\n"
+        "module {module}\n\ngo 1.22\n\nrequire (\n\tgithub.com/urfave/cli/v3 v3.3.8{toml_dep}\n\tsigs.k8s.io/yaml v1.6.0\n\t{sdk_module} v0.0.0\n)\n\nrequire github.com/tmaxmax/go-sse v0.11.0 // indirect\n"
     );
     if let Some(replace) = &config.sdk_replace {
         write!(out, "\nreplace {sdk_module} => {replace}\n").unwrap();
@@ -836,91 +855,11 @@ fn emit_go_mod(module: &str, sdk_module: &str, config: &CliConfig) -> String {
 /// ($refs name the sibling types directly — no JSON-pointer noise). Built
 /// for coding assistants: `<binary> schema widgets create` answers "what
 /// does this command take" in prose a human can also skim.
-fn emit_schemas(api: &Api, binary: &str) -> String {
+fn emit_schemas(api: &Api, binary: &str, plans: &Plans) -> String {
     use indexmap::IndexMap;
-    use serde_json::{json, Map, Value};
+    use serde_json::Value;
 
-    // Ty -> JSON Schema (request direction). Named types land in `defs`
-    // (insertion-ordered = discovery order) and are referenced by BARE NAME.
-    fn ty_schema(api: &Api, ty: &Ty, defs: &mut IndexMap<String, Value>) -> Value {
-        match ty {
-            Ty::String => json!({"type": "string"}),
-            Ty::Bool => json!({"type": "boolean"}),
-            Ty::Int32 | Ty::Int64 => json!({"type": "integer"}),
-            Ty::Float | Ty::Double => json!({"type": "number"}),
-            Ty::Timestamp => json!({"type": "string", "format": "date-time"}),
-            Ty::Bytes => json!({"type": "string", "format": "byte"}),
-            Ty::Json => json!({}),
-            Ty::Literal(v) => json!({"const": v}),
-            Ty::List(inner) => json!({"type": "array", "items": ty_schema(api, inner, defs)}),
-            Ty::Map(inner) => {
-                json!({"type": "object", "additionalProperties": ty_schema(api, inner, defs)})
-            }
-            Ty::Named(name) => {
-                if !defs.contains_key(name) {
-                    // Reserve the slot first: self-referential types must
-                    // find their own name present and stop recursing.
-                    defs.insert(name.clone(), Value::Null);
-                    let schema = match api.types.get(name) {
-                        Some(decl) => decl_schema(api, &decl.shape, defs),
-                        None => json!({}),
-                    };
-                    defs.insert(name.clone(), schema);
-                }
-                json!({"$ref": name})
-            }
-        }
-    }
-
-    fn decl_schema(api: &Api, shape: &Shape, defs: &mut IndexMap<String, Value>) -> Value {
-        match shape {
-            Shape::Struct(st) => {
-                let mut properties = Map::new();
-                let mut required = Vec::new();
-                // Request direction: readOnly fields are server-owned and
-                // never accepted as input.
-                for f in st.input_fields() {
-                    let mut s = ty_schema(api, &f.ty, defs);
-                    if let (Some(desc), Some(obj)) = (&f.description, s.as_object_mut()) {
-                        obj.entry("description")
-                            .or_insert_with(|| Value::String(desc.clone()));
-                    }
-                    if f.required {
-                        required.push(Value::String(f.wire_name.clone()));
-                    }
-                    properties.insert(f.wire_name.clone(), s);
-                }
-                let mut obj = Map::new();
-                obj.insert("type".into(), json!("object"));
-                obj.insert("properties".into(), Value::Object(properties));
-                if !required.is_empty() {
-                    obj.insert("required".into(), Value::Array(required));
-                }
-                if let Some(additional) = &st.additional {
-                    obj.insert(
-                        "additionalProperties".into(),
-                        ty_schema(api, additional, defs),
-                    );
-                }
-                Value::Object(obj)
-            }
-            Shape::Enum(e) => json!({"type": "string", "enum": e.values}),
-            Shape::Union(u) => {
-                let variants: Vec<Value> = u
-                    .variants
-                    .iter()
-                    .map(|v| ty_schema(api, &v.ty, defs))
-                    .collect();
-                let mut obj = Map::new();
-                obj.insert("oneOf".into(), Value::Array(variants));
-                if let Some(d) = &u.discriminator {
-                    obj.insert("discriminator".into(), json!({"propertyName": d.property}));
-                }
-                Value::Object(obj)
-            }
-            Shape::Alias(inner) => ty_schema(api, inner, defs),
-        }
-    }
+    use cli_inputs::ty_schema;
 
     // One flag bullet: grammar, requiredness, description, enum values or a
     // pointer at the Types section.
@@ -1015,16 +954,9 @@ fn emit_schemas(api: &Api, binary: &str) -> String {
                 )
                 .unwrap();
             }
-            for f in &op.body_fields {
-                write!(
-                    line,
-                    " {}",
-                    flag_grammar(api, &f.wire_name, &f.ty, f.required)
-                )
-                .unwrap();
-            }
-            if op.whole_body.is_some() {
-                write!(line, " {}", body_grammar(api, op)).unwrap();
+            let plan = plans.get(&op.id);
+            if let Some(plan) = plan {
+                write!(line, " {}", cli_inputs::body_grammar(plan)).unwrap();
             }
             if matches!((&op.pagination, &op.response), (None, ResponseKind::Sse(_))) {
                 write!(line, " [--last-event-id <id>]").unwrap();
@@ -1060,44 +992,8 @@ fn emit_schemas(api: &Api, binary: &str) -> String {
                     &mut inline_schemas,
                 ));
             }
-            for f in &op.body_fields {
-                flag_bullets.push(flag_bullet(
-                    api,
-                    &f.wire_name,
-                    &f.ty,
-                    f.required,
-                    f.description.as_deref(),
-                    &mut defs,
-                    &mut inline_schemas,
-                ));
-            }
-            if let Some(body) = &op.whole_body {
-                match api.body_choices(op) {
-                    Some(choices) => {
-                        let list = choice_flag_list(&choices);
-                        for c in &choices {
-                            let desc = choice_description(c, &list);
-                            flag_bullets.push(flag_bullet(
-                                api,
-                                &c.wire_name,
-                                &c.ty,
-                                false,
-                                Some(&desc),
-                                &mut defs,
-                                &mut inline_schemas,
-                            ));
-                        }
-                    }
-                    None => flag_bullets.push(flag_bullet(
-                        api,
-                        "body",
-                        body,
-                        true,
-                        Some("The full request body."),
-                        &mut defs,
-                        &mut inline_schemas,
-                    )),
-                }
+            if let Some(plan) = plan {
+                flag_bullets.extend(cli_inputs::flag_bullets(api, plan, &mut defs));
             }
             if !flag_bullets.is_empty() {
                 doc.push_str("\n## Flags\n\n");
@@ -1106,7 +1002,7 @@ fn emit_schemas(api: &Api, binary: &str) -> String {
                     doc.push('\n');
                 }
                 doc.push_str(
-                    "\nJSON-valued flags accept a literal document, `@file`, or `-` (stdin; one flag per invocation). Repeatable flags take one value per occurrence.\n",
+                    "\nDocument inputs (`<doc>`) accept a YAML or JSON literal, `@path`, or `-` (stdin; one input per invocation). Sources layer file < document < flag, deeper wins. Repeatable flags take one value per occurrence. Enum values accept the short forms listed.\n",
                 );
             }
 
@@ -1183,7 +1079,7 @@ func schemaCommand() *cli.Command {
 }
 
 /// Escape a string as a double-quoted Go string literal.
-fn go_quote(s: &str) -> String {
+pub(crate) fn go_quote(s: &str) -> String {
     let mut out = String::with_capacity(s.len() + 2);
     out.push('"');
     for c in s.chars() {
@@ -2013,7 +1909,7 @@ func main() {{
 		// Slice flags carry JSON documents; never split values on commas.
 		DisableSliceFlagSeparator: true,
 		Flags: []cli.Flag{{
-			&cli.StringFlag{{Name: "display", Usage: "Output mode for ordinary commands (one of: json, table, extended); command-local --display overrides"}},
+			&cli.StringFlag{{Name: "display", Usage: "Output mode for ordinary commands (one of: json, yaml, table, extended); command-local --display overrides"}},
 {api_key_flag}{profile_flag}			&cli.StringFlag{{Name: "base-url", Usage: "API base URL"}},
 			&cli.BoolFlag{{Name: "debug", Sources: cli.EnvVars("{debug_env}"), Usage: "Dump every HTTP exchange (redacted credentials) to stderr"}},
 {client_param_flags}		}},
@@ -2186,312 +2082,12 @@ fn lower_camel(snake: &str) -> String {
 
 // ---- helpers.go ----------------------------------------------------------------
 
+const RT_HELPERS: &str = include_str!("../../runtime/cli/helpers.go");
+const RT_BODY: &str = include_str!("../../runtime/cli/body.go");
+const RT_BODY_TEST: &str = include_str!("../../runtime/cli/body_test.go");
+
 fn emit_helpers(_api: &Api, _sdk_module: &str) -> String {
-    r#"// Code generated by redwood. DO NOT EDIT.
-package main
-
-import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"os"
-	"strings"
-	"text/tabwriter"
-
-	cli "github.com/urfave/cli/v3"
-)
-
-// addAlias clones the command at path onto the root under a new name, so a
-// deeply nested command gains a top-level spelling. A shallow clone shares
-// the target's flags and action; the path is validated at generation time,
-// so a miss here is impossible short of hand-editing — degrade silently.
-func addAlias(root *cli.Command, name string, path ...string) {
-	cmds := root.Commands
-	var target *cli.Command
-	for _, seg := range path {
-		target = nil
-		for _, c := range cmds {
-			if c.Name == seg {
-				target = c
-				break
-			}
-		}
-		if target == nil {
-			return
-		}
-		cmds = target.Commands
-	}
-	clone := *target
-	clone.Name = name
-	root.Commands = append(root.Commands, &clone)
-}
-
-// printJSON writes v to stdout as indented JSON (single-response commands).
-func printJSON(v any) error {
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	return enc.Encode(v)
-}
-
-// printJSONLine writes v to stdout as one compact JSON document per line
-// (NDJSON). Streaming commands use this so every line parses independently —
-// an unbounded stream never forms a single JSON document, and consumers
-// (jq -c, line readers) must not need an incremental JSON framer.
-func printJSONLine(v any) error {
-	return json.NewEncoder(os.Stdout).Encode(v)
-}
-
-// displayColumn is one statically-resolved table/extended column: header
-// plus JSON WIRE path segments into the response projection. truncate > 0
-// caps the TABLE cell width (runes); extended output is never cut.
-type displayColumn struct {
-	header   string
-	path     []string
-	truncate int
-}
-
-// displayMode resolves the effective mode: command-local flag, then the
-// root flag, then the configured default.
-func displayMode(cmd *cli.Command, def string) string {
-	if cmd.IsSet("display") {
-		return cmd.String("display")
-	}
-	if v := cmd.Root().String("display"); v != "" {
-		return v
-	}
-	return def
-}
-
-// lookupPath traverses dot-separated object keys through a decoded JSON
-// value. Reported ok=false for any missing segment or non-object step.
-func lookupPath(value any, path []string) (any, bool) {
-	current := value
-	for _, key := range path {
-		obj, isObj := current.(map[string]any)
-		if !isObj {
-			return nil, false
-		}
-		next, present := obj[key]
-		if !present {
-			return nil, false
-		}
-		current = next
-	}
-	return current, true
-}
-
-// truncateCell caps a rendered cell at width runes, marking the cut with an
-// ellipsis; width <= 0 leaves it untouched.
-func truncateCell(text string, width int) string {
-	if width <= 0 {
-		return text
-	}
-	runes := []rune(text)
-	if len(runes) <= width {
-		return text
-	}
-	if width == 1 {
-		return "…"
-	}
-	return string(runes[:width-1]) + "…"
-}
-
-// renderCell prints scalars plainly, missing/null as "-", composites as
-// compact JSON, and makes embedded newlines/tabs visible so one value
-// cannot corrupt table structure. Values are never truncated here — the
-// table renderer applies a column's truncate width, extended never does.
-func renderCell(v any, ok bool) string {
-	if !ok || v == nil {
-		return "-"
-	}
-	var text string
-	switch tv := v.(type) {
-	case string:
-		text = tv
-	case bool, float64, json.Number:
-		text = fmt.Sprintf("%v", tv)
-	default:
-		raw, err := json.Marshal(tv)
-		if err != nil {
-			return "-"
-		}
-		text = string(raw)
-	}
-	text = strings.ReplaceAll(text, "\t", "\\t")
-	text = strings.ReplaceAll(text, "\r", "\\r")
-	return strings.ReplaceAll(text, "\n", "\\n")
-}
-
-// renderDisplay is the single output dispatcher for ordinary commands:
-// json preserves the existing machine contract byte-for-byte; table and
-// extended render the configured columns from a JSON projection of the
-// response. Paginated tables render only the current page and report a
-// next cursor on stderr so stdout rows stay clean.
-func renderDisplay(mode string, columns []displayColumn, isPage bool, v any) error {
-	if mode == "json" || mode == "" {
-		return printJSON(v)
-	}
-	raw, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-	var projected any
-	if err := json.Unmarshal(raw, &projected); err != nil {
-		return err
-	}
-	rows := []any{projected}
-	if isPage {
-		obj, _ := projected.(map[string]any)
-		items, _ := obj["items"].([]any)
-		rows = items
-		if cursor, _ := obj["nextCursor"].(string); cursor != "" {
-			fmt.Fprintf(os.Stderr, "next cursor: %s\n", cursor)
-		}
-	}
-	if mode == "table" {
-		w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-		headers := make([]string, len(columns))
-		for i, c := range columns {
-			headers[i] = c.header
-		}
-		fmt.Fprintln(w, strings.Join(headers, "\t"))
-		for _, row := range rows {
-			cells := make([]string, len(columns))
-			for i, c := range columns {
-				value, present := lookupPath(row, c.path)
-				cells[i] = truncateCell(renderCell(value, present), c.truncate)
-			}
-			fmt.Fprintln(w, strings.Join(cells, "\t"))
-		}
-		return w.Flush()
-	}
-	// extended: psql-style vertical records with the SAME columns.
-	width := 0
-	for _, c := range columns {
-		if len(c.header) > width {
-			width = len(c.header)
-		}
-	}
-	for i, row := range rows {
-		fmt.Fprintf(os.Stdout, "-[ RECORD %d ]-\n", i+1)
-		for _, c := range columns {
-			value, present := lookupPath(row, c.path)
-			fmt.Fprintf(os.Stdout, "%-*s | %s\n", width, c.header, renderCell(value, present))
-		}
-	}
-	return nil
-}
-
-// isOneOf reports whether value is one of the declared enum choices
-// (exact, case-sensitive — wire values are canonical).
-func isOneOf(value string, choices []string) bool {
-	for _, c := range choices {
-		if value == c {
-			return true
-		}
-	}
-	return false
-}
-
-// stdinBudget enforces the '-' contract BEFORE any read: stdin can supply
-// at most one JSON document per invocation (a second '-' would otherwise
-// see drained input), and a doomed command must not block on stdin.
-func stdinBudget(raws []string) error {
-	count := 0
-	for _, raw := range raws {
-		if raw == "-" {
-			count++
-		}
-	}
-	if count > 1 {
-		return fmt.Errorf("'-' (stdin) may supply at most one JSON argument per command; use @file or literal JSON for the others")
-	}
-	return nil
-}
-
-// resolveInput expands a JSON flag value: "@path" reads the file, "-" reads
-// stdin (at most one flag per invocation), anything else is the literal
-// document. Files and stdin keep secrets and large payloads out of shell
-// history and process listings.
-func resolveInput(raw string) (string, error) {
-	switch {
-	case raw == "-":
-		data, err := io.ReadAll(os.Stdin)
-		if err != nil {
-			return "", fmt.Errorf("reading stdin: %w", err)
-		}
-		return strings.TrimSpace(string(data)), nil
-	case strings.HasPrefix(raw, "@"):
-		data, err := os.ReadFile(raw[1:])
-		if err != nil {
-			return "", err
-		}
-		return strings.TrimSpace(string(data)), nil
-	default:
-		return raw, nil
-	}
-}
-
-// decodeParams round-trips the collected flag values through JSON into the
-// SDK's typed params struct.
-func decodeParams(values map[string]any, target any) error {
-	raw, err := json.Marshal(values)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(raw, target); err != nil {
-		return fmt.Errorf("invalid parameters: %w", err)
-	}
-	return nil
-}
-
-// jsonArg parses a --flag JSON document (literal, @file, or - for stdin),
-// failing with the flag name.
-func jsonArg(name, raw string) (json.RawMessage, error) {
-	resolved, err := resolveInput(raw)
-	if err != nil {
-		return nil, fmt.Errorf("--%s: %w", name, err)
-	}
-	if !json.Valid([]byte(resolved)) {
-		return nil, fmt.Errorf("--%s: invalid JSON", name)
-	}
-	// A structured flag holds an object/array/value, never null: for a
-	// required flag null cannot satisfy presence, and for an optional one it
-	// would silently decode into a nil field and vanish from the request.
-	if resolved == "null" {
-		return nil, fmt.Errorf("--%s: null is not a valid value; omit the flag instead", name)
-	}
-	return json.RawMessage(resolved), nil
-}
-
-// jsonObjectArg parses a --flag JSON document that must be an object (a
-// union arm the generator stamps with its discriminator tag).
-func jsonObjectArg(name, raw string) (map[string]any, error) {
-	doc, err := jsonArg(name, raw)
-	if err != nil {
-		return nil, err
-	}
-	var obj map[string]any
-	if err := json.Unmarshal(doc, &obj); err != nil || obj == nil {
-		return nil, fmt.Errorf("--%s: expected a JSON object", name)
-	}
-	return obj, nil
-}
-
-// jsonSliceArg parses repeated --flag JSON documents.
-func jsonSliceArg(name string, raws []string) ([]json.RawMessage, error) {
-	out := make([]json.RawMessage, 0, len(raws))
-	for _, raw := range raws {
-		msg, err := jsonArg(name, raw)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, msg)
-	}
-	return out, nil
-}
-"#
-    .to_string()
+    RT_HELPERS.to_string()
 }
 
 // ---- per-resource command files -------------------------------------------------
@@ -2501,14 +2097,13 @@ fn emit_resource_command(
     resource: &Resource,
     sdk_module: &str,
     display: &(String, &crate::config::CliDisplayConfig),
+    plans: &Plans,
 ) -> String {
     // Every op command uses fmt for its argument-cardinality usage errors;
     // positional ops also trim-check the ID.
     let needs_fmt = !resource.operations.is_empty();
     let needs_strings = resource.operations.iter().any(|op| {
         !op.positionals.is_empty()
-            || op.whole_body.is_some()
-            || op.body_fields.iter().any(|f| f.required)
             || op
                 .path_params
                 .iter()
@@ -2528,6 +2123,16 @@ fn emit_resource_command(
     let mut out = format!(
         "// Code generated by redwood. DO NOT EDIT.\npackage main\n\nimport (\n\t\"context\"\n{fmt_import}{strings_import}\n\t\"github.com/urfave/cli/v3\"\n{sdk_import})\n\n",
     );
+    // Embedded request schemas: what documents are checked against.
+    for op in &resource.operations {
+        if plans.contains_key(&op.id) {
+            out.push_str(&cli_inputs::emit_schema_const(
+                &cli_inputs::schema_const_name(resource, op),
+                &cli_inputs::request_schema_json(api, op),
+            ));
+            out.push('\n');
+        }
+    }
     let func = lower_camel(&resource.ident);
     writeln!(out, "func {func}Command() *cli.Command {{").unwrap();
     writeln!(out, "\treturn &cli.Command{{").unwrap();
@@ -2540,7 +2145,7 @@ fn emit_resource_command(
     }
     writeln!(out, "\t\tCommands: []*cli.Command{{").unwrap();
     for op in &resource.operations {
-        emit_op_command(api, resource, op, display, &mut out);
+        emit_op_command(api, resource, op, display, plans.get(&op.id), &mut out);
     }
     // Nested resources become subcommand groups.
     for child in api
@@ -2557,7 +2162,7 @@ fn emit_resource_command(
 
 /// Collapse a multi-line description into one help line: whole sentences,
 /// never cut mid-line, capped at a word boundary.
-fn first_line(text: &str) -> String {
+pub(crate) fn first_line(text: &str) -> String {
     let collapsed = text.split_whitespace().collect::<Vec<_>>().join(" ");
     if collapsed.len() <= 160 {
         return collapsed;
@@ -2566,7 +2171,7 @@ fn first_line(text: &str) -> String {
     format!("{}…", &collapsed[..cut])
 }
 
-fn escape_go(text: &str) -> String {
+pub(crate) fn escape_go(text: &str) -> String {
     text.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
@@ -2579,6 +2184,7 @@ fn emit_op_command(
     resource: &Resource,
     op: &Operation,
     display: &(String, &crate::config::CliDisplayConfig),
+    plan: Option<&crate::ir::plan::BodyPlan>,
     out: &mut String,
 ) {
     writeln!(out, "\t\t\t{{").unwrap();
@@ -2613,7 +2219,7 @@ fn emit_op_command(
         writeln!(out, "\t\t\t\tFlags: []cli.Flag{{").unwrap();
         writeln!(
             out,
-            "\t\t\t\t\t&cli.StringFlag{{Name: \"display\", Usage: \"Output mode (one of: json, table, extended)\"}},"
+            "\t\t\t\t\t&cli.StringFlag{{Name: \"display\", Usage: \"Output mode (one of: json, yaml, table, extended)\"}},"
         )
         .unwrap();
         for (p, required) in &flag_specs {
@@ -2626,27 +2232,8 @@ fn emit_op_command(
                 out,
             );
         }
-        for f in &op.body_fields {
-            emit_flag(
-                api,
-                &f.wire_name,
-                &f.ty,
-                f.required,
-                f.description.as_deref(),
-                out,
-            );
-        }
-        if let Some(ty) = &op.whole_body {
-            match api.body_choices(op) {
-                Some(choices) => {
-                    let list = choice_flag_list(&choices);
-                    for c in &choices {
-                        let desc = choice_description(c, &list);
-                        emit_flag(api, &c.wire_name, &c.ty, false, Some(&desc), out);
-                    }
-                }
-                None => emit_flag(api, "body", ty, true, Some("The entire request body"), out),
-            }
+        if let Some(plan) = plan {
+            cli_inputs::emit_flags(plan, out);
         }
         if is_stream {
             writeln!(
@@ -2722,6 +2309,11 @@ fn emit_op_command(
         } else {
             default_mode
         };
+        let dry_guard = if plan.is_some() {
+            " && !cmd.Bool(\"dry-run\")"
+        } else {
+            ""
+        };
         writeln!(
             out,
             "\t\t\t\t\t_display := displayMode(cmd, \"{op_default}\")"
@@ -2729,7 +2321,7 @@ fn emit_op_command(
         .unwrap();
         writeln!(
             out,
-            "\t\t\t\t\tif !isOneOf(_display, []string{{\"json\", \"table\", \"extended\"}}) {{\n\t\t\t\t\t\treturn cli.Exit(fmt.Sprintf(\"--display: invalid value %q (valid: json, table, extended)\", _display), 2)\n\t\t\t\t\t}}"
+            "\t\t\t\t\tif !isOneOf(_display, []string{{\"json\", \"yaml\", \"table\", \"extended\"}}) {{\n\t\t\t\t\t\treturn cli.Exit(fmt.Sprintf(\"--display: invalid value %q (valid: json, yaml, table, extended)\", _display), 2)\n\t\t\t\t\t}}"
         )
         .unwrap();
         if is_stream_op {
@@ -2740,15 +2332,16 @@ fn emit_op_command(
             .unwrap();
         } else if model.is_none() {
             // Void ops: no payload to render; only json (a no-op) allowed.
+            // A dry run prints the body, which any mode can show.
             writeln!(
                 out,
-                "\t\t\t\t\tif _display != \"json\" {{\n\t\t\t\t\t\treturn cli.Exit(\"this command has no displayable response; use --display json\", 2)\n\t\t\t\t\t}}"
+                "\t\t\t\t\tif _display != \"json\" && _display != \"yaml\"{dry_guard} {{\n\t\t\t\t\t\treturn cli.Exit(\"this command has no displayable response; use --display json\", 2)\n\t\t\t\t\t}}"
             )
             .unwrap();
         } else if applicable.is_empty() {
             writeln!(
                 out,
-                "\t\t\t\t\tif _display != \"json\" {{\n\t\t\t\t\t\treturn cli.Exit(\"no display columns apply to this command; use --display json\", 2)\n\t\t\t\t\t}}"
+                "\t\t\t\t\tif _display != \"json\" && _display != \"yaml\"{dry_guard} {{\n\t\t\t\t\t\treturn cli.Exit(\"no display columns apply to this command; use --display json or yaml\", 2)\n\t\t\t\t\t}}"
             )
             .unwrap();
             writeln!(out, "\t\t\t\t\t_columns := []displayColumn(nil)").unwrap();
@@ -2793,39 +2386,8 @@ fn emit_op_command(
                 required_flags.push(flag_name(&p.wire_name));
             }
         }
-        for f in &op.body_fields {
-            if f.required {
-                required_flags.push(flag_name(&f.wire_name));
-            }
-        }
-        let choices = api.body_choices(op);
-        if op.whole_body.is_some() && choices.is_none() {
-            required_flags.push("body".to_string());
-        }
-        if let Some(choices) = &choices {
-            // A choice is exactly one arm: none and several are both usage
-            // errors, reported before stdin, credentials, or transport.
-            let list = choice_flag_list(choices);
-            writeln!(out, "\t\t\t\t\t_chosen := []string{{}}").unwrap();
-            for c in choices {
-                let flag = flag_name(&c.wire_name);
-                writeln!(
-                    out,
-                    "\t\t\t\t\tif cmd.IsSet(\"{flag}\") {{\n\t\t\t\t\t\t_chosen = append(_chosen, \"--{flag}\")\n\t\t\t\t\t}}"
-                )
-                .unwrap();
-            }
-            writeln!(
-                out,
-                "\t\t\t\t\tif len(_chosen) == 0 {{\n\t\t\t\t\t\treturn cli.Exit(\"exactly one of {list} is required\", 2)\n\t\t\t\t\t}}"
-            )
-            .unwrap();
-            writeln!(
-                out,
-                "\t\t\t\t\tif len(_chosen) > 1 {{\n\t\t\t\t\t\treturn cli.Exit(strings.Join(_chosen, \", \")+\" are mutually exclusive; exactly one of {list} is required\", 2)\n\t\t\t\t\t}}"
-            )
-            .unwrap();
-        }
+        // Body inputs are checked on the assembled body (documents can
+        // satisfy them), after every flag has been read.
         if !required_flags.is_empty() {
             writeln!(out, "\t\t\t\t\t_missing := []string{{}}").unwrap();
             for flag in &required_flags {
@@ -2850,11 +2412,6 @@ fn emit_op_command(
         for p in op.path_params.iter().chain(op.query_params.iter()) {
             if let Some(values) = enum_values(api, &p.ty) {
                 checks.push((flag_name(&p.wire_name), values, matches!(p.ty, Ty::List(_))));
-            }
-        }
-        for f in &op.body_fields {
-            if let Some(values) = enum_values(api, &f.ty) {
-                checks.push((flag_name(&f.wire_name), values, matches!(f.ty, Ty::List(_))));
             }
         }
         for (flag, values, is_slice) in checks {
@@ -2884,28 +2441,10 @@ fn emit_op_command(
     // doomed command must fail before draining/blocking on stdin or building
     // a client.
     {
-        let mut singles: Vec<String> = Vec::new();
-        let mut slices: Vec<String> = Vec::new();
-        for f in &op.body_fields {
-            match classify(api, &f.ty) {
-                FlagKind::Json => singles.push(flag_name(&f.wire_name)),
-                FlagKind::JsonSlice => slices.push(flag_name(&f.wire_name)),
-                _ => {}
-            }
-        }
-        match (op.whole_body.is_some(), api.body_choices(op)) {
-            (true, Some(choices)) => {
-                for c in &choices {
-                    match classify(api, &c.ty) {
-                        FlagKind::Json => singles.push(flag_name(&c.wire_name)),
-                        FlagKind::JsonSlice => slices.push(flag_name(&c.wire_name)),
-                        _ => {}
-                    }
-                }
-            }
-            (true, None) => singles.push("body".to_string()),
-            (false, _) => {}
-        }
+        let (singles, slices) = match plan {
+            Some(plan) => cli_inputs::stdin_inputs(plan),
+            None => (Vec::new(), Vec::new()),
+        };
         if !singles.is_empty() || !slices.is_empty() {
             let mut expr = String::from("[]string{");
             expr.push_str(
@@ -2949,14 +2488,9 @@ fn emit_op_command(
         for (p, _) in &flag_specs {
             emit_flag_read(api, &p.wire_name, &p.ty, out);
         }
-        for f in &op.body_fields {
-            emit_flag_read(api, &f.wire_name, &f.ty, out);
-        }
-        if let Some(ty) = &op.whole_body {
-            match api.body_choices(op) {
-                Some(choices) => emit_choice_reads(api, &choices, out),
-                None => emit_flag_read(api, "body", ty, out),
-            }
+        if let Some(plan) = plan {
+            cli_inputs::emit_action(op, plan, &cli_inputs::schema_const_name(resource, op), out);
+            cli_inputs::emit_merge_into_values(plan, out);
         }
         let params_ty = super::golang::params_type_name_pub(resource, op);
         writeln!(out, "\t\t\t\t\tvar params sdk.{params_ty}").unwrap();
@@ -3107,71 +2641,6 @@ fn emit_flag_read(api: &Api, wire: &str, ty: &Ty, out: &mut String) {
     writeln!(out, "\t\t\t\t\tif cmd.IsSet(\"{name}\") {{").unwrap();
     emit_flag_read_into(api, "values", wire, ty, out);
     writeln!(out, "\t\t\t\t\t}}").unwrap();
-}
-
-/// Help text for one arm of a body choice: the arm's own description plus
-/// the exclusivity contract, so users learn the alternatives from --help.
-fn choice_description(choice: &BodyChoice, list: &str) -> String {
-    let own = choice
-        .description
-        .as_deref()
-        .map(first_line)
-        .unwrap_or_default();
-    let own = own.trim_end_matches('.');
-    if own.is_empty() {
-        format!("Exactly one of {list}.")
-    } else {
-        format!("{own}. Exactly one of {list}.")
-    }
-}
-
-/// Read a body choice: the set arm builds the request body as
-/// `{<discriminator>: tag, <field>: value}` (single-payload arm) or the arm's
-/// JSON object stamped with the tag. Exclusivity was enforced upstream, so at
-/// most one branch runs.
-fn emit_choice_reads(api: &Api, choices: &[BodyChoice], out: &mut String) {
-    let discriminator = choices
-        .first()
-        .and_then(|c| match api.types.get(&c.variant).map(|d| &d.shape) {
-            Some(Shape::Struct(st)) => st
-                .fields
-                .iter()
-                .find(|f| matches!(&f.ty, Ty::Literal(v) if *v == c.tag))
-                .map(|f| f.wire_name.clone()),
-            _ => None,
-        })
-        .unwrap_or_else(|| "type".to_string());
-    for c in choices {
-        let name = flag_name(&c.wire_name);
-        writeln!(out, "\t\t\t\t\tif cmd.IsSet(\"{name}\") {{").unwrap();
-        match &c.payload_field {
-            Some(field) => {
-                writeln!(
-                    out,
-                    "\t\t\t\t\t\tbody := map[string]any{{\"{discriminator}\": \"{}\"}}",
-                    escape_go(&c.tag)
-                )
-                .unwrap();
-                emit_flag_read_into(api, "body", field, &c.ty, out);
-            }
-            None => {
-                writeln!(
-                    out,
-                    "\t\t\t\t\t\tbody, err := jsonObjectArg(\"{name}\", cmd.String(\"{name}\"))"
-                )
-                .unwrap();
-                writeln!(out, "\t\t\t\t\t\tif err != nil {{\n\t\t\t\t\t\t\treturn cli.Exit(err.Error(), 2)\n\t\t\t\t\t\t}}").unwrap();
-                writeln!(
-                    out,
-                    "\t\t\t\t\t\tbody[\"{discriminator}\"] = \"{}\"",
-                    escape_go(&c.tag)
-                )
-                .unwrap();
-            }
-        }
-        writeln!(out, "\t\t\t\t\t\tvalues[\"body\"] = body").unwrap();
-        writeln!(out, "\t\t\t\t\t}}").unwrap();
-    }
 }
 
 /// Assign the parsed flag value into `target[wire]` (no IsSet guard).

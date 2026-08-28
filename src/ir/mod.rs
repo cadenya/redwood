@@ -7,6 +7,7 @@
 //! backend to handle every edge case.
 
 pub mod lower;
+pub mod plan;
 
 use indexmap::IndexMap;
 
@@ -441,6 +442,10 @@ pub struct Operation {
     /// the params object carries it under a required `body` member, sent as
     /// the entire request body. Mutually exclusive with `body_fields`.
     pub whole_body: Option<Ty>,
+    /// Wire name of a top-level body field declared `format: field-mask`
+    /// (a partial-update mask listing the paths being changed). Surfaces
+    /// that assemble a body from individual inputs can derive it.
+    pub update_mask: Option<String>,
     pub response: ResponseKind,
     pub pagination: Option<Pagination>,
 }

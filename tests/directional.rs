@@ -195,7 +195,7 @@ fn read_only_plus_write_only_is_rejected() {
 #[test]
 fn manifest_samples_follow_direction() {
     let api = lowered();
-    let backend = redwood::backends::manifest::ManifestBackend;
+    let backend = redwood::backends::manifest::ManifestBackend::default();
     let files = backend.generate(&api).expect("generates");
     let manifest: serde_json::Value =
         serde_json::from_str(files.get("manifest.json").unwrap()).unwrap();

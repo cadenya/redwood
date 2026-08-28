@@ -99,7 +99,7 @@ fn main() -> Result<()> {
             },
         }),
         Language::Docs => Box::new(DocsBackend),
-        Language::Manifest => Box::new(ManifestBackend),
+        Language::Manifest => Box::new(ManifestBackend { cli: lang.cli }),
         Language::Openapi => Box::new(OpenApiBackend {
             spec_source: source.clone(),
             ts_config: lang.typescript,

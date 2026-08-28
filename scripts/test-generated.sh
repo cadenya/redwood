@@ -52,6 +52,7 @@ case "${target}" in
     "${cli_bin}" --version
     "${cli_bin}" --help >/dev/null
     node "${repo_root}/e2e/conformance/run-cli.mjs"
+    node "${repo_root}/e2e/cli-body.mjs"
     cargo build --locked
     REDWOOD_BIN="${repo_root}/target/debug/redwood" node "${repo_root}/e2e/cli-auth.mjs"
     ;;

@@ -679,6 +679,31 @@ pub struct CliConfig {
     /// The release pipeline that publishes to these lives with the CLI repo;
     /// this only controls what the generated docs tell users to run.
     pub install: Option<CliInstallConfig>,
+    /// Request-body input naming ([lang.cli.body]): how body fields become
+    /// flags. Every rule is structural; this only tunes names.
+    #[serde(default)]
+    pub body: CliBodyConfig,
+}
+
+/// [lang.cli.body]: options for the body plan (see `ir::plan`).
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CliBodyConfig {
+    /// Envelope segments dropped from flag names; defaults to
+    /// `["metadata", "spec"]`. An empty list disables elision.
+    pub elide: Option<Vec<String>>,
+    /// Singular overrides for repeatable inputs, keyed by the field's wire
+    /// name: `"memoryCascade" = "memory-cascade"`.
+    #[serde(default)]
+    pub singular: IndexMap<String, String>,
+    /// Offer enum short forms (`weighted` for `..._WEIGHTED`); default true.
+    pub enum_short_forms: Option<bool>,
+    /// Per-operation segment renames, keyed like display methods
+    /// (`"post /v1/things"` or an operationId), then by dotted wire path:
+    /// `"spec.modelConfig" = "model"`. An empty replacement elides the
+    /// segment. Unknown operations and unmatched paths are errors.
+    #[serde(default)]
+    pub rename: IndexMap<String, IndexMap<String, String>>,
 }
 
 /// Where the built CLI is published, for the README's Install section.

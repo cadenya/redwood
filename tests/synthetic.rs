@@ -164,7 +164,7 @@ fn backends_are_schema_agnostic() {
             config: Default::default(),
         }),
         Box::new(redwood::backends::docs::DocsBackend),
-        Box::new(redwood::backends::manifest::ManifestBackend),
+        Box::new(redwood::backends::manifest::ManifestBackend::default()),
     ];
 
     for backend in &backends {
