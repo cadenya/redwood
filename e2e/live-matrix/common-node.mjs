@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { accessSync, constants, readFileSync, writeFileSync } from 'node:fs';
+import { isAbsolute } from 'node:path';
 
 export const manifest = JSON.parse(
   readFileSync(new URL('../../gen/manifest/manifest.json', import.meta.url), 'utf8'),
@@ -9,13 +10,23 @@ export function loadLiveEnvironment() {
   const rootEnv = readFileSync(new URL('../../.env.development', import.meta.url), 'utf8');
   for (const line of rootEnv.split('\n')) {
     const match = line.match(/^\s*(?:export\s+)?([A-Z0-9_]+)=(.*)$/);
-    if (!match || match[1] === 'CADENYA_API_KEY') continue;
+    if (!match || process.env[match[1]] !== undefined) continue;
     process.env[match[1]] = match[2].trim().replace(/^['"]|['"]$/g, '');
   }
-  const token = readFileSync(new URL('../../tmp/token.jwt', import.meta.url), 'utf8').trim();
-  assert.ok(token && !/\s/.test(token), 'tmp/token.jwt must contain one nonblank token');
-  process.env.CADENYA_API_KEY = token;
+  if (!process.env.CADENYA_API_KEY) {
+    const token = readFileSync(new URL('../../tmp/token.jwt', import.meta.url), 'utf8').trim();
+    assert.ok(token && !/\s/.test(token), 'tmp/token.jwt must contain one nonblank token');
+    process.env.CADENYA_API_KEY = token;
+  }
   assert.ok(process.env.CADENYA_WORKSPACE_ID, 'CADENYA_WORKSPACE_ID missing from root .env.development');
+}
+
+export function configuredCliBinary() {
+  const binary = process.env.CADENYA_CLI_BINARY;
+  if (!binary) return undefined;
+  assert.ok(isAbsolute(binary), 'CADENYA_CLI_BINARY must be an absolute path');
+  accessSync(binary, constants.X_OK);
+  return binary;
 }
 
 export function freshReport(sdk, wave) {

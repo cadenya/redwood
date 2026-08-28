@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import {
+  configuredCliBinary,
   counts,
   loadLiveEnvironment,
   readReport,
@@ -23,11 +24,13 @@ if (process.env.CADENYA_LIVE_SPECIALIZED_FIXTURES !== 'cli') {
 
 loadLiveEnvironment();
 const exec = promisify(execFile);
-const binary = join(mkdtempSync(join(tmpdir(), 'cadenya-cli-specialized-')), 'cadenya');
-execFileSync('go', ['build', '-o', binary, '.'], {
-  cwd: new URL('../../gen/cli', import.meta.url),
-  timeout: 300_000,
-});
+const binary = configuredCliBinary() ?? join(mkdtempSync(join(tmpdir(), 'cadenya-cli-specialized-')), 'cadenya');
+if (!process.env.CADENYA_CLI_BINARY) {
+  execFileSync('go', ['build', '-o', binary, '.'], {
+    cwd: new URL('../../gen/cli', import.meta.url),
+    timeout: 300_000,
+  });
+}
 const resultPath = new URL('./results-cli.json', import.meta.url);
 const report = readReport(resultPath, 'cli');
 const operations = report.operations;
@@ -60,7 +63,7 @@ function fail(operationId, error) {
 }
 
 async function command(args, milliseconds = 30_000) {
-  const { stdout } = await exec(binary, args, {
+  const { stdout } = await exec(binary, ['--display', 'json', ...args], {
     env: { ...process.env },
     encoding: 'utf8',
     timeout: milliseconds,
@@ -85,11 +88,28 @@ async function poll(label, callback, milliseconds = 120_000) {
 }
 
 async function createToolSet(suffix, adapter) {
-  const value = await command([
+  const args = [
     'tool-sets', 'create',
-    '--metadata', json({ name: `${run}-${suffix}`, labels: { liveMatrix: run } }),
-    '--spec', json({ description: 'specialized live matrix fixture', adapter }),
-  ]);
+    '--name', `${run}-${suffix}`,
+    '--label', `liveMatrix=${run}`,
+    '--description', 'specialized live matrix fixture',
+    '--adapter', adapter.type,
+  ];
+  if (adapter.type === 'openapi') {
+    args.push(
+      '--openapi', adapter.openapi.type,
+      '--openapi-url', adapter.openapi.url,
+      '--openapi-base-url', adapter.openapi.baseUrl,
+    );
+  } else if (adapter.type === 'mcp') {
+    args.push(
+      '--mcp-url', adapter.mcp.url,
+      '--mcp-tool-approvals', adapter.mcp.toolApprovals.type,
+      '--mcp-tool-approvals-only-filter', json(adapter.mcp.toolApprovals.only.filters[0]),
+      '--mcp-tool-approvals-only-operator', 'and',
+    );
+  }
+  const value = await command(args);
   const id = resourceId(value);
   assert.ok(id, 'created tool set omitted metadata.id');
   cleanup.push(async () => {
@@ -104,7 +124,8 @@ async function createObjective(agentId, variationId, suffix, firstUserMessage) {
     'objectives', 'create',
     '--agent-id', agentId,
     '--variation-id', variationId,
-    '--metadata', json({ labels: { liveMatrix: run, case: suffix } }),
+    '--label', `liveMatrix=${run}`,
+    '--label', `case=${suffix}`,
     '--system-prompt-data', '{}',
     '--first-user-message', firstUserMessage,
   ], 120_000);
@@ -133,7 +154,7 @@ async function waitForObjective(objectiveId, predicate, label) {
 
 async function streamUntil(objectiveId, checkpoint, expectedType, milliseconds = 120_000) {
   return new Promise((resolve, reject) => {
-    const args = ['objectives', 'stream-events', objectiveId];
+    const args = ['--display', 'json', 'objectives', 'stream-events', objectiveId];
     if (checkpoint) args.push('--last-event-id', checkpoint);
     const child = spawn(binary, args, { env: { ...process.env }, stdio: ['ignore', 'pipe', 'pipe'] });
     let buffer = '';
@@ -220,13 +241,11 @@ try {
   const bareId = await createToolSet('bare-content', { type: 'bare', bare: {} });
   const bareTool = await command([
     'tool-sets', 'tools', 'create', bareId,
-    '--metadata', json({ name: `${run}-provide-content` }),
-    '--spec', json({
-      description: 'Request externally supplied live-test content.',
-      requiresApproval: true,
-      parameters: { type: 'object', properties: {} },
-      config: { type: 'bare', bare: {} },
-    }),
+    '--name', `${run}-provide-content`,
+    '--description', 'Request externally supplied live-test content.',
+    '--requires-approval=true',
+    '--parameter', 'type=object',
+    '--config', 'bare',
   ]);
   const bareToolId = resourceId(bareTool);
   assert.ok(bareToolId, 'bare tool omitted metadata.id');
@@ -237,16 +256,15 @@ try {
   assert.ok(modelId, 'workspace has no readable model fixture');
   const agent = await command([
     'agents', 'create',
-    '--metadata', json({ name: `${run}-agent`, labels: { liveMatrix: run } }),
-    '--spec', json({ variationSelectionMode: 'VARIATION_SELECTION_MODE_UNSPECIFIED' }),
-    '--default-variation', json({
-      metadata: { name: `${run}-variation`, labels: { liveMatrix: run } },
-      spec: {
-        systemPromptTemplate: 'You are an integration-test agent. Follow explicit tool-use instructions.',
-        modelConfig: { modelId },
-        constraints: { maxToolCalls: 2, inactivityTimeout: '300s' },
-      },
-    }),
+    '--name', `${run}-agent`,
+    '--label', `liveMatrix=${run}`,
+    '--variation-selection-mode', 'random',
+    '--default-variation-name', `${run}-variation`,
+    '--default-variation-label', `liveMatrix=${run}`,
+    '--default-variation-system-prompt-template', 'You are an integration-test agent. Follow explicit tool-use instructions.',
+    '--default-variation-model-id', modelId,
+    '--default-variation-constraints-max-tool-calls', '2',
+    '--default-variation-constraints-inactivity-timeout', '300s',
   ]);
   const agentId = resourceId(agent);
   assert.ok(agentId, 'created agent omitted metadata.id');
@@ -291,8 +309,9 @@ try {
   await waitForObjective(approveId, (objective) => objective.state === 'STATE_WAITING', 'post-tool waiting state');
   await command([
     'objectives', 'create-feedback', approveId,
-    '--metadata', json({ labels: { liveMatrix: run } }),
-    '--data', json({ score: 1, comment: 'specialized CLI live fixture' }),
+    '--label', `liveMatrix=${run}`,
+    '--data-score', '1',
+    '--data-comment', 'specialized CLI live fixture',
   ]);
   complete('ObjectiveService_CreateObjectiveFeedback', 'submitted feedback on the completed MCP interaction');
   const continued = await command(['objectives', 'continue', approveId, '--message', 'Reply exactly CONTINUE_OK.', '--enqueue=false'], 120_000);
@@ -302,7 +321,7 @@ try {
   try {
     const compacted = await command([
       'objectives', 'compact', approveId,
-      '--compaction-config', json({ summarization: { instructions: 'Summarize the integration-test conversation accurately.' } }),
+      '--compaction-config-summarization-instructions', 'Summarize the integration-test conversation accurately.',
     ], 120_000);
     assert.ok(compacted && typeof compacted === 'object');
     complete('ObjectiveService_CompactObjective', 'compacted the continued MCP objective and decoded the response');

@@ -724,6 +724,10 @@ paths:
 
 #[test]
 fn reserved_flag_names_collide_too() {
+    assert!(
+        redwood::ir::plan::RESERVED_FLAGS.contains(&"f"),
+        "the -f alias occupies the same command-local namespace as body flags"
+    );
     let api = api();
     let err = body_plan(
         &api,
@@ -800,4 +804,64 @@ components:
     assert!(union.inferable);
     // The shared field is one input serving both arms.
     assert_eq!(p.inputs.iter().filter(|i| i.flag == "title").count(), 1);
+}
+
+#[test]
+fn shared_union_fields_must_have_compatible_cli_types() {
+    let spec = redwood::openapi::parse(
+        r#"
+openapi: 3.1.0
+info: { title: Shared Types API, version: '1' }
+servers: [{ url: https://shared.example }]
+paths:
+  /v1/values:
+    post:
+      operationId: ValueService_CreateValue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Value' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object } } } }
+components:
+  schemas:
+    Value:
+      oneOf:
+        - $ref: '#/components/schemas/TextValue'
+        - $ref: '#/components/schemas/CountValue'
+      discriminator:
+        propertyName: type
+        mapping:
+          text: '#/components/schemas/TextValue'
+          count: '#/components/schemas/CountValue'
+    TextValue:
+      type: object
+      required: [type, value]
+      properties:
+        type: { type: string, enum: [text] }
+        value: { type: string }
+        textOnly: { type: string }
+    CountValue:
+      type: object
+      required: [type, value]
+      properties:
+        type: { type: string, enum: [count] }
+        value: { type: integer }
+        countOnly: { type: integer }
+"#,
+    )
+    .unwrap();
+    let api = ir::lower::lower(&spec).unwrap();
+    let err = body_plan(
+        &api,
+        op(&api, "ValueService_CreateValue"),
+        &PlanOptions::default(),
+    )
+    .unwrap_err()
+    .to_string();
+    assert!(
+        err.contains("--value") && err.contains("incompatible types"),
+        "{err}"
+    );
 }

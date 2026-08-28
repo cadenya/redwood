@@ -9,13 +9,15 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import { counts, freshReport, loadLiveEnvironment, manifest, safeFailure, writeReport } from './common-node.mjs';
+import { configuredCliBinary, counts, freshReport, loadLiveEnvironment, manifest, safeFailure, writeReport } from './common-node.mjs';
 import { cliInputArgs, cliSnippets } from './snippets-cli.mjs';
 
 const exec = promisify(execFile);
 loadLiveEnvironment();
-const binary = join(mkdtempSync(join(tmpdir(), 'cadenya-cli-read-')), 'cadenya');
-execFileSync('go', ['build', '-o', binary, '.'], { cwd: new URL('../../gen/cli', import.meta.url), timeout: 300_000 });
+const binary = configuredCliBinary() ?? join(mkdtempSync(join(tmpdir(), 'cadenya-cli-read-')), 'cadenya');
+if (!process.env.CADENYA_CLI_BINARY) {
+  execFileSync('go', ['build', '-o', binary, '.'], { cwd: new URL('../../gen/cli', import.meta.url), timeout: 300_000 });
+}
 const report = freshReport('cli', 'read wave');
 const operations = report.operations;
 const ids = { workspaceId: process.env.CADENYA_WORKSPACE_ID };
@@ -40,6 +42,7 @@ const blocked = (id, why) => operations[id] = { status: 'blocked', evidence: `re
 
 function argv(op) {
   const args = [...op.resource.split('.').map(kebab), kebab(op.method)];
+  args.push('--display', 'json');
   for (const positional of op.positionals ?? []) {
     args.push(ids[positional.name === 'id' ? genericId(op) : positional.name]);
   }

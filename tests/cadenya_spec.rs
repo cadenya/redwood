@@ -102,18 +102,30 @@ fn cli_lowers_oneof_body_to_mutually_exclusive_flags() {
         !add.contains("Name: \"body\""),
         "no opaque --body flag: {add}"
     );
+    assert!(
+        add.contains("commands.ConvertAgentVariationsAddAssignment(cmd, &converted)"),
+        "command delegates conversion: {add}"
+    );
+    let conversion = &files["internal/commands/agent_variations_add_assignment_conv.go"];
     // The arm is inferred from the flag used; conflicts and a missing arm
-    // are usage errors raised by the runtime's union resolution.
-    assert!(add.contains("_body.resolveUnion(unionSpec{Flag: \"type\", Path: []string{}, Discriminator: \"type\", Required: true, Inferable: true"), "{add}");
+    // are usage errors raised by the generated operation converter.
+    assert!(conversion.contains("_body.resolveUnion(unionSpec{Flag: \"type\", Path: []string{}, Discriminator: \"type\", Required: true, Inferable: true"), "{conversion}");
     assert!(
-        add.contains("{Tag: \"toolSetId\", Keys: []string{\"toolSetId\"}"),
-        "{add}"
+        conversion.contains("{Tag: \"toolSetId\", Keys: []string{\"toolSetId\"}"),
+        "{conversion}"
     );
     assert!(
-        add.contains("_body.set(\"tool-set-id\", []string{\"toolSetId\"}, _v)"),
-        "{add}"
+        conversion.contains("_body.set(\"tool-set-id\", []string{\"toolSetId\"}, _v)"),
+        "{conversion}"
     );
-    assert!(add.contains("values[\"body\"] = _body.body"), "{add}");
+    assert!(
+        conversion.contains("cmd.String(\"tool-set-id\")"),
+        "converter reads urfave directly: {conversion}"
+    );
+    assert!(
+        conversion.contains("values[\"body\"] = _body.body"),
+        "{conversion}"
+    );
 
     let api_md = &files["api.md"];
     let usage = api_md
@@ -468,4 +480,23 @@ fn update_bodies_carry_a_derivable_mask() {
         .find(|o| o.id == "ToolService_UpdateToolSet")
         .unwrap();
     assert_eq!(update.update_mask.as_deref(), Some("updateMask"));
+
+    let files = redwood::backends::cli::CliBackend {
+        config: Default::default(),
+    }
+    .generate(&api)
+    .expect("cli generates");
+    let command = &files["internal/commands/tool_sets_update_conv.go"];
+    let derive = command
+        .find("_body.updateMask(\"updateMask\")")
+        .expect("mask is derived");
+    let finish = command.find("_body.finish(").expect("body is validated");
+    assert!(
+        derive < finish,
+        "a required field mask must be derived before required-field validation"
+    );
+    assert!(
+        command[finish..].contains(", _strict)"),
+        "final validation must enforce --strict after unions resolve"
+    );
 }

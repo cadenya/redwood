@@ -4,12 +4,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"text/tabwriter"
 
 	cli "github.com/urfave/cli/v3"
+	"sigs.k8s.io/yaml"
 )
 
 // addAlias clones the command at path onto the root under a new name, so a
@@ -223,84 +223,24 @@ func stdinBudget(raws []string) error {
 	return nil
 }
 
-// resolveInput expands a JSON flag value: "@path" reads the file, "-" reads
-// stdin (at most one flag per invocation), anything else is the literal
-// document. Files and stdin keep secrets and large payloads out of shell
-// history and process listings.
-func resolveInput(raw string) (string, error) {
-	switch {
-	case raw == "-":
-		data, err := io.ReadAll(os.Stdin)
-		if err != nil {
-			return "", fmt.Errorf("reading stdin: %w", err)
-		}
-		return strings.TrimSpace(string(data)), nil
-	case strings.HasPrefix(raw, "@"):
-		data, err := os.ReadFile(raw[1:])
-		if err != nil {
-			return "", err
-		}
-		return strings.TrimSpace(string(data)), nil
-	default:
-		return raw, nil
-	}
-}
-
-// decodeParams round-trips the collected flag values through JSON into the
-// SDK's typed params struct.
-func decodeParams(values map[string]any, target any) error {
-	raw, err := json.Marshal(values)
+// printYAML writes v as a YAML document.
+func printYAML(v any) error {
+	raw, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(raw, target); err != nil {
-		return fmt.Errorf("invalid parameters: %w", err)
-	}
-	return nil
-}
-
-// jsonArg parses a --flag JSON document (literal, @file, or - for stdin),
-// failing with the flag name.
-func jsonArg(name, raw string) (json.RawMessage, error) {
-	resolved, err := resolveInput(raw)
+	out, err := yaml.JSONToYAML(raw)
 	if err != nil {
-		return nil, fmt.Errorf("--%s: %w", name, err)
+		return err
 	}
-	if !json.Valid([]byte(resolved)) {
-		return nil, fmt.Errorf("--%s: invalid JSON", name)
-	}
-	// A structured flag holds an object/array/value, never null: for a
-	// required flag null cannot satisfy presence, and for an optional one it
-	// would silently decode into a nil field and vanish from the request.
-	if resolved == "null" {
-		return nil, fmt.Errorf("--%s: null is not a valid value; omit the flag instead", name)
-	}
-	return json.RawMessage(resolved), nil
+	_, err = os.Stdout.Write(out)
+	return err
 }
 
-// jsonObjectArg parses a --flag JSON document that must be an object (a
-// union arm the generator stamps with its discriminator tag).
-func jsonObjectArg(name, raw string) (map[string]any, error) {
-	doc, err := jsonArg(name, raw)
-	if err != nil {
-		return nil, err
+// printDocument renders a --dry-run body: YAML unless json was asked for.
+func printDocument(mode string, v any) error {
+	if mode == "json" {
+		return printJSON(v)
 	}
-	var obj map[string]any
-	if err := json.Unmarshal(doc, &obj); err != nil || obj == nil {
-		return nil, fmt.Errorf("--%s: expected a JSON object", name)
-	}
-	return obj, nil
-}
-
-// jsonSliceArg parses repeated --flag JSON documents.
-func jsonSliceArg(name string, raws []string) ([]json.RawMessage, error) {
-	out := make([]json.RawMessage, 0, len(raws))
-	for _, raw := range raws {
-		msg, err := jsonArg(name, raw)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, msg)
-	}
-	return out, nil
+	return printYAML(v)
 }

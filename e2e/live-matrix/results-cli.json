@@ -1,35 +1,35 @@
 {
   "schemaVersion": 1,
   "sdk": "cli",
-  "executedAt": "2026-08-14T05:16:39.865Z",
+  "executedAt": "2026-08-28T01:31:32.030Z",
   "operations": {
     "AccountService_GetAccount": {
       "status": "completed",
       "evidence": "real api.cadenya.com: CLI exit 0 and decoded expected JSON shape; no response body persisted"
     },
     "AccountService_RotateChallengeToken": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "AccountService_RotateWebhookSigningKey": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "GlobalAPIKeyService_GetGlobalAPIKey": {
       "status": "completed",
       "evidence": "real api.cadenya.com: CLI exit 0 and decoded expected JSON shape; no response body persisted"
     },
     "GlobalAPIKeyService_DisableGlobalAPIKey": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "GlobalAPIKeyService_EnableGlobalAPIKey": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "GlobalAPIKeyService_RotateGlobalAPIKey": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "APIKeyService_ListAPIKeys": {
       "status": "completed",
@@ -37,7 +37,7 @@
     },
     "APIKeyService_CreateAPIKey": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "APIKeyService_GetAPIKey": {
       "status": "completed",
@@ -45,59 +45,59 @@
     },
     "APIKeyService_DeleteAPIKey": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "APIKeyService_UpdateAPIKey": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "APIKeyService_DisableAPIKey": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "APIKeyService_EnableAPIKey": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "APIKeyService_RotateAPIKey": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WorkspaceAdminService_ListProfiles": {
       "status": "blocked",
-      "evidence": "real API CLI read wave: credential authorization prerequisite"
+      "evidence": "real api.cadenya.com: generated CLI reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_ListAccountWorkspaces": {
       "status": "blocked",
-      "evidence": "real API CLI read wave: credential authorization prerequisite"
+      "evidence": "real api.cadenya.com: generated CLI reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_CreateWorkspace": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: flattened --name request reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_GetWorkspace": {
       "status": "blocked",
-      "evidence": "real API CLI read wave: credential authorization prerequisite"
+      "evidence": "real api.cadenya.com: generated CLI reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_ArchiveWorkspace": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: generated CLI request reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_UpdateWorkspace": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: flattened --name request reached authorization; test workspace prerequisite unavailable (HTTP 403)"
     },
     "WorkspaceAdminService_ListWorkspaceMembers": {
       "status": "blocked",
-      "evidence": "real API CLI read wave: credential authorization prerequisite"
+      "evidence": "real api.cadenya.com: generated CLI reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_AddWorkspaceMember": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: flattened --email request reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "WorkspaceAdminService_RemoveWorkspaceMember": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: generated CLI request reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "ProfilesService_Whoami": {
       "status": "completed",
@@ -113,7 +113,7 @@
     },
     "AgentService_CreateAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentService_ListAgentFeedback": {
       "status": "completed",
@@ -129,27 +129,27 @@
     },
     "AgentService_DeleteAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentService_UpdateAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentService_ArchiveAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentService_PublishAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentService_UnarchiveAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentService_UnpublishAgent": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_ListAgentSchedules": {
       "status": "completed",
@@ -157,31 +157,31 @@
     },
     "AgentScheduleService_CreateAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_GetAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_DeleteAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_UpdateAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_ArchiveAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_PauseAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentScheduleService_ResumeAgentSchedule": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_ListAgentVariations": {
       "status": "completed",
@@ -189,7 +189,7 @@
     },
     "AgentVariationService_CreateAgentVariation": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_GetAgentVariation": {
       "status": "completed",
@@ -197,31 +197,31 @@
     },
     "AgentVariationService_DeleteAgentVariation": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_UpdateAgentVariation": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_AddAgentVariationAssignment": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_RemoveAgentVariationAssignment": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_AddAgentVariationMemoryLayer": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_RemoveAgentVariationMemoryLayer": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AgentVariationService_UpdateAgentVariationMemoryLayer": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "AIProviderKeyService_ListAIProviderKeys": {
       "status": "completed",
@@ -229,7 +229,7 @@
     },
     "AIProviderKeyService_CreateAIProviderKey": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: nested provider/credentials union flags reached the endpoint; supplied credential returned ADMIN_ROLE_REQUIRED (HTTP 403)"
     },
     "AIProviderKeyService_GetAIProviderKey": {
       "status": "completed",
@@ -237,11 +237,11 @@
     },
     "AIProviderKeyService_DeleteAIProviderKey": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: create prerequisite unavailable because supplied credential lacks the admin role"
     },
     "AIProviderKeyService_UpdateAIProviderKey": {
       "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "evidence": "real api.cadenya.com: create prerequisite unavailable because supplied credential lacks the admin role"
     },
     "MemoryService_ListMemoryLayers": {
       "status": "completed",
@@ -249,7 +249,7 @@
     },
     "MemoryService_CreateMemoryLayer": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "MemoryService_GetMemoryLayer": {
       "status": "completed",
@@ -257,11 +257,11 @@
     },
     "MemoryService_DeleteMemoryLayer": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "MemoryService_UpdateMemoryLayer": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "MemoryService_ListMemoryEntries": {
       "status": "completed",
@@ -269,7 +269,7 @@
     },
     "MemoryService_CreateMemoryEntry": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "MemoryService_GetMemoryEntry": {
       "status": "completed",
@@ -277,11 +277,11 @@
     },
     "MemoryService_DeleteMemoryEntry": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "MemoryService_UpdateMemoryEntry": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ModelService_ListModels": {
       "status": "completed",
@@ -292,16 +292,16 @@
       "evidence": "real api.cadenya.com: CLI exit 0 and decoded expected JSON shape; no response body persisted"
     },
     "ModelService_DisableModel": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "ModelService_EnableModel": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: serialized CLI coordinated operation succeeded (coord-cli-mtc9rnmd); secret/body not persisted"
     },
     "ModelService_SwapModelOnVariations": {
-      "status": "blocked",
-      "evidence": "operation deliberately not executed: coordinated privileged/shared-state tail withheld after execution review; requires a serialized authorized admin prerequisite"
+      "status": "completed",
+      "evidence": "real api.cadenya.com: repeatable --model-swap shorthand succeeded against a safe unassigned model; response body and ID not persisted"
     },
     "ObjectiveService_ListObjectives": {
       "status": "completed",
@@ -345,7 +345,7 @@
     },
     "ObjectiveService_GetObjectiveTask": {
       "status": "blocked",
-      "evidence": "real API CLI read wave: no safe live fixture discovered (ids.objectiveTaskId)"
+      "evidence": "real api.cadenya.com: generated CLI reached the endpoint with a live objective; server reports GetObjectiveTask not implemented (HTTP 501)"
     },
     "ObjectiveService_ListObjectiveToolCalls": {
       "status": "completed",
@@ -397,7 +397,7 @@
     },
     "TenantService_DeleteTenant": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "TenantService_ListTenantSubjects": {
       "status": "completed",
@@ -409,7 +409,7 @@
     },
     "ToolService_CreateToolSet": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_GetToolSet": {
       "status": "completed",
@@ -417,19 +417,19 @@
     },
     "ToolService_DeleteToolSet": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_UpdateToolSet": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_ArchiveToolSet": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_UnarchiveToolSet": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_ListToolSetEvents": {
       "status": "completed",
@@ -449,19 +449,19 @@
     },
     "ToolService_CreateToolSetSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_GetToolSetSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI exit 0 and decoded expected JSON shape; no response body persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_DeleteToolSetSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_UpdateToolSetSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_ListTools": {
       "status": "completed",
@@ -469,7 +469,7 @@
     },
     "ToolService_CreateTool": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_GetTool": {
       "status": "completed",
@@ -477,27 +477,27 @@
     },
     "ToolService_DeleteTool": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_UpdateTool": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_OmitTool": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "ToolService_RestoreTool": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "UploadService_CreateUpload": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "UploadService_GetUpload": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetSessionService_ListWidgetSessions": {
       "status": "completed",
@@ -505,23 +505,23 @@
     },
     "WidgetSessionService_CreateWidgetSession": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetSessionService_DeleteTenantWidgetSessions": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetSessionService_GetWidgetSession": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetSessionService_DeleteWidgetSession": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetSessionService_RevokeWidgetSession": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetService_ListWidgets": {
       "status": "completed",
@@ -529,27 +529,27 @@
     },
     "WidgetService_CreateWidget": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetService_GetWidget": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetService_DeleteWidget": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetService_UpdateWidget": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetService_ArchiveWidget": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WidgetService_UnarchiveWidget": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WorkspaceSecretService_ListWorkspaceSecrets": {
       "status": "completed",
@@ -557,19 +557,19 @@
     },
     "WorkspaceSecretService_CreateWorkspaceSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WorkspaceSecretService_GetWorkspaceSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WorkspaceSecretService_DeleteWorkspaceSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     },
     "WorkspaceSecretService_UpdateWorkspaceSecret": {
       "status": "completed",
-      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-msshmhc1); response body not persisted"
+      "evidence": "real api.cadenya.com: CLI owned-fixture mutation succeeded (live-cli-mtc9zpvv); response body not persisted"
     }
   }
 }
