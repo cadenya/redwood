@@ -553,6 +553,10 @@ impl OpenApiBackend {
                 " \\\n  --header \"Authorization: Bearer ${{{}}}\"",
                 api.api_key_env
             )),
+            Auth::Basic => line.push_str(&format!(
+                " \\\n  --basic \\\n  --user \"${{{}}}:${{{}}}\"",
+                api.basic_username_env, api.basic_password_env
+            )),
             Auth::ApiKeyHeader(header) => line.push_str(&format!(
                 " \\\n  --header \"{}: ${{{}}}\"",
                 shell_double_quote_content(header),

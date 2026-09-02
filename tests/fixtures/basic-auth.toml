@@ -1,0 +1,9 @@
+[lang.go]
+module_path = "example.com/passwords-go"
+package_name = "passwords"
+
+[lang.cli]
+module_path = "example.com/passwords-cli"
+binary_name = "passwords"
+sdk_module = "example.com/passwords-go"
+sdk_replace = "../go"

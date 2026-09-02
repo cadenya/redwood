@@ -27,6 +27,8 @@ pub fn lower(spec: &Spec) -> Result<Api> {
         client_params: Vec::new(),
         sse_skip_events: Vec::new(),
         api_key_env: format!("{}_API_KEY", client_name(&spec.info.title).to_uppercase()),
+        basic_username_env: format!("{}_USERNAME", client_name(&spec.info.title).to_uppercase()),
+        basic_password_env: format!("{}_PASSWORD", client_name(&spec.info.title).to_uppercase()),
         webhook_env: format!(
             "{}_WEBHOOK_SECRET",
             client_name(&spec.info.title).to_uppercase()
@@ -58,7 +60,12 @@ fn detect_auth(spec: &Spec) -> anyhow::Result<Auth> {
             anyhow::anyhow!("security requirement references undefined scheme {name}")
         })?;
         match (scheme.scheme_type.as_str(), scheme.scheme.as_deref()) {
-            ("http", Some("bearer")) => Ok(Auth::Bearer),
+            ("http", Some(http_scheme)) if http_scheme.eq_ignore_ascii_case("bearer") => {
+                Ok(Auth::Bearer)
+            }
+            ("http", Some(http_scheme)) if http_scheme.eq_ignore_ascii_case("basic") => {
+                Ok(Auth::Basic)
+            }
             ("apiKey", _) if scheme.location.as_deref() == Some("header") => scheme
                 .name
                 .clone()

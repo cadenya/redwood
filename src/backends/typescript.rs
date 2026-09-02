@@ -60,7 +60,6 @@ impl TypeScriptBackend {
             .clone()
             .unwrap_or_else(|| api.name.to_lowercase());
         let name = &api.name;
-        let api_env = &api.api_key_env;
         let ws_env_note = api
             .client_params
             .first()
@@ -157,16 +156,18 @@ impl TypeScriptBackend {
             String::new()
         } else {
             format!(
-                "\n## Webhooks (no API key required)\n\n```ts\nimport {{ Webhooks }} from '{package}';\n\nconst webhooks = new Webhooks(process.env.{wh_env});\nconst event = await webhooks.unwrap(payload, request.headers);\n```\n\nVerification follows Standard Webhooks (24–64 byte decoded secrets,\ninteger timestamps, bounded tolerance). This verifies the signature; it is\nnot runtime schema validation of the payload shape.\n",
+                "\n## Webhooks (no API credential required)\n\n```ts\nimport {{ Webhooks }} from '{package}';\n\nconst webhooks = new Webhooks(process.env.{wh_env});\nconst event = await webhooks.unwrap(payload, request.headers);\n```\n\nVerification follows Standard Webhooks (24–64 byte decoded secrets,\ninteger timestamps, bounded tolerance). This verifies the signature; it is\nnot runtime schema validation of the payload shape.\n",
                 wh_env = api.webhook_env
             )
         };
         let env_comment = if matches!(api.auth, Auth::None) {
             "// This API requires no authentication.".to_string()
         } else {
-            format!(
-                "// Reads {api_env}{ws_env_note} from the environment when\n// options are omitted. Explicit blank values are configuration errors."
-            )
+            let auth_env = match api.auth {
+                Auth::Basic => format!("{} and {}", api.basic_username_env, api.basic_password_env),
+                _ => api.api_key_env.clone(),
+            };
+            format!("// Reads {auth_env}{ws_env_note} from the environment when\n// options are omitted. Explicit blank values are configuration errors.")
         };
         format!(
             r#"# {name} TypeScript SDK
@@ -1716,7 +1717,7 @@ fn emit_client(api: &Api, config: &crate::config::TypeScriptConfig) -> String {
         out,
         r#"
 export interface ClientOptions {{
-{api_key_option}  /** Override the API base URL. Defaults to {base_url}. */
+{auth_options}  /** Override the API base URL. Defaults to {base_url}. */
   baseURL?: string;
   /** Max automatic retries for retryable failures. Defaults to {max_retries}. */
   maxRetries?: number;
@@ -1743,13 +1744,17 @@ export class {name} {{
         name = api.name,
         extra_options = client_extra_options(api),
         max_retries = api.max_retries,
-        api_key_option = if matches!(api.auth, Auth::None) {
-            String::new()
-        } else {
-            format!(
+        auth_options = match api.auth {
+            Auth::None => String::new(),
+            Auth::Basic => format!(
+                "  /** HTTP Basic Auth username. Defaults to the {username_env} environment variable. */\n  username?: string;\n  /** HTTP Basic Auth password. Defaults to the {password_env} environment variable. */\n  password?: string;\n",
+                username_env = api.basic_username_env,
+                password_env = api.basic_password_env,
+            ),
+            _ => format!(
                 "  /** API key. Defaults to the {env_var} environment variable. */\n  apiKey?: string;\n",
                 env_var = env_var_name(api)
-            )
+            ),
         },
     )
     .unwrap();
@@ -1778,6 +1783,12 @@ export class {name} {{
         (Auth::ApiKeyHeader(header), true) => {
             format!("(): Record<string, string> => (apiKey ? {{ '{header}': apiKey }} : {{}})")
         }
+        (Auth::Basic, false) => {
+            "() => ({ Authorization: basicAuthHeader(username, password) })".to_string()
+        }
+        (Auth::Basic, true) => {
+            "(): Record<string, string> => (username && password ? { Authorization: basicAuthHeader(username, password) } : {})".to_string()
+        }
         (Auth::None, _) => "() => ({})".to_string(),
     };
     write!(
@@ -1786,7 +1797,7 @@ export class {name} {{
   private readonly _client: HttpClient;
 
   constructor(options: ClientOptions = {{}}) {{
-{api_key_resolve}    this._client = new HttpClient({{
+{auth_resolve}    this._client = new HttpClient({{
       baseURL: resolveOption('baseURL', options.baseURL, readEnv('{base_env}')) ?? '{base_url}',
       authHeader: {auth_header},
       maxRetries: options.maxRetries ?? {max_retries},
@@ -1801,11 +1812,23 @@ export class {name} {{
         base_url = api.base_url,
         defaults = client_defaults_entries(api),
         max_retries = api.max_retries,
-        api_key_resolve = if matches!(api.auth, Auth::None) {
+        auth_resolve = if matches!(api.auth, Auth::None) {
             // No security scheme: the client constructs unauthenticated and
             // demands no credential (a required-but-unused key would make
             // every public-API SDK unusable).
             String::new()
+        } else if matches!(api.auth, Auth::Basic) && api.auth_optional {
+            format!(
+                "    const basicAuthExplicit = options.username !== undefined || options.password !== undefined;\n    const username = (basicAuthExplicit ? options.username : readEnv('{username_env}'))?.trim() ?? '';\n    const password = (basicAuthExplicit ? options.password : readEnv('{password_env}'))?.trim() ?? '';\n    if (!!username !== !!password) {{\n      throw new Error('HTTP Basic Auth username and password must be provided together.');\n    }}\n",
+                username_env = api.basic_username_env,
+                password_env = api.basic_password_env,
+            )
+        } else if matches!(api.auth, Auth::Basic) {
+            format!(
+                "    const username = resolveOption('username', options.username, readEnv('{username_env}'));\n    const password = resolveOption('password', options.password, readEnv('{password_env}'));\n    if (!username || !password) {{\n      throw new Error(\n        \"Missing HTTP Basic Auth credentials. Pass username and password or set the {username_env} and {password_env} environment variables.\",\n      );\n    }}\n",
+                username_env = api.basic_username_env,
+                password_env = api.basic_password_env,
+            )
         } else if api.auth_optional {
             // Mixed public/private surface: a missing key is a legal state
             // (public endpoints), so nothing throws here — protected
@@ -1877,7 +1900,25 @@ function resolveOption(
   }}
   return env?.trim() || undefined;
 }}
+{basic_auth_helper}
 "#
+        ,
+        basic_auth_helper = if matches!(api.auth, Auth::Basic) {
+            r#"
+// RFC 7617 credentials are encoded from UTF-8 bytes before base64. Building
+// the binary string incrementally avoids Node-only Buffer APIs and works in
+// browsers without overflowing the argument stack for long credentials.
+function basicAuthHeader(username: string, password: string): string {
+  let binary = '';
+  for (const byte of new TextEncoder().encode(`${username}:${password}`)) {
+    binary += String.fromCharCode(byte);
+  }
+  return `Basic ${btoa(binary)}`;
+}
+"#
+        } else {
+            ""
+        }
     )
     .unwrap();
     out
