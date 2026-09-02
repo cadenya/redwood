@@ -36,7 +36,9 @@ use indexmap::IndexMap;
 use super::*;
 
 /// Inputs every body-taking command owns regardless of the schema.
-pub const RESERVED_FLAGS: &[&str] = &["display", "file", "dry-run", "strict", "help", "version"];
+pub const RESERVED_FLAGS: &[&str] = &[
+    "display", "file", "f", "dry-run", "strict", "help", "version",
+];
 
 /// Nesting depth (struct levels) beyond which a subtree is a document only.
 const MAX_DEPTH: usize = 8;
@@ -441,8 +443,29 @@ impl<'a> Walker<'a> {
                 dotted(&input.path)
             ),
             Some(FlagOwner::Path(existing)) if *existing == input.path => {
-                // The same wire path reached through two union arms: one
-                // input serves both (the tag disambiguates).
+                // The same wire path reached through two union arms can use
+                // one flag only when both arms agree on how that flag is
+                // parsed. Silently keeping the first arm's type would make
+                // the other arm schema-dependent on declaration order.
+                let prior = self
+                    .plan
+                    .inputs
+                    .iter()
+                    .find(|prior| prior.flag == input.flag && prior.path == input.path)
+                    .expect("registered input has a plan entry");
+                if prior.kind != input.kind
+                    || prior.enum_values != input.enum_values
+                    || prior.enum_short != input.enum_short
+                    || prior.pair_form != input.pair_form
+                {
+                    bail!(
+                        "input --{} reaches {} through multiple union arms with incompatible types ({:?} and {:?}); use the union document input instead",
+                        input.flag,
+                        dotted(&input.path),
+                        prior.kind,
+                        input.kind
+                    );
+                }
                 return Ok(());
             }
             Some(FlagOwner::Path(existing)) => bail!(

@@ -194,11 +194,17 @@ pub fn emit_flags(plan: &BodyPlan, out: &mut String) {
             InputKind::Leaf(Ty::Bool) => {
                 format!("&cli.BoolFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
             }
-            InputKind::Leaf(Ty::Int32) | InputKind::Leaf(Ty::Int64) => {
-                format!("&cli.IntFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
+            InputKind::Leaf(Ty::Int32) => {
+                format!("&cli.Int32Flag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
             }
-            InputKind::Leaf(Ty::Float) | InputKind::Leaf(Ty::Double) => {
-                format!("&cli.FloatFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
+            InputKind::Leaf(Ty::Int64) => {
+                format!("&cli.Int64Flag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
+            }
+            InputKind::Leaf(Ty::Float) => {
+                format!("&cli.Float32Flag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
+            }
+            InputKind::Leaf(Ty::Double) => {
+                format!("&cli.Float64Flag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
             }
             InputKind::Leaf(_) | InputKind::UnionTag => {
                 format!("&cli.StringFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
@@ -329,11 +335,39 @@ pub fn emit_action(op: &Operation, plan: &BodyPlan, schema_const: &str, out: &mu
     writeln!(out, "\t\t\t\t\t_body := newBodyBuilder()").unwrap();
     writeln!(out, "\t\t\t\t\t_strict := cmd.Bool(\"strict\")").unwrap();
     writeln!(out, "\t\t\t\t\tvar _rawBody any").unwrap();
-    guarded(
-        out,
-        "file",
-        &checked("_body.applyFile(\"file\", cmd.String(\"file\"), _schema, _strict)"),
-    );
+    if plan.whole_body {
+        let mut body = String::new();
+        writeln!(
+            body,
+            "\t\t\t\t\t\t_value, err := _body.applyRootDocument(\"file\", cmd.String(\"file\"), true, _schema, _strict)"
+        )
+        .unwrap();
+        body.push_str(EXIT);
+        writeln!(body, "\t\t\t\t\t\t_rawBody = _value").unwrap();
+        guarded(out, "file", &body);
+
+        // A non-object file value cannot be deep-merged. Any more specific
+        // body input replaces it and resumes normal structured assembly.
+        let overrides = plan
+            .inputs
+            .iter()
+            .map(|i| format!("cmd.IsSet(\"{}\")", i.flag))
+            .collect::<Vec<_>>()
+            .join(" || ");
+        if !overrides.is_empty() {
+            writeln!(
+                out,
+                "\t\t\t\t\tif _rawBody != nil && ({overrides}) {{\n\t\t\t\t\t\t_rawBody = nil\n\t\t\t\t\t}}"
+            )
+            .unwrap();
+        }
+    } else {
+        guarded(
+            out,
+            "file",
+            &checked("_body.applyFile(\"file\", cmd.String(\"file\"), _schema, _strict)"),
+        );
+    }
     // Documents first (outer before inner is the plan's walk order), then
     // union tags, then leaves and collections: deeper inputs win.
     for input in &plan.inputs {
@@ -344,21 +378,11 @@ pub fn emit_action(op: &Operation, plan: &BodyPlan, schema_const: &str, out: &mu
                 let mut body = String::new();
                 writeln!(
                     body,
-                    "\t\t\t\t\t\t_doc, err := docArg(\"{flag}\", cmd.String(\"{flag}\"))"
+                    "\t\t\t\t\t\t_value, err := _body.applyRootDocument(\"{flag}\", cmd.String(\"{flag}\"), false, _schema, _strict)"
                 )
                 .unwrap();
                 body.push_str(EXIT);
-                writeln!(
-                    body,
-                    "\t\t\t\t\t\tif _obj, ok := _doc.(map[string]any); ok {{"
-                )
-                .unwrap();
-                writeln!(body, "\t\t\t\t\t\t\tif err := _body.merge(\"{flag}\", nil, _obj); err != nil {{\n\t\t\t\t\t\t\t\treturn cli.Exit(err.Error(), 2)\n\t\t\t\t\t\t\t}}").unwrap();
-                writeln!(
-                    body,
-                    "\t\t\t\t\t\t}} else {{\n\t\t\t\t\t\t\t_rawBody = _doc\n\t\t\t\t\t\t}}"
-                )
-                .unwrap();
+                writeln!(body, "\t\t\t\t\t\t_rawBody = _value").unwrap();
                 guarded(out, flag, &body);
             }
             InputKind::Doc(_) => guarded(
@@ -400,8 +424,10 @@ pub fn emit_action(op: &Operation, plan: &BodyPlan, schema_const: &str, out: &mu
                         body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, _v)")));
                     }
                     (Ty::Bool, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Bool(\"{flag}\"))"))),
-                    (Ty::Int32 | Ty::Int64, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Int(\"{flag}\"))"))),
-                    (Ty::Float | Ty::Double, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Float(\"{flag}\"))"))),
+                    (Ty::Int32, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Int32(\"{flag}\"))"))),
+                    (Ty::Int64, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Int64(\"{flag}\"))"))),
+                    (Ty::Float, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Float32(\"{flag}\"))"))),
+                    (Ty::Double, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Float64(\"{flag}\"))"))),
                     (Ty::String | Ty::Bytes, _) => {
                         writeln!(body, "\t\t\t\t\t\t_v, err := stringArg(\"{flag}\", cmd.String(\"{flag}\"))").unwrap();
                         body.push_str(EXIT);
@@ -488,12 +514,7 @@ pub fn emit_action(op: &Operation, plan: &BodyPlan, schema_const: &str, out: &mu
         .filter(|i| !i.path.is_empty())
         .map(|i| format!("\"{}\": \"--{}\"", escape_go(&i.path.join(".")), i.flag))
         .collect();
-    writeln!(
-        out,
-        "\t\t\t\t\tif err := _body.finish(_schema, map[string]string{{{}}}); err != nil {{\n\t\t\t\t\t\treturn cli.Exit(err.Error(), 2)\n\t\t\t\t\t}}",
-        flag_for.join(", ")
-    )
-    .unwrap();
+    let flag_for = format!("map[string]string{{{}}}", flag_for.join(", "));
     if let Some(mask) = &op.update_mask {
         if let Some(input) = plan.inputs.iter().find(|i| i.path == [mask.clone()]) {
             writeln!(
@@ -506,11 +527,19 @@ pub fn emit_action(op: &Operation, plan: &BodyPlan, schema_const: &str, out: &mu
             .unwrap();
         }
     }
-    writeln!(
-        out,
-        "\t\t\t\t\tif cmd.Bool(\"dry-run\") {{\n\t\t\t\t\t\tif _rawBody != nil {{\n\t\t\t\t\t\t\treturn printDocument(_display, _rawBody)\n\t\t\t\t\t\t}}\n\t\t\t\t\t\treturn printDocument(_display, _body.body)\n\t\t\t\t\t}}"
-    )
-    .unwrap();
+    if plan.whole_body {
+        writeln!(
+            out,
+            "\t\t\t\t\tif _rawBody != nil {{\n\t\t\t\t\t\t_value, err := _body.finishValue(_schema, _rawBody, {flag_for}, _strict)\n\t\t\t\t\t\tif err != nil {{\n\t\t\t\t\t\t\treturn cli.Exit(err.Error(), 2)\n\t\t\t\t\t\t}}\n\t\t\t\t\t\t_rawBody = _value\n\t\t\t\t\t}} else if err := _body.finish(_schema, {flag_for}, _strict); err != nil {{\n\t\t\t\t\t\treturn cli.Exit(err.Error(), 2)\n\t\t\t\t\t}}"
+        )
+        .unwrap();
+    } else {
+        writeln!(
+            out,
+            "\t\t\t\t\tif err := _body.finish(_schema, {flag_for}, _strict); err != nil {{\n\t\t\t\t\t\treturn cli.Exit(err.Error(), 2)\n\t\t\t\t\t}}"
+        )
+        .unwrap();
+    }
 }
 
 /// Emit the merge of the assembled body into the params map.

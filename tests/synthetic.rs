@@ -65,6 +65,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
+  /v1/depots:classify:
+    post:
+      tags: [DepotService]
+      summary: Classify depot regions
+      operationId: DepotService_ClassifyDepots
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepotRegion'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: object }
   /v1/depots/{id}:
     get:
       tags: [DepotService]
@@ -205,6 +224,22 @@ fn backends_are_schema_agnostic() {
                 resource.contains("class HealthResource"),
                 "resource class must be collision-suffixed, got:\n{}",
                 &resource[..resource.len().min(400)]
+            );
+        }
+        if backend.name() == "cli" {
+            let conversion = files
+                .iter()
+                .find(|(path, _)| {
+                    path.starts_with("internal/commands/")
+                        && path.contains("depot")
+                        && path.ends_with("_conv.go")
+                })
+                .map(|(_, contents)| contents)
+                .expect("depot conversion emitted");
+            assert!(
+                conversion.contains("applyRootDocument(\"file\"")
+                    && conversion.contains("_body.finishValue("),
+                "whole-body arrays must support -f and schema validation"
             );
         }
         for (path, contents) in &files {

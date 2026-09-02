@@ -36,6 +36,11 @@ impl Backend for OpenApiBackend {
         // Go/CLI sample naming honors the same vendor casings the SDK uses.
         golang::install_config_casings(&self.go_config.special_casings);
 
+        // CLI samples are part of this artifact's public contract. Validate the
+        // complete body surface up front instead of silently omitting flags when
+        // a rename is stale or two generated names collide.
+        cli_inputs::plan_all(api, &self.cli_config)?;
+
         let mut doc: Value = serde_yaml::from_str(&self.spec_source)
             .map_err(|e| anyhow::anyhow!("parsing source spec: {e}"))?;
 
@@ -495,7 +500,9 @@ impl OpenApiBackend {
         // flattened surface (first arm of each union), so the sample is
         // both minimal and accepted by the CLI's own preflight.
         let opts = cli_inputs::plan_options(&self.cli_config, op);
-        if let Ok(Some(body)) = crate::ir::plan::body_plan(api, op, &opts) {
+        if let Some(body) = crate::ir::plan::body_plan(api, op, &opts)
+            .expect("CLI body plans validated before rendering samples")
+        {
             for arg in cli_inputs::sample_args(api, &body) {
                 line.push_str(&format!(" \\\n  {arg}"));
             }
