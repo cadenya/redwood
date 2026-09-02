@@ -344,7 +344,10 @@ fn sample(api: &Api, ty: &Ty, depth: usize, dir: SampleDir) -> Value {
     match ty {
         Ty::String => json!("sample"),
         Ty::Bool => json!(true),
-        Ty::Int32 | Ty::Int64 => json!(1),
+        Ty::Int32 => json!(1),
+        // Deliberately cross the int32 boundary: generated examples and
+        // conformance drivers should prove that int64 values stay wide.
+        Ty::Int64 => json!(4_294_967_296_i64),
         Ty::Float | Ty::Double => json!(1.5),
         Ty::Timestamp => json!("2026-01-01T00:00:00Z"),
         Ty::Bytes => json!("aGVsbG8="),

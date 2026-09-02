@@ -139,6 +139,33 @@ struct Plan<'a> {
     paginated: bool,
 }
 
+pub(crate) fn sample_id(wire: &str) -> String {
+    use heck::ToSnakeCase;
+    let snake = wire.to_snake_case();
+    format!(
+        "{}_123",
+        snake.trim_end_matches("_id").trim_end_matches("id")
+    )
+}
+
+/// Positional path examples traditionally use a descriptive `<name>_123`
+/// token. Integer schemas are the exception: their examples must be numeric
+/// so generated snippets type-check and exercise the declared width.
+pub(crate) fn path_sample(api: &Api, param: &Param) -> serde_json::Value {
+    let mut ty = &param.ty;
+    for _ in 0..8 {
+        match ty {
+            Ty::Int32 | Ty::Int64 => return wire_sample(api, ty),
+            Ty::Named(name) => match api.types.get(name).map(|decl| &decl.shape) {
+                Some(Shape::Alias(inner)) => ty = inner,
+                _ => break,
+            },
+            _ => break,
+        }
+    }
+    serde_json::Value::String(sample_id(&param.wire_name))
+}
+
 fn plan<'a>(api: &Api, op: &'a Operation) -> Plan<'a> {
     let is_client_param = |wire: &str| api.client_params.iter().any(|c| c.wire_name == wire);
     let positionals: Vec<&Param> = op.positionals.iter().collect();
@@ -164,15 +191,6 @@ fn plan<'a>(api: &Api, op: &'a Operation) -> Plan<'a> {
         response: &op.response,
         paginated: op.pagination.is_some(),
     }
-}
-
-pub(crate) fn sample_id(wire: &str) -> String {
-    use heck::ToSnakeCase;
-    let snake = wire.to_snake_case();
-    format!(
-        "{}_123",
-        snake.trim_end_matches("_id").trim_end_matches("id")
-    )
 }
 
 /// Wire-keyed sample for TS/CLI; snake-keyed for Python/Ruby.
@@ -237,7 +255,7 @@ impl OpenApiBackend {
         let method = op.name.to_lower_camel_case();
         let mut args: Vec<String> = Vec::new();
         for p in &plan.positionals {
-            args.push(format!("'{}'", sample_id(&p.wire_name)));
+            args.push(ts_value(&path_sample(api, p)));
         }
         let mut fields: Vec<String> = Vec::new();
         for p in &plan.named {
@@ -301,7 +319,12 @@ impl OpenApiBackend {
         let method = golang::go_name(&op.name);
         let mut args: Vec<String> = vec!["ctx".into()];
         for p in &plan.positionals {
-            args.push(format!("\"{}\"", sample_id(&p.wire_name)));
+            let sample = path_sample(api, p);
+            args.push(match sample {
+                serde_json::Value::Number(number) => number.to_string(),
+                serde_json::Value::String(value) => format!("\"{value}\""),
+                _ => unreachable!("path samples are strings or integers"),
+            });
         }
         let mut pre = String::new();
         if op.has_params() {
@@ -367,7 +390,7 @@ impl OpenApiBackend {
         let method = python::py_name(&op.name);
         let mut args: Vec<String> = Vec::new();
         for p in &plan.positionals {
-            args.push(format!("\"{}\"", sample_id(&p.wire_name)));
+            args.push(python::py_literal(&path_sample(api, p)));
         }
         for p in &plan.named {
             args.push(format!(
@@ -416,7 +439,7 @@ impl OpenApiBackend {
         let method = ruby::rb_name(&op.name);
         let mut args: Vec<String> = Vec::new();
         for p in &plan.positionals {
-            args.push(format!("\"{}\"", sample_id(&p.wire_name)));
+            args.push(ruby::rb_literal(&path_sample(api, p)));
         }
         for p in &plan.named {
             args.push(format!(
@@ -466,7 +489,13 @@ impl OpenApiBackend {
             .join(" ");
         let mut line = format!("{binary} {cmd} {}", cli_backend::command_name(&op.name));
         for p in &plan.positionals {
-            line.push_str(&format!(" {}", sample_id(&p.wire_name)));
+            let value = path_sample(api, p);
+            let rendered = match &value {
+                serde_json::Value::String(s) => s.clone(),
+                serde_json::Value::Bool(_) | serde_json::Value::Number(_) => value.to_string(),
+                other => format!("'{other}'"),
+            };
+            line.push_str(&format!(" {rendered}"));
         }
         let push_flag = |line: &mut String, wire: &str, ty: &Ty| {
             let flag = cli_backend::flag_name(wire);
@@ -510,7 +539,7 @@ impl OpenApiBackend {
         for p in op.positionals.iter().chain(op.path_params.iter()) {
             path = path.replace(
                 &format!("{{{}}}", p.wire_name),
-                &percent_encode(&sample_id(&p.wire_name)),
+                &percent_encode(&curl_scalar(&path_sample(api, p))),
             );
         }
 
@@ -620,7 +649,8 @@ pub(crate) fn go_value(api: &Api, ty: &Ty, pkg: &str) -> String {
     match ty {
         Ty::String | Ty::Timestamp | Ty::Bytes => "\"sample\"".into(),
         Ty::Bool => "true".into(),
-        Ty::Int32 | Ty::Int64 => "1".into(),
+        Ty::Int32 => "1".into(),
+        Ty::Int64 => "4294967296".into(),
         Ty::Float | Ty::Double => "1.0".into(),
         Ty::Literal(v) => format!("\"{v}\""),
         Ty::Json => "map[string]any{}".into(),

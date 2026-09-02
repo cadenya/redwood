@@ -79,7 +79,11 @@ fn emit_api_md(api: &Api) -> String {
             }
             let mut args: Vec<String> = Vec::new();
             for p in &op.positionals {
-                args.push(format!("{}: str", py_name(&p.wire_name)));
+                args.push(format!(
+                    "{}: {}",
+                    py_name(&p.wire_name),
+                    py_param_ty(api, &p.ty, "types.", false)
+                ));
             }
             let mut kwargs: Vec<String> = Vec::new();
             for p in op.path_params.iter().chain(op.query_params.iter()) {
@@ -966,7 +970,13 @@ fn emit_method(api: &Api, resource: &Resource, op: &Operation, out: &mut String)
     writeln!(out, "    def {}(", py_name(&op.name)).unwrap();
     writeln!(out, "        self,").unwrap();
     for p in &op.positionals {
-        writeln!(out, "        {}: str,", py_name(&p.wire_name)).unwrap();
+        writeln!(
+            out,
+            "        {}: {},",
+            py_name(&p.wire_name),
+            py_param_ty(api, &p.ty, "types.", false)
+        )
+        .unwrap();
     }
     let mut kwargs: Vec<(&str, String, bool)> = Vec::new(); // (wire, annotation, has_default)
     for p in op.path_params.iter().chain(op.query_params.iter()) {
@@ -1636,8 +1646,9 @@ client = {name}({conf_auth}base_url=os.environ["MOCK_URL"])
     for resource in &api.resources {
         for op in &resource.operations {
             let mut args: Vec<String> = Vec::new();
-            for _ in &op.positionals {
-                args.push("\"sample\"".into());
+            for p in &op.positionals {
+                let sample = super::manifest_sample(api, &p.ty);
+                args.push(py_literal(&sample));
             }
             for p in op.path_params.iter().chain(op.query_params.iter()) {
                 let sample = super::manifest_sample(api, &p.ty);

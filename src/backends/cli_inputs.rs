@@ -194,8 +194,11 @@ pub fn emit_flags(plan: &BodyPlan, out: &mut String) {
             InputKind::Leaf(Ty::Bool) => {
                 format!("&cli.BoolFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
             }
-            InputKind::Leaf(Ty::Int32) | InputKind::Leaf(Ty::Int64) => {
-                format!("&cli.IntFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
+            InputKind::Leaf(Ty::Int32) => {
+                format!("&cli.Int32Flag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
+            }
+            InputKind::Leaf(Ty::Int64) => {
+                format!("&cli.Int64Flag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
             }
             InputKind::Leaf(Ty::Float) | InputKind::Leaf(Ty::Double) => {
                 format!("&cli.FloatFlag{{Name: \"{name}\", Usage: \"{usage}\"{category}}}")
@@ -400,7 +403,8 @@ pub fn emit_action(op: &Operation, plan: &BodyPlan, schema_const: &str, out: &mu
                         body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, _v)")));
                     }
                     (Ty::Bool, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Bool(\"{flag}\"))"))),
-                    (Ty::Int32 | Ty::Int64, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Int(\"{flag}\"))"))),
+                    (Ty::Int32, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Int32(\"{flag}\"))"))),
+                    (Ty::Int64, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Int64(\"{flag}\"))"))),
                     (Ty::Float | Ty::Double, _) => body.push_str(&checked(&format!("_body.set(\"{flag}\", {path}, cmd.Float(\"{flag}\"))"))),
                     (Ty::String | Ty::Bytes, _) => {
                         writeln!(body, "\t\t\t\t\t\t_v, err := stringArg(\"{flag}\", cmd.String(\"{flag}\"))").unwrap();
@@ -664,7 +668,8 @@ pub fn ty_schema(api: &Api, ty: &Ty, defs: &mut IndexMap<String, Value>) -> Valu
     match ty {
         Ty::String => json!({"type": "string"}),
         Ty::Bool => json!({"type": "boolean"}),
-        Ty::Int32 | Ty::Int64 => json!({"type": "integer"}),
+        Ty::Int32 => json!({"type": "integer", "format": "int32"}),
+        Ty::Int64 => json!({"type": "integer", "format": "int64"}),
         Ty::Float | Ty::Double => json!({"type": "number"}),
         Ty::Timestamp => json!({"type": "string", "format": "date-time"}),
         Ty::Bytes => json!({"type": "string", "format": "byte"}),

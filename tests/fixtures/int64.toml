@@ -1,0 +1,9 @@
+[lang.go]
+module_path = "example.com/wide-numbers-go"
+package_name = "widenumbers"
+
+[lang.cli]
+module_path = "example.com/wide-numbers-cli"
+binary_name = "wide-numbers"
+sdk_module = "example.com/wide-numbers-go"
+sdk_replace = "../go"

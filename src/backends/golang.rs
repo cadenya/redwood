@@ -490,6 +490,35 @@ pub(crate) fn go_ty(_api: &Api, ty: &Ty) -> String {
     }
 }
 
+/// Integer width through component aliases. OpenAPI commonly models IDs as
+/// a named `integer` schema, and path methods must preserve that width rather
+/// than silently turning the ID back into a string.
+fn integer_width(api: &Api, ty: &Ty) -> Option<u8> {
+    let mut current = ty;
+    for _ in 0..8 {
+        match current {
+            Ty::Int32 => return Some(32),
+            Ty::Int64 => return Some(64),
+            Ty::Named(name) => match api.types.get(name).map(|decl| &decl.shape) {
+                Some(Shape::Alias(inner)) => current = inner,
+                _ => return None,
+            },
+            _ => return None,
+        }
+    }
+    None
+}
+
+/// A compile-time sample for the public positional type. String path tokens
+/// retain the traditional sample while integer IDs exercise their width.
+pub(crate) fn positional_sample(api: &Api, ty: &Ty) -> String {
+    match integer_width(api, ty) {
+        Some(64) => "4294967296".to_string(),
+        Some(32) => "1".to_string(),
+        _ => "\"sample\"".to_string(),
+    }
+}
+
 /// Type expression for a field: structs/unions are always pointers (nil =
 /// absent, and it keeps recursive types finite); scalars are pointers only
 /// when optional.
@@ -1067,7 +1096,12 @@ fn return_ty(api: &Api, op: &Operation) -> Option<String> {
 fn method_signature(api: &Api, resource: &Resource, op: &Operation) -> String {
     let mut args = vec!["ctx context.Context".to_string()];
     for p in &op.positionals {
-        args.push(format!("{} string", go_local(&p.wire_name)));
+        let ty = if integer_width(api, &p.ty).is_some() {
+            go_ty(api, &p.ty)
+        } else {
+            "string".to_string()
+        };
+        args.push(format!("{} {ty}", go_local(&p.wire_name)));
     }
     if op.has_params() {
         args.push(format!("params *{}", params_type_name(resource, op)));
@@ -1264,12 +1298,29 @@ fn emit_method(
         fmt_str.push_str(&rest[..start].replace('%', "%%"));
         fmt_str.push_str("%s");
         let param = &rest[start + 1..end];
-        let expr = if op.positionals.iter().any(|p| p.wire_name == param)
-            || client_param(api, param).is_some()
-        {
+        let is_client = client_param(api, param).is_some();
+        let expr = if op.positionals.iter().any(|p| p.wire_name == param) || is_client {
             go_local(param)
         } else {
             format!("params.{}", go_name(param))
+        };
+        // Client parameters are configuration strings. Every other path
+        // parameter keeps its schema type at the public method boundary and
+        // is rendered only when constructing the URL.
+        let expr = if is_client {
+            expr
+        } else {
+            let path_param = op
+                .positionals
+                .iter()
+                .chain(op.path_params.iter())
+                .find(|p| p.wire_name == param)
+                .expect("path placeholder has an IR parameter");
+            if integer_width(api, &path_param.ty).is_some() {
+                scalar_to_string(api, imports, &path_param.ty, &expr).0
+            } else {
+                expr
+            }
         };
         let seg = format!("seg{}", go_name(param));
         writeln!(out, "\t{seg}, err := pathSegment(\"{param}\", {expr})").unwrap();
@@ -1962,8 +2013,7 @@ func main() {{
 fn emit_conformance_call(api: &Api, resource: &Resource, op: &Operation, out: &mut String) {
     let mut call_args = vec!["ctx".to_string()];
     for p in &op.positionals {
-        call_args.push("\"sample\"".to_string());
-        let _ = p;
+        call_args.push(positional_sample(api, &p.ty));
     }
     if op.has_params() {
         // Build the params sample as JSON, decoded via the struct's tags.

@@ -1,0 +1,87 @@
+openapi: 3.1.0
+info:
+  title: Wide Numbers API
+  version: '1.0'
+servers:
+  - url: https://wide-numbers.example
+paths:
+  /v1/things/{thingId}:
+    get:
+      tags: [ThingsService]
+      operationId: ThingsService_GetThing
+      parameters:
+        - name: thingId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ResourceId'
+        - name: relatedId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: smallCount
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thing'
+    patch:
+      tags: [ThingsService]
+      operationId: ThingsService_UpdateThing
+      parameters:
+        - name: thingId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateThingRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thing'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ResourceId:
+      type: integer
+      format: int64
+      minimum: 1
+    Thing:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '#/components/schemas/ResourceId'
+        total:
+          type: integer
+          format: int64
+    UpdateThingRequest:
+      type: object
+      required: [ownerId, smallCount]
+      properties:
+        ownerId:
+          type: integer
+          format: int64
+        smallCount:
+          type: integer
+          format: int32
+security:
+  - bearerAuth: []

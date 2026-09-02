@@ -86,11 +86,11 @@ const DEFAULT_TIMEOUT_MS = 60_000;
  * Encode one path segment, rejecting empty/whitespace values at the boundary
  * — an empty segment would silently rewrite the route (/parents//children).
  */
-export function pathSegment(name: string, value: string | undefined): string {
+export function pathSegment(name: string, value: QueryPrimitive | undefined): string {
   if (value === undefined || String(value).trim() === '') {
     throw new Error(`Missing required path parameter '${name}'.`);
   }
-  return encodeURIComponent(value);
+  return encodeURIComponent(String(value));
 }
 
 /**

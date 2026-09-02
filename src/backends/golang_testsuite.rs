@@ -49,7 +49,7 @@ fn skip_frame(api: &Api) -> String {
     }
 }
 
-fn sample_path(op: &Operation) -> String {
+fn sample_path(api: &Api, op: &Operation) -> String {
     let mut out = String::new();
     let mut rest = op.path.as_str();
     while let Some(start) = rest.find('{') {
@@ -58,7 +58,15 @@ fn sample_path(op: &Operation) -> String {
             .map(|e| start + e)
             .expect("balanced");
         out.push_str(&rest[..start]);
-        out.push_str("sample");
+        let wire = &rest[start + 1..end];
+        let value = op
+            .positionals
+            .iter()
+            .chain(op.path_params.iter())
+            .find(|p| p.wire_name == wire)
+            .map(|p| wire_sample_go(api, &p.ty, 0))
+            .unwrap_or_else(|| json!("sample"));
+        out.push_str(&scalar_str(&value));
         rest = &rest[end + 1..];
     }
     out.push_str(rest);
@@ -101,7 +109,8 @@ fn wire_sample_go(api: &Api, ty: &Ty, depth: usize) -> Value {
     match ty {
         Ty::String => json!("sample"),
         Ty::Bool => json!(true),
-        Ty::Int32 | Ty::Int64 => json!(1),
+        Ty::Int32 => json!(1),
+        Ty::Int64 => json!(4_294_967_296_i64),
         Ty::Float | Ty::Double => json!(1.0),
         Ty::Timestamp => json!("2026-01-01T00:00:00Z"),
         Ty::Bytes => json!("sample"),
@@ -191,7 +200,7 @@ fn set_in(value: &mut Value, path: &str, new: Value) {
 }
 
 fn golden_file(api: &Api, op: &Operation) -> String {
-    let path = sample_path(op);
+    let path = sample_path(api, op);
     let body = request_body_value(api, op);
     let method = op.http_method.as_str();
     let interaction = |query: Value, status: u16, content_type: &str, response_body: String| {
@@ -351,8 +360,8 @@ fn call_expr(
     skip_client_params: bool,
 ) -> String {
     let mut args = vec!["ctx".to_string()];
-    for _ in &op.positionals {
-        args.push("\"sample\"".into());
+    for p in &op.positionals {
+        args.push(super::golang::positional_sample(api, &p.ty));
     }
     if let Some(params) = params_expr(api, resource, op, pkg, skip_client_params) {
         args.push(params);

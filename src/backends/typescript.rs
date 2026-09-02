@@ -1215,7 +1215,7 @@ fn ts_example_value(v: &serde_json::Value) -> String {
 /// object holding only the REQUIRED non-client fields (client defaults stay
 /// invisible, like idiomatic call sites).
 fn ts_doc_example(api: &Api, resource: &Resource, op: &Operation) -> String {
-    use super::openapi_export::sample_id;
+    use super::openapi_export::path_sample;
     let accessor = resource
         .path()
         .split('.')
@@ -1225,7 +1225,7 @@ fn ts_doc_example(api: &Api, resource: &Resource, op: &Operation) -> String {
     let method = op.name.to_lower_camel_case();
     let mut args: Vec<String> = Vec::new();
     for p in &op.positionals {
-        args.push(format!("'{}'", sample_id(&p.wire_name)));
+        args.push(ts_example_value(&path_sample(api, p)));
     }
     let mut entries: Vec<String> = Vec::new();
     for p in op.path_params.iter().chain(op.query_params.iter()) {
@@ -1233,9 +1233,9 @@ fn ts_doc_example(api: &Api, resource: &Resource, op: &Operation) -> String {
             continue;
         }
         entries.push(format!(
-            "{}: '{}'",
+            "{}: {}",
             prop_key(&p.wire_name),
-            sample_id(&p.wire_name)
+            ts_example_value(&path_sample(api, p))
         ));
     }
     for f in op.body_fields.iter().filter(|f| f.required) {
@@ -1903,7 +1903,11 @@ fn emit_api_md(api: &Api) -> String {
             }
             let mut args: Vec<String> = Vec::new();
             for p in &op.positionals {
-                args.push(format!("{}: string", p.wire_name.to_lower_camel_case()));
+                args.push(format!(
+                    "{}: {}",
+                    p.wire_name.to_lower_camel_case(),
+                    ts_ty(&p.ty)
+                ));
             }
             if op.has_params() {
                 let optional = if params_arg_required(api, op) {
