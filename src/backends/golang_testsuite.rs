@@ -371,6 +371,9 @@ fn harness(api: &Api, pkg: &str) -> String {
     let mut client_opts: Vec<String> = vec![format!("{pkg}.WithBaseURL(baseURL)")];
     match &api.auth {
         Auth::None => {}
+        Auth::Basic => client_opts.push(format!(
+            "{pkg}.WithBasicAuth(\"test-user\", \"test-password\")"
+        )),
         _ => client_opts.push(format!("{pkg}.WithAPIKey(\"test-key\")")),
     }
     for c in &api.client_params {
@@ -783,6 +786,7 @@ func TestClientConstruction(t *testing.T) {{
         pkg = pkg,
         ctor_opts = match &api.auth {
             Auth::None => String::new(),
+            Auth::Basic => format!("{pkg}.WithBasicAuth(\"test-user\", \"test-password\"), "),
             _ => format!("{pkg}.WithAPIKey(\"test-key\"), "),
         },
     );
@@ -871,6 +875,22 @@ func TestAuthenticationHeader(t *testing.T) {{
 	_, err := {call}
 	require.NoError(t, err)
 	require.Equal(t, "test-key", (*headers).Get("{header}"))
+}}"#,
+                call = go_get_call("client")
+            )
+            .unwrap();
+        }
+        Auth::Basic => {
+            writeln!(
+                out,
+                r#"
+func TestAuthenticationHeader(t *testing.T) {{
+	server, _, headers := sequenceServer(t, {ok_literal})
+	client := newTestClient(t, server.URL)
+	ctx := context.Background()
+	_, err := {call}
+	require.NoError(t, err)
+	require.Equal(t, "Basic dGVzdC11c2VyOnRlc3QtcGFzc3dvcmQ=", (*headers).Get("Authorization"))
 }}"#,
                 call = go_get_call("client")
             )

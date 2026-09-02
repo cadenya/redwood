@@ -94,6 +94,8 @@ pub fn apply(api: &mut crate::ir::Api, cfg: &GeneratorConfig) -> Result<()> {
         // Env-var defaults derive from the client name, so they follow the
         // rename (an explicit env_var/webhook_env_var below still wins).
         api.api_key_env = format!("{}_API_KEY", name.to_uppercase());
+        api.basic_username_env = format!("{}_USERNAME", name.to_uppercase());
+        api.basic_password_env = format!("{}_PASSWORD", name.to_uppercase());
         api.webhook_env = format!("{}_WEBHOOK_SECRET", name.to_uppercase());
     }
     if let Some(base_url) = &cfg.api.base_url {
@@ -132,6 +134,12 @@ pub fn apply(api: &mut crate::ir::Api, cfg: &GeneratorConfig) -> Result<()> {
     if let Some(env) = &cfg.api.env_var {
         api.api_key_env = env.clone();
     }
+    if let Some(env) = &cfg.api.basic_username_env_var {
+        api.basic_username_env = env.clone();
+    }
+    if let Some(env) = &cfg.api.basic_password_env_var {
+        api.basic_password_env = env.clone();
+    }
     if let Some(env) = &cfg.api.webhook_env_var {
         api.webhook_env = env.clone();
     }
@@ -149,6 +157,8 @@ pub fn apply(api: &mut crate::ir::Api, cfg: &GeneratorConfig) -> Result<()> {
         // Built-in client options in every target's constructor surface.
         let reserved = [
             "api_key",
+            "username",
+            "password",
             "base_url",
             "webhook_secret",
             "max_retries",
@@ -528,6 +538,12 @@ pub struct ApiConfig {
     pub base_url: Option<String>,
     /// Env var holding the API key; defaults to `<NAME>_API_KEY`.
     pub env_var: Option<String>,
+    /// Env var holding the HTTP Basic Auth username; defaults to
+    /// `<NAME>_USERNAME`.
+    pub basic_username_env_var: Option<String>,
+    /// Env var holding the HTTP Basic Auth password; defaults to
+    /// `<NAME>_PASSWORD`.
+    pub basic_password_env_var: Option<String>,
     /// Wire names of params that become client-level defaults, settable at
     /// construction or via `<NAME>_<PARAM>` env vars. e.g. ["workspaceId"].
     #[serde(default)]

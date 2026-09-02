@@ -487,8 +487,13 @@ fn default_stub_response(api: &Api, op: &Operation) -> String {
 
 fn spec_helper(api: &Api, gem: &str) -> String {
     let mut client_args: Vec<String> = Vec::new();
-    if !matches!(api.auth, Auth::None) {
-        client_args.push("api_key: \"test-key\"".into());
+    match api.auth {
+        Auth::None => {}
+        Auth::Basic => {
+            client_args.push("username: \"test-user\"".into());
+            client_args.push("password: \"test-password\"".into());
+        }
+        _ => client_args.push("api_key: \"test-key\"".into()),
     }
     for c in &api.client_params {
         let snake = rb_name(&c.wire_name);
@@ -679,6 +684,20 @@ fn behavior_spec(api: &Api, module: &str) -> String {
             writeln!(out, "    stub = {stub_line}.to_return({get_response})").unwrap();
             writeln!(out, "    {get_call}").unwrap();
             writeln!(out, "    expect(WebMock).to(have_requested(:get, %r{{.*}}).with {{ |req| req.headers[\"{header}\"] == \"test-key\" }})").unwrap();
+            writeln!(out, "  end").unwrap();
+            writeln!(out, "end").unwrap();
+        }
+        Auth::Basic => {
+            writeln!(out, "\nRSpec.describe \"authentication\" do").unwrap();
+            writeln!(out, "  let(:client) {{ build_client }}").unwrap();
+            writeln!(
+                out,
+                "  it \"sends the HTTP Basic credential on every request\" do"
+            )
+            .unwrap();
+            writeln!(out, "    stub = {stub_line}.to_return({get_response})").unwrap();
+            writeln!(out, "    {get_call}").unwrap();
+            writeln!(out, "    expect(WebMock).to(have_requested(:get, %r{{.*}}).with {{ |req| req.headers[\"Authorization\"] == \"Basic dGVzdC11c2VyOnRlc3QtcGFzc3dvcmQ=\" }})").unwrap();
             writeln!(out, "  end").unwrap();
             writeln!(out, "end").unwrap();
         }
