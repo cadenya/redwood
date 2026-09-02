@@ -18,6 +18,7 @@ case "${target}" in
     node "${repo_root}/e2e/ts-config-matrix.mjs"
     node "${repo_root}/e2e/ts-apipromise.mjs"
     node "${repo_root}/e2e/ts-directional-wire.mjs"
+    node "${repo_root}/e2e/ts-query-flatten.mjs"
     node "${repo_root}/e2e/ts-sse-reconnect.mjs"
     node "${repo_root}/e2e/conformance/ts-driver.mjs"
     ;;
