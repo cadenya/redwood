@@ -3,6 +3,18 @@
 Notable changes to Redwood are documented here. This file is maintained by
 Release Please from Conventional Commit messages.
 
+## [0.3.1](https://github.com/cadenya/redwood/compare/v0.3.0...v0.3.1) (2026-09-02)
+
+
+### Refactors
+
+* **cli:** generate typed command conversion ([#6](https://github.com/cadenya/redwood/issues/6)) ([949e243](https://github.com/cadenya/redwood/commit/949e2436d5cce03dd484b94db33bf617980fefdc))
+
+
+### Build System
+
+* **deps:** bump the github-actions group with 8 updates ([#7](https://github.com/cadenya/redwood/issues/7)) ([23c3de4](https://github.com/cadenya/redwood/commit/23c3de4ee2ea53065ceff2540e6401b563a084d5))
+
 ## [0.3.0](https://github.com/cadenya/redwood/compare/v0.2.0...v0.3.0) (2026-08-28)
 
 
