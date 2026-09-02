@@ -1,0 +1,62 @@
+openapi: 3.1.0
+info:
+  title: QueryFixture
+  version: '1.0'
+servers:
+  - url: https://api.example.test
+paths:
+  /v1/reports/summary:
+    get:
+      tags: [ReportService]
+      operationId: ReportService_QuerySummary
+      summary: Query a report summary
+      parameters:
+        - name: range.start
+          in: query
+          schema: { type: string, format: date-time }
+        - name: range.end
+          in: query
+          schema: { type: string, format: date-time }
+        - name: filters.resourceId
+          in: query
+          schema: { type: string }
+        - name: filters.states
+          in: query
+          schema:
+            type: array
+            items: { type: string }
+        - name: interval
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReportInterval'
+        - name: groupBy
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReportGroupBy'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSummary'
+components:
+  schemas:
+    ReportInterval:
+      type: string
+      enum: [REPORT_INTERVAL_DAY, REPORT_INTERVAL_HOUR]
+    ReportGroupBy:
+      type: string
+      enum: [REPORT_GROUP_BY_STATE, REPORT_GROUP_BY_RESOURCE]
+    ReportSummary:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportPoint'
+    ReportPoint:
+      type: object
+      properties:
+        timestamp: { type: string, format: date-time }
+        value: { type: number, format: double }
