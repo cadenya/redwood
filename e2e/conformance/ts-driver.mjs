@@ -19,6 +19,19 @@ const client = new Cadenya({ apiKey: 'conformance-key', baseURL });
 
 const toCamel = (s) => s.replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase());
 
+const setNested = (target, path, value) => {
+  const segments = path.split('.');
+  let owner = target;
+  for (const segment of segments.slice(0, -1)) {
+    const current = owner[segment];
+    if (current !== undefined && (current === null || typeof current !== 'object')) {
+      throw new Error(`query parameter ${path} collides at ${segment}`);
+    }
+    owner = owner[segment] ??= {};
+  }
+  owner[segments.at(-1)] = value;
+};
+
 const results = [];
 for (const op of manifest.operations) {
   const label = `${op.resource}.${op.method}`;
@@ -30,9 +43,10 @@ for (const op of manifest.operations) {
     if (typeof fn !== 'function') throw new Error(`missing method ${toCamel(op.method)}`);
 
     const params = {};
-    for (const p of [...op.pathParams, ...op.queryParams, ...op.bodyFields]) {
+    for (const p of [...op.pathParams, ...op.bodyFields]) {
       params[p.name] = p.sample;
     }
+    for (const p of op.queryParams) setNested(params, p.name, p.sample);
     if (op.wholeBody) params.body = op.wholeBody.sample;
     const args = [];
     for (const pos of op.positionals ?? []) args.push(pos.sample);

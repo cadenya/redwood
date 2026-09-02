@@ -30,6 +30,13 @@ for target in typescript go python ruby cli docs manifest openapi; do
     --out "${out_root}/${target}"
 done
 
+# Keep a small schema-controlled TypeScript fixture for behavior that may not
+# be present in every revision of the published contract.
+"${redwood_bin}" \
+  --spec "${repo_root}/e2e/fixtures/dotted-query.yml" \
+  --language typescript \
+  --out "${out_root}/fixtures/typescript-dotted-query"
+
 # Exercise Redwood's URL input path directly in addition to using the frozen
 # snapshot above for a consistent cross-language matrix.
 url_probe="$(mktemp -d "${TMPDIR:-/tmp}/redwood-url-probe.XXXXXX")"

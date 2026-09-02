@@ -14,6 +14,19 @@ case "${target}" in
       npm run build
       npm run typecheck
     )
+    (
+      cd "${repo_root}/gen/fixtures/typescript-dotted-query"
+      npm install --no-audit --no-fund
+      npm run build
+    )
+    "${repo_root}/gen/fixtures/typescript-dotted-query/node_modules/.bin/tsc" \
+      --noEmit \
+      --strict \
+      --target ES2022 \
+      --lib ES2022,DOM \
+      --module NodeNext \
+      --moduleResolution NodeNext \
+      "${repo_root}/e2e/ts-query-flatten-usage.mts"
     node "${repo_root}/e2e/smoke.mjs"
     node "${repo_root}/e2e/ts-config-matrix.mjs"
     node "${repo_root}/e2e/ts-apipromise.mjs"
