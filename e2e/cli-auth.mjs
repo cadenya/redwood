@@ -6,7 +6,9 @@
 // workspaces extension stored, status while logged in, logout, and a login
 // that ends in expired_token.
 //
-// Run: node e2e/cli-auth.mjs   (needs REDWOOD_BIN or target/debug/redwood + gen/go)
+// Run: node e2e/cli-auth.mjs
+// Needs REDWOOD_BIN or target/debug/redwood plus gen/go and the frozen
+// gen/api-spec.ci.yml snapshot they were generated from.
 import { createServer } from 'node:http';
 import { execFileSync, execFile } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, statSync, existsSync, rmSync } from 'node:fs';
@@ -97,8 +99,15 @@ writeFileSync(
 const outDir = join(root, 'gen/cli-auth-e2e'); // sibling of gen/go for the ../go replace
 rmSync(outDir, { recursive: true, force: true });
 const redwoodBin = process.env.REDWOOD_BIN ?? join(root, 'target/debug/redwood');
+const fixtureSpec = join(root, 'gen/api-spec.ci.yml');
+if (!existsSync(fixtureSpec)) {
+  throw new Error('missing gen/api-spec.ci.yml; run scripts/generate-live-spec.sh first');
+}
 execFileSync(redwoodBin, [
-  '--spec', join(root, 'api-spec.yml'),
+  // The generated CLI replaces its SDK dependency with ../go. Both artifacts
+  // must use the same contract snapshot or removed operations leave the CLI
+  // referring to SDK parameter types that cannot exist.
+  '--spec', fixtureSpec,
   '--config', fixtureConfig,
   '--language', 'cli',
   '--out', outDir,

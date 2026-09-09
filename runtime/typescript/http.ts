@@ -38,7 +38,12 @@ export interface RequestOptions {
 }
 
 export type QueryPrimitive = string | number | boolean;
-export type QueryValue = QueryPrimitive | QueryPrimitive[] | undefined | null;
+/**
+ * Query objects are flattened to dot-delimited paths. `object` is used here
+ * deliberately so generated named interfaces (which do not declare an index
+ * signature) remain assignable as query parameter values.
+ */
+export type QueryValue = QueryPrimitive | readonly QueryPrimitive[] | object | undefined | null;
 
 export interface RequestSpec {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -589,14 +594,48 @@ export class HttpClient {
 
   private buildURL(path: string, query?: Record<string, QueryValue>): string {
     const url = new URL(this.baseURL + path);
+    const ancestors = new Set<object>();
     for (const [key, value] of Object.entries(query ?? {})) {
-      if (value === undefined || value === null) continue;
-      // Arrays serialize as repeated params: ?state=a&state=b
-      for (const item of Array.isArray(value) ? value : [value]) {
-        url.searchParams.append(key, String(item));
-      }
+      appendQueryValue(url.searchParams, key, value, ancestors);
     }
     return url.toString();
+  }
+}
+
+/**
+ * Flatten nested query objects to dot-delimited paths. Arrays retain the
+ * existing repeated-parameter behavior at whichever path they occur:
+ * `{ filters: { state: ['a', 'b'] } }` becomes
+ * `?filters.state=a&filters.state=b`.
+ */
+function appendQueryValue(
+  searchParams: URLSearchParams,
+  key: string,
+  value: unknown,
+  ancestors: Set<object>,
+): void {
+  if (value === undefined || value === null) return;
+
+  if (typeof value !== 'object') {
+    searchParams.append(key, String(value));
+    return;
+  }
+
+  if (ancestors.has(value)) {
+    throw new APIRequestError('query parameters contain a circular reference', undefined);
+  }
+  ancestors.add(value);
+  try {
+    if (Array.isArray(value)) {
+      for (const item of value) appendQueryValue(searchParams, key, item, ancestors);
+      return;
+    }
+
+    for (const [childKey, childValue] of Object.entries(value)) {
+      appendQueryValue(searchParams, `${key}.${childKey}`, childValue, ancestors);
+    }
+  } finally {
+    ancestors.delete(value);
   }
 }
 

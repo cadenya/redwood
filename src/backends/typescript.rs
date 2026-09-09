@@ -26,6 +26,15 @@ impl Backend for TypeScriptBackend {
     }
 
     fn generate(&self, api: &Api) -> anyhow::Result<FileSet> {
+        // Dotted query names share one SDK-facing object per root segment.
+        // Validate those trees before emission so ambiguous scalar/object
+        // collisions fail generation instead of producing invalid TypeScript.
+        for resource in &api.resources {
+            for op in &resource.operations {
+                query_param_tree(op)?;
+            }
+        }
+
         let mut files = FileSet::new();
         files.insert("src/core/error.ts".into(), RT_ERROR.to_string());
         files.insert("src/core/http.ts".into(), RT_HTTP.to_string());
@@ -739,6 +748,14 @@ fn prop_access(target: &str, name: &str, optional: bool) -> String {
     }
 }
 
+fn nested_prop_access(target: &str, path: &str, optional_root: bool) -> String {
+    let mut out = target.to_string();
+    for (index, segment) in path.split('.').enumerate() {
+        out = prop_access(&out, segment, optional_root || index > 0);
+    }
+    out
+}
+
 fn doc(out: &mut String, indent: &str, text: &str) {
     let text = text.trim();
     if text.is_empty() {
@@ -897,6 +914,132 @@ fn params_type_name(api_resource: &Resource, op: &Operation) -> String {
         .join("_")
         .to_upper_camel_case();
     format!("{singular}{}Params", op.name.to_upper_camel_case())
+}
+
+/// TypeScript presents dotted query parameters as nested objects even though
+/// the IR keeps their exact wire names. The HTTP runtime flattens these
+/// objects back to dotted keys when it constructs the URL.
+#[derive(Debug)]
+struct QueryParamNode<'a> {
+    segment: &'a str,
+    param: Option<&'a Param>,
+    children: Vec<QueryParamNode<'a>>,
+}
+
+fn query_param_tree(op: &Operation) -> anyhow::Result<Vec<QueryParamNode<'_>>> {
+    fn first_param<'a>(node: &'a QueryParamNode<'a>) -> Option<&'a Param> {
+        node.param
+            .or_else(|| node.children.iter().find_map(first_param))
+    }
+
+    fn insert<'a>(
+        nodes: &mut Vec<QueryParamNode<'a>>,
+        segments: &[&'a str],
+        param: &'a Param,
+        operation_id: &str,
+    ) -> anyhow::Result<()> {
+        let segment = segments[0];
+        let index = match nodes.iter().position(|node| node.segment == segment) {
+            Some(index) => index,
+            None => {
+                nodes.push(QueryParamNode {
+                    segment,
+                    param: None,
+                    children: Vec::new(),
+                });
+                nodes.len() - 1
+            }
+        };
+        let node = &mut nodes[index];
+
+        if segments.len() == 1 {
+            if let Some(existing) = first_param(node) {
+                anyhow::bail!(
+                    "{operation_id}: query parameters {:?} and {:?} collide when represented as a nested TypeScript params object",
+                    existing.wire_name,
+                    param.wire_name,
+                );
+            }
+            node.param = Some(param);
+            return Ok(());
+        }
+
+        if let Some(existing) = node.param {
+            anyhow::bail!(
+                "{operation_id}: query parameters {:?} and {:?} collide when represented as a nested TypeScript params object",
+                existing.wire_name,
+                param.wire_name,
+            );
+        }
+        insert(&mut node.children, &segments[1..], param, operation_id)
+    }
+
+    let mut roots = Vec::new();
+    for param in &op.query_params {
+        let segments: Vec<&str> = param.wire_name.split('.').collect();
+        insert(&mut roots, &segments, param, &op.id)?;
+    }
+    Ok(roots)
+}
+
+fn query_node_required(api: &Api, node: &QueryParamNode<'_>) -> bool {
+    match node.param {
+        Some(param) => param.required && client_param(api, &param.wire_name).is_none(),
+        None => node
+            .children
+            .iter()
+            .any(|child| query_node_required(api, child)),
+    }
+}
+
+fn emit_param_member(api: &Api, out: &mut String, indent: &str, member_name: &str, param: &Param) {
+    let fallback = client_param(api, &param.wire_name);
+    let is_required = param.required && fallback.is_none();
+    let mut description = param.description.clone().unwrap_or_default();
+    if let Some(client_param) = fallback {
+        if !description.is_empty() {
+            description.push_str("\n\n");
+        }
+        description.push_str(&format!(
+            "Defaults to the client-level `{}` option or the {} environment variable.",
+            client_param.wire_name.to_lower_camel_case(),
+            client_param.env_var
+        ));
+    }
+    if !description.is_empty() {
+        doc(out, indent, &description);
+    }
+    let optional = if is_required { "" } else { "?" };
+    writeln!(
+        out,
+        "{indent}{}{optional}: {};",
+        prop_key(member_name),
+        ts_ty(&param.ty)
+    )
+    .unwrap();
+}
+
+fn emit_query_node(api: &Api, out: &mut String, indent: &str, node: &QueryParamNode<'_>) {
+    if let Some(param) = node.param {
+        emit_param_member(api, out, indent, node.segment, param);
+        return;
+    }
+
+    let optional = if query_node_required(api, node) {
+        ""
+    } else {
+        "?"
+    };
+    writeln!(out, "{indent}{}{optional}: {{", prop_key(node.segment)).unwrap();
+    let child_indent = format!("{indent}  ");
+    for required_pass in [true, false] {
+        for child in &node.children {
+            if query_node_required(api, child) == required_pass {
+                emit_query_node(api, out, &child_indent, child);
+            }
+        }
+    }
+    writeln!(out, "{indent}}};").unwrap();
 }
 
 fn singularize(word: &str) -> String {
@@ -1122,37 +1265,21 @@ fn emit_params_interface(api: &Api, out: &mut String, resource: &Resource, op: &
         params_type_name(resource, op)
     )
     .unwrap();
+    let query_roots = query_param_tree(op).expect("query parameter tree validated before emission");
     // Required data reads first: two passes so docs/IDE hover lead with what
     // the caller must supply (property order carries no runtime meaning).
     for required_pass in [true, false] {
-        for p in op.path_params.iter().chain(op.query_params.iter()) {
-            let fallback = client_param(api, &p.wire_name);
-            let is_required = p.required && fallback.is_none();
+        for param in &op.path_params {
+            let is_required = param.required && client_param(api, &param.wire_name).is_none();
             if is_required != required_pass {
                 continue;
             }
-            let mut description = p.description.clone().unwrap_or_default();
-            if let Some(c) = fallback {
-                if !description.is_empty() {
-                    description.push_str("\n\n");
-                }
-                description.push_str(&format!(
-                    "Defaults to the client-level `{}` option or the {} environment variable.",
-                    c.wire_name.to_lower_camel_case(),
-                    c.env_var
-                ));
+            emit_param_member(api, out, "  ", &param.wire_name, param);
+        }
+        for root in &query_roots {
+            if query_node_required(api, root) == required_pass {
+                emit_query_node(api, out, "  ", root);
             }
-            if !description.is_empty() {
-                doc(out, "  ", &description);
-            }
-            let optional = if is_required { "" } else { "?" };
-            writeln!(
-                out,
-                "  {}{optional}: {};",
-                prop_key(&p.wire_name),
-                ts_ty(&p.ty)
-            )
-            .unwrap();
         }
         for f in &op.body_fields {
             if f.required != required_pass {
@@ -1210,6 +1337,23 @@ fn ts_example_value(v: &serde_json::Value) -> String {
     }
 }
 
+fn query_node_example(api: &Api, node: &QueryParamNode<'_>) -> Option<String> {
+    if let Some(param) = node.param {
+        return (param.required && client_param(api, &param.wire_name).is_none())
+            .then(|| ts_example_value(&super::manifest_sample(api, &param.ty)));
+    }
+
+    let children: Vec<String> = node
+        .children
+        .iter()
+        .filter_map(|child| {
+            query_node_example(api, child)
+                .map(|value| format!("{}: {value}", prop_key(child.segment)))
+        })
+        .collect();
+    (!children.is_empty()).then(|| format!("{{ {} }}", children.join(", ")))
+}
+
 /// A runnable usage snippet for the method, embedded as @example JSDoc.
 /// Arguments mirror the real signature: positional sample ids, then a params
 /// object holding only the REQUIRED non-client fields (client defaults stay
@@ -1228,7 +1372,7 @@ fn ts_doc_example(api: &Api, resource: &Resource, op: &Operation) -> String {
         args.push(format!("'{}'", sample_id(&p.wire_name)));
     }
     let mut entries: Vec<String> = Vec::new();
-    for p in op.path_params.iter().chain(op.query_params.iter()) {
+    for p in &op.path_params {
         if !p.required || client_param(api, &p.wire_name).is_some() {
             continue;
         }
@@ -1237,6 +1381,11 @@ fn ts_doc_example(api: &Api, resource: &Resource, op: &Operation) -> String {
             prop_key(&p.wire_name),
             sample_id(&p.wire_name)
         ));
+    }
+    for root in query_param_tree(op).expect("query parameter tree validated before emission") {
+        if let Some(value) = query_node_example(api, &root) {
+            entries.push(format!("{}: {value}", prop_key(root.segment)));
+        }
     }
     for f in op.body_fields.iter().filter(|f| f.required) {
         entries.push(format!(
@@ -1358,7 +1507,7 @@ fn emit_method(api: &Api, out: &mut String, resource: &Resource, op: &Operation)
             writeln!(
                 lines,
                 "{indent}const {local} = String({} ?? this._client.defaults['{}'] ?? '').trim() || undefined;",
-                prop_access("params", &p.wire_name, params_optional),
+                nested_prop_access("params", &p.wire_name, params_optional),
                 c.wire_name,
             )
             .unwrap();
@@ -1380,16 +1529,20 @@ fn emit_method(api: &Api, out: &mut String, resource: &Resource, op: &Operation)
         format!("path: {path_expr}"),
     ];
     if !op.query_params.is_empty() {
-        let entries: Vec<String> = op
-            .query_params
+        let entries: Vec<String> = query_param_tree(op)
+            .expect("query parameter tree validated before emission")
             .iter()
-            .map(|p| {
-                let value = if client_param(api, &p.wire_name).is_some() {
-                    p.wire_name.to_lower_camel_case()
+            .map(|root| {
+                let value = if let Some(param) = root.param {
+                    if client_param(api, &param.wire_name).is_some() {
+                        param.wire_name.to_lower_camel_case()
+                    } else {
+                        prop_access("params", root.segment, params_optional)
+                    }
                 } else {
-                    prop_access("params", &p.wire_name, params_optional)
+                    prop_access("params", root.segment, params_optional)
                 };
-                format!("{}: {}", prop_key(&p.wire_name), value)
+                format!("{}: {}", prop_key(root.segment), value)
             })
             .collect();
         spec_lines.push(format!("query: {{ {} }}", entries.join(", ")));
