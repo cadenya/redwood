@@ -214,7 +214,7 @@ try {
   const fakerAssignment = await client.agents.variations.addAssignment(
     agentId,
     variationId,
-    { body: { type: 'toolSetId', toolSetId: fakerId } },
+    { type: 'toolSetId', toolSetId: fakerId },
     requestOptions(),
   );
   assert.ok(fakerAssignment.id, 'faker assignment omitted row id');
@@ -222,7 +222,7 @@ try {
   const bareAssignment = await client.agents.variations.addAssignment(
     agentId,
     variationId,
-    { body: { type: 'toolId', toolId: bareToolId } },
+    { type: 'toolId', toolId: bareToolId },
     requestOptions(),
   );
   assert.ok(bareAssignment.id, 'bare assignment omitted row id');

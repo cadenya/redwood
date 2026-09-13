@@ -124,7 +124,7 @@ fn operation_json(
         "pathParams": params_json(&op.path_params),
         "queryParams": params_json(&op.query_params),
         "bodyFields": body_json,
-        // A non-object body sent whole (params carry it as `body`). A
+        // A body sent whole (TypeScript exposes discriminated unions directly). A
         // discriminated union additionally lists its arms as `choices`, the
         // shape flag-driven surfaces (the CLI) expose instead of a document:
         // exactly one arm is given, keyed by `name`, and the request body is
@@ -132,6 +132,7 @@ fn operation_json(
         "wholeBody": op.whole_body.as_ref().map(|ty| {
             let mut body = json!({
                 "sample": sample(api, ty, 0, SampleDir::Input),
+                "typescriptDirect": super::typescript::direct_union_body(api, op),
             });
             if let Some(choices) = api.body_choices(op) {
                 let arms: Vec<Value> = choices.iter().map(|c| {

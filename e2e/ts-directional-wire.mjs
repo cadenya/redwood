@@ -85,16 +85,14 @@ if (JSON.stringify(outputShapedSpec) !== before) {
 // workspaceId/agentId/variationId alongside the input ID field.
 {
   const body = await capture(() => client.agents.variations.addAssignment('agent_1', 'variation_1', {
-    body: {
-      type: 'toolId',
-      toolId: 'tool_9',
-      workspaceId: 'w_leak',
-      agentId: 'a_leak',
-      variationId: 'v_leak',
-    },
+    type: 'toolId',
+    toolId: 'tool_9',
+    workspaceId: 'w_override',
+    agentId: 'a_leak',
+    variationId: 'v_leak',
   }));
   const flat = JSON.stringify(body ?? {});
-  if (flat.includes('w_leak') || flat.includes('a_leak') || flat.includes('v_leak')) {
+  if (flat.includes('w_override') || flat.includes('a_leak') || flat.includes('v_leak')) {
     failures.push(`addAssignment leaked readOnly union fields: ${flat}`);
   }
   if (!flat.includes('tool_9')) failures.push(`addAssignment dropped the input toolId: ${flat}`);

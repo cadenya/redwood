@@ -140,7 +140,9 @@ const cleanupOperations = {
 
 function paramsExpression(op) {
   const entries = [];
-  if (hasInput(op)) entries.push(`...fixtures.inputs.${op.id}`);
+  if (op.wholeBody?.typescriptDirect) {
+    entries.push(`...(({ body, ...params }) => ({ ...params, ...body }))(fixtures.inputs.${op.id})`);
+  } else if (hasInput(op)) entries.push(`...fixtures.inputs.${op.id}`);
 
   // Put resource identifiers after the scenario input so an input file can
   // never accidentally redirect a test to an unrelated live resource.
@@ -152,7 +154,7 @@ function paramsExpression(op) {
   )) {
     entries.push(`${param.name}: ${idExpression(op, param.name)}`);
   }
-  if (op.wholeBody) entries.push(`body: fixtures.inputs.${op.id}.body`);
+  if (op.wholeBody && !op.wholeBody.typescriptDirect) entries.push(`body: fixtures.inputs.${op.id}.body`);
   return entries.length ? `{ ${entries.join(', ')} }` : null;
 }
 

@@ -37,6 +37,12 @@ done
   --language typescript \
   --out "${out_root}/fixtures/typescript-dotted-query"
 
+"${redwood_bin}" \
+  --spec "${repo_root}/e2e/fixtures/union-body.yml" \
+  --config "${repo_root}/e2e/fixtures/union-body.toml" \
+  --language typescript \
+  --out "${out_root}/fixtures/typescript-union-body"
+
 # Exercise Redwood's URL input path directly in addition to using the frozen
 # snapshot above for a consistent cross-language matrix.
 url_probe="$(mktemp -d "${TMPDIR:-/tmp}/redwood-url-probe.XXXXXX")"

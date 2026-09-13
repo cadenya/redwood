@@ -19,6 +19,11 @@ case "${target}" in
       npm install --no-audit --no-fund
       npm run build
     )
+    (
+      cd "${repo_root}/gen/fixtures/typescript-union-body"
+      npm install --no-audit --no-fund
+      npm run build
+    )
     "${repo_root}/gen/fixtures/typescript-dotted-query/node_modules/.bin/tsc" \
       --noEmit \
       --strict \
@@ -26,11 +31,13 @@ case "${target}" in
       --lib ES2022,DOM \
       --module NodeNext \
       --moduleResolution NodeNext \
-      "${repo_root}/e2e/ts-query-flatten-usage.mts"
+      "${repo_root}/e2e/ts-query-flatten-usage.mts" \
+      "${repo_root}/e2e/ts-union-body-usage.mts"
     node "${repo_root}/e2e/smoke.mjs"
     node "${repo_root}/e2e/ts-config-matrix.mjs"
     node "${repo_root}/e2e/ts-apipromise.mjs"
     node "${repo_root}/e2e/ts-directional-wire.mjs"
+    node "${repo_root}/e2e/ts-union-body.mjs"
     node "${repo_root}/e2e/ts-query-flatten.mjs"
     node "${repo_root}/e2e/ts-sse-reconnect.mjs"
     node "${repo_root}/e2e/conformance/ts-driver.mjs"

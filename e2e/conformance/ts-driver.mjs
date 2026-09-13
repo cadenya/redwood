@@ -47,7 +47,8 @@ for (const op of manifest.operations) {
       params[p.name] = p.sample;
     }
     for (const p of op.queryParams) setNested(params, p.name, p.sample);
-    if (op.wholeBody) params.body = op.wholeBody.sample;
+    if (op.wholeBody?.typescriptDirect) Object.assign(params, op.wholeBody.sample);
+    else if (op.wholeBody) params.body = op.wholeBody.sample;
     const args = [];
     for (const pos of op.positionals ?? []) args.push(pos.sample);
     if (Object.keys(params).length > 0) args.push(params);

@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: UnionFixture
+  version: '1.0'
+servers:
+  - url: https://api.example.test
+paths:
+  /v1/workspaces/{workspaceId}/assignments:
+    post:
+      tags: [AssignmentService]
+      operationId: AssignmentService_AddAssignment
+      parameters: &parameters
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: filters.mode
+          in: query
+          schema: { type: string }
+        - name: dryRun
+          in: query
+          schema: { type: boolean }
+      requestBody: &body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentRequest'
+      responses: &responses
+        '204':
+          description: Done
+    delete:
+      tags: [AssignmentService]
+      operationId: AssignmentService_RemoveAssignment
+      parameters: *parameters
+      requestBody: *body
+      responses: *responses
+  /v1/submissions:
+    post:
+      tags: [SubmissionService]
+      operationId: SubmissionService_Submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentRequest'
+      responses: *responses
+  /v1/batches:
+    post:
+      tags: [BatchService]
+      operationId: BatchService_Submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items: { type: string }
+      responses: *responses
+components:
+  schemas:
+    AssignmentRequest:
+      oneOf:
+        - $ref: '#/components/schemas/ToolAssignment'
+        - $ref: '#/components/schemas/ToolSetAssignment'
+      discriminator:
+        propertyName: type
+        mapping:
+          toolId: '#/components/schemas/ToolAssignment'
+          toolSetId: '#/components/schemas/ToolSetAssignment'
+    ToolAssignment:
+      type: object
+      required: [type, toolId]
+      properties:
+        type: { type: string, enum: [toolId] }
+        toolId: { type: string }
+    ToolSetAssignment:
+      type: object
+      required: [type, toolSetId, scope]
+      properties:
+        type: { type: string, enum: [toolSetId] }
+        toolSetId: { type: string }
+        scope: { type: string }
