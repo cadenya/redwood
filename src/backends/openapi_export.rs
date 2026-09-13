@@ -260,7 +260,20 @@ impl OpenApiBackend {
             ));
         }
         if let Some(ty) = plan.whole_body {
-            fields.push(format!("body: {}", ts_value(&wire_sample(api, ty))));
+            let sample = wire_sample(api, ty);
+            if super::typescript::direct_union_body(api, op) {
+                if let Some(body) = sample.as_object() {
+                    fields.extend(body.iter().map(|(key, value)| {
+                        format!(
+                            "{}: {}",
+                            serde_json::to_string(key).unwrap(),
+                            ts_value(value)
+                        )
+                    }));
+                }
+            } else {
+                fields.push(format!("body: {}", ts_value(&sample)));
+            }
         }
         if !fields.is_empty() {
             args.push(format!("{{ {} }}", fields.join(", ")));

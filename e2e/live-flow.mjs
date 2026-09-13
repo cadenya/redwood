@@ -129,15 +129,11 @@ async function run() {
   step('agent', `${agentId.slice(0, 14)}… variation ${variationId.slice(0, 14)}…`);
 
   // 4. Both assignment kinds through the whole-body discriminated union.
-  await client.agents.variations.addAssignment({
-    agentId,
-    variationId,
-    body: { type: 'toolId', toolId: alphaTool },
+  await client.agents.variations.addAssignment(agentId, variationId, {
+    type: 'toolId', toolId: alphaTool,
   }, OPTS);
-  await client.agents.variations.addAssignment({
-    agentId,
-    variationId,
-    body: { type: 'toolSetId', toolSetId: setB },
+  await client.agents.variations.addAssignment(agentId, variationId, {
+    type: 'toolSetId', toolSetId: setB,
   }, OPTS);
   step('assignments', 'individual tool + whole tool set (whole-body union)');
 
