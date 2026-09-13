@@ -3,6 +3,13 @@
 Notable changes to Redwood are documented here. This file is maintained by
 Release Please from Conventional Commit messages.
 
+## [0.3.2](https://github.com/cadenya/redwood/compare/v0.3.1...v0.3.2) (2026-09-13)
+
+
+### Bug Fixes
+
+* **typescript:** expose discriminated union bodies directly ([#14](https://github.com/cadenya/redwood/issues/14)) ([08f184f](https://github.com/cadenya/redwood/commit/08f184f206457ee9eebadcc33c84828c325efcea))
+
 ## [0.3.1](https://github.com/cadenya/redwood/compare/v0.3.0...v0.3.1) (2026-09-09)
 
 
