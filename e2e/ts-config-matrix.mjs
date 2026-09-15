@@ -78,4 +78,40 @@ throws('webhookSecret: ""', () => new Cadenya({ apiKey: 'k', webhookSecret: '', 
   throws('apiKey omitted, no env', () => new Cadenya({ fetch: stubFetch }));
 }
 
+// Capture generated requests before browser-specific fetch behavior can hide headers.
+{
+  const originalProcess = globalThis.process;
+  for (const [label, runtimeProcess, expectUserAgent] of [
+    ['Node', originalProcess, true],
+    ['browser or worker', undefined, false],
+    ['browser with process shim', { env: {} }, false],
+  ]) {
+    const captured = [];
+    try {
+      globalThis.process = runtimeProcess;
+      const client = new Cadenya({
+        apiKey: 'test-key',
+        workspaceId: 'ws_test',
+        baseURL: 'https://example.test',
+        defaultHeaders: { 'X-Request-ID': 'request-1' },
+        fetch: async (_url, init) => {
+          captured.push(new Headers(init.headers));
+          return new Response(JSON.stringify({ items: [], nextCursor: null }), {
+            headers: { 'Content-Type': 'application/json' },
+          });
+        },
+      });
+      await client.agents.list();
+      assert.equal(captured.length, 1);
+      assert.equal(captured[0].has('User-Agent'), expectUserAgent, label);
+      if (expectUserAgent) assert.match(captured[0].get('User-Agent'), /^cadenya-typescript\//);
+      assert.equal(captured[0].get('Authorization'), 'Bearer test-key', label);
+      assert.equal(captured[0].get('X-Request-ID'), 'request-1', label);
+    } finally {
+      globalThis.process = originalProcess;
+    }
+    console.log(`ok  ${label} request headers`);
+  }
+}
+
 console.log('\nts config matrix: all cases passed');

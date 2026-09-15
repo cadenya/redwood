@@ -1,2 +1,5 @@
 [api]
 client_params = ["workspaceId"]
+
+[positional]
+"post /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/assignments" = ["agentId", "variationId"]
