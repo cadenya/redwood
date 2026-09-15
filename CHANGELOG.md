@@ -3,6 +3,13 @@
 Notable changes to Redwood are documented here. This file is maintained by
 Release Please from Conventional Commit messages.
 
+## [0.3.3](https://github.com/cadenya/redwood/compare/v0.3.2...v0.3.3) (2026-09-15)
+
+
+### Bug Fixes
+
+* omit automatic User-Agent in browser TypeScript clients ([#16](https://github.com/cadenya/redwood/issues/16)) ([e72091d](https://github.com/cadenya/redwood/commit/e72091d3d54c82e148b1af159875cec943137d29))
+
 ## [0.3.2](https://github.com/cadenya/redwood/compare/v0.3.1...v0.3.2) (2026-09-13)
 
 
