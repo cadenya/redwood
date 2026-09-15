@@ -2,11 +2,12 @@
 // OUTPUT-shaped values (carrying server-owned readOnly fields — the
 // fetched-modify-resubmit pattern, or plain JavaScript callers) through the
 // public built client must strip readOnly keys from the actual JSON without
-// mutating the caller's objects. Runs against gen/typescript/dist.
+// mutating the caller's objects. Exercises the live contract and union fixture.
 // Run: node e2e/ts-directional-wire.mjs
 import { createServer } from 'node:http';
 
 const { default: Cadenya } = await import('../gen/typescript/dist/index.js');
+const { default: UnionFixture } = await import('../gen/fixtures/typescript-union-body/dist/index.js');
 
 let captured = null;
 const server = createServer((req, res) => {
@@ -84,7 +85,8 @@ if (JSON.stringify(outputShapedSpec) !== before) {
 // --- 3) Union whole body: assignment variants carry readOnly
 // workspaceId/agentId/variationId alongside the input ID field.
 {
-  const body = await capture(() => client.agents.variations.addAssignment('agent_1', 'variation_1', {
+  const unionClient = new UnionFixture({ workspaceId: 'w', baseURL });
+  const body = await capture(() => unionClient.agentVariations.addAssignment('agent_1', 'variation_1', {
     type: 'toolId',
     toolId: 'tool_9',
     workspaceId: 'w_override',

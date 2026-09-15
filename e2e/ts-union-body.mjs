@@ -1,7 +1,6 @@
 // Public generated clients: verify the JSON body and transport parameters separately.
 import assert from 'node:assert/strict';
 import UnionFixture from '../gen/fixtures/typescript-union-body/dist/index.js';
-import Cadenya from '../gen/typescript/dist/index.js';
 
 const requests = [];
 const fetch = async (input, init) => {
@@ -33,14 +32,14 @@ assert.deepEqual(requests.at(-1).body, { type: 'toolId', toolId: 'tool_789' });
 await client.batch.submit({ body: ['one', 'two'] });
 assert.deepEqual(requests.at(-1).body, ['one', 'two']);
 
-const cadenya = new Cadenya({ apiKey: 'probe', workspaceId: 'ws_default', fetch: async (input, init) => {
+const nestedClient = new UnionFixture({ workspaceId: 'ws_default', fetch: async (input, init) => {
   await fetch(input, init);
   return Response.json({ id: 'assignment_123' });
 } });
 for (const field of ['toolId', 'toolSetId', 'subAgentId']) {
   for (const workspaceId of [undefined, 'ws_override']) {
     const params = Object.freeze({ type: field, [field]: 'target_789', workspaceId, agentId: 'a_leak', variationId: 'v_leak' });
-    await cadenya.agents.variations.addAssignment('agent_123', 'agentvar_456', params);
+    await nestedClient.agentVariations.addAssignment('agent_123', 'agentvar_456', params);
     assert.equal(requests.at(-1).url.pathname, `/v1/workspaces/${workspaceId ?? 'ws_default'}/agents/agent_123/variations/agentvar_456/assignments`);
     assert.deepEqual(requests.at(-1).body, { type: field, [field]: 'target_789' });
     assert.equal(params.agentId, 'a_leak');

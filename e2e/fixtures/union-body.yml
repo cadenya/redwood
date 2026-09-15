@@ -58,6 +58,30 @@ paths:
               type: array
               items: { type: string }
       responses: *responses
+  /v1/workspaces/{workspaceId}/agents/{agentId}/variations/{variationId}/assignments:
+    post:
+      tags: [AgentVariationService, Agent Variations]
+      operationId: AgentVariationService_AddAgentVariationAssignment
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: agentId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: variationId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAgentVariationAssignmentRequest'
+      responses: *responses
 components:
   schemas:
     AssignmentRequest:
@@ -82,3 +106,41 @@ components:
         type: { type: string, enum: [toolSetId] }
         toolSetId: { type: string }
         scope: { type: string }
+    AddAgentVariationAssignmentRequest:
+      oneOf:
+        - $ref: '#/components/schemas/AddAgentVariationAssignmentRequest_ToolId'
+        - $ref: '#/components/schemas/AddAgentVariationAssignmentRequest_ToolSetId'
+        - $ref: '#/components/schemas/AddAgentVariationAssignmentRequest_SubAgentId'
+      discriminator:
+        propertyName: type
+        mapping:
+          toolId: '#/components/schemas/AddAgentVariationAssignmentRequest_ToolId'
+          toolSetId: '#/components/schemas/AddAgentVariationAssignmentRequest_ToolSetId'
+          subAgentId: '#/components/schemas/AddAgentVariationAssignmentRequest_SubAgentId'
+    AddAgentVariationAssignmentRequest_ToolId:
+      type: object
+      required: [type, toolId]
+      properties:
+        type: { type: string, enum: [toolId] }
+        toolId: { type: string }
+        workspaceId: { type: string, readOnly: true }
+        agentId: { type: string, readOnly: true }
+        variationId: { type: string, readOnly: true }
+    AddAgentVariationAssignmentRequest_ToolSetId:
+      type: object
+      required: [type, toolSetId]
+      properties:
+        type: { type: string, enum: [toolSetId] }
+        toolSetId: { type: string }
+        workspaceId: { type: string, readOnly: true }
+        agentId: { type: string, readOnly: true }
+        variationId: { type: string, readOnly: true }
+    AddAgentVariationAssignmentRequest_SubAgentId:
+      type: object
+      required: [type, subAgentId]
+      properties:
+        type: { type: string, enum: [subAgentId] }
+        subAgentId: { type: string }
+        workspaceId: { type: string, readOnly: true }
+        agentId: { type: string, readOnly: true }
+        variationId: { type: string, readOnly: true }

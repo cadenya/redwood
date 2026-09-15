@@ -2,11 +2,8 @@ import type {
   UnionFixture,
   AssignmentAddParams,
   AssignmentRemoveParams,
-} from '../gen/fixtures/typescript-union-body/dist/index.js';
-import type {
-  Cadenya,
   AgentVariationAddAssignmentParams,
-} from '../gen/typescript/dist/index.js';
+} from '../gen/fixtures/typescript-union-body/dist/index.js';
 
 export function fixtureCalls(client: UnionFixture, params: AssignmentAddParams) {
   if (params.type === 'toolId') {
@@ -37,9 +34,9 @@ export function fixtureCalls(client: UnionFixture, params: AssignmentAddParams) 
   client.assignment.add({ body: { type: 'toolId', toolId: 'tool_789' } });
 }
 
-export function cadenyaCall(client: Cadenya, params: AgentVariationAddAssignmentParams) {
+export function nestedAssignmentCall(client: UnionFixture, params: AgentVariationAddAssignmentParams) {
   if (params.type === 'toolSetId') params.toolSetId.toUpperCase();
-  return client.agents.variations.addAssignment('agent_123', 'agentvar_456', {
+  return client.agentVariations.addAssignment('agent_123', 'agentvar_456', {
     type: 'toolSetId', toolSetId: 'toolset_789',
   });
 }
