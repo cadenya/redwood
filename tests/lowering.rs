@@ -531,6 +531,25 @@ fn bearer_auth_and_base_url_detected() {
 }
 
 #[test]
+fn http_basic_auth_detected() {
+    let doc = r#"
+openapi: 3.1.0
+info: { title: Passwords API, version: '1.0' }
+paths: {}
+components:
+  securitySchemes:
+    basicAuth: { type: http, scheme: Basic }
+security:
+  - basicAuth: []
+"#;
+    let spec = redwood::openapi::parse(doc).expect("spec parses");
+    let api = redwood::ir::lower::lower(&spec).expect("spec lowers");
+    assert_eq!(api.auth, Auth::Basic);
+    assert_eq!(api.basic_username_env, "PASSWORDS_USERNAME");
+    assert_eq!(api.basic_password_env, "PASSWORDS_PASSWORD");
+}
+
+#[test]
 fn webhooks_stanza_lowers_to_events() {
     let doc = r#"
 openapi: 3.1.0

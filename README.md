@@ -125,7 +125,9 @@ OpenAPI 3.0/3.1  ->  ir::lower  ->  normalized IR  ->  Backend trait
 Redwood generates typed request and response shapes, cursor pagination,
 automatic retries with `Retry-After`, structured API errors, SSE streams,
 per-request options, client-level path defaults, and Standard Webhooks
-verification. The CLI adds shell-oriented command grammar, persistent profiles
+verification. It projects OpenAPI Bearer, HTTP Basic, and header API-key
+security schemes into native client options and environment variables. The CLI
+adds shell-oriented command grammar, persistent profiles
 and defaults, structured output modes, and redacted HTTP debug logging.
 
 ## Development and testing

@@ -290,18 +290,21 @@ fn emit_readme(api: &Api, binary: &str, module: &str, config: &CliConfig, plans:
         .unwrap_or_default();
     let base_env = format!("{}_BASE_URL", api.name.to_uppercase());
     let debug_env = format!("{}_DEBUG", api.name.to_uppercase());
-    let api_config_line = if matches!(api.auth, Auth::None) {
-        String::new()
-    } else if config.auth.is_some() {
-        format!(
+    let api_config_line = match api.auth {
+        Auth::None => String::new(),
+        Auth::Basic => format!(
+            "- `{username_env}` — HTTP Basic Auth username (or `--username`)\n- `{password_env}` — HTTP Basic Auth password (or `--password`)\n",
+            username_env = api.basic_username_env,
+            password_env = api.basic_password_env,
+        ),
+        _ if config.auth.is_some() => format!(
             "- `{api_env}` — API key (or `--api-key`; without either, the stored login from `{binary} auth login` is used)\n",
             api_env = api.api_key_env
-        )
-    } else {
-        format!(
+        ),
+        _ => format!(
             "- `{api_env}` — API key (or `--api-key`)\n",
             api_env = api.api_key_env
-        )
+        ),
     };
     // Packaged-install instructions are opt-in per project ([lang.cli.install]);
     // `go install` from source is always documented as the fallback.
@@ -1135,6 +1138,11 @@ fn validate_auth_config(api: &Api, auth: &CliAuthConfig) -> anyhow::Result<()> {
              login command has no credential to store"
         );
     }
+    if matches!(api.auth, Auth::Basic) {
+        anyhow::bail!(
+            "[lang.cli.auth]: device-authorization login yields a single token and is not compatible with HTTP Basic Auth"
+        );
+    }
     for (label, value) in [
         (
             "device_authorization_endpoint",
@@ -1939,7 +1947,7 @@ func main() {{
 		DisableSliceFlagSeparator: true,
 		Flags: []cli.Flag{{
 			&cli.StringFlag{{Name: "display", Usage: "Output mode for ordinary commands (one of: json, yaml, table, extended); command-local --display overrides"}},
-{api_key_flag}{profile_flag}			&cli.StringFlag{{Name: "base-url", Usage: "API base URL"}},
+{auth_flags}{profile_flag}			&cli.StringFlag{{Name: "base-url", Usage: "API base URL"}},
 			&cli.BoolFlag{{Name: "debug", Sources: cli.EnvVars("{debug_env}"), Usage: "Dump every HTTP exchange (redacted credentials) to stderr"}},
 {client_param_flags}		}},
 		Commands: []*cli.Command{{
@@ -1956,18 +1964,21 @@ func main() {{
                 )
             })
             .collect::<String>(),
-        api_key_flag = if matches!(api.auth, Auth::None) {
-            String::new()
-        } else if config.auth.is_some() {
-            format!(
+        auth_flags = match api.auth {
+            Auth::None => String::new(),
+            Auth::Basic => format!(
+                "\t\t\t&cli.StringFlag{{Name: \"username\", Usage: \"HTTP Basic Auth username (default: ${username_env})\"}},\n\t\t\t&cli.StringFlag{{Name: \"password\", Usage: \"HTTP Basic Auth password (default: ${password_env})\"}},\n",
+                username_env = api.basic_username_env,
+                password_env = api.basic_password_env,
+            ),
+            _ if config.auth.is_some() => format!(
                 "\t\t\t&cli.StringFlag{{Name: \"api-key\", Usage: \"API key (default: ${env}, then the stored login)\"}},\n",
                 env = api.api_key_env
-            )
-        } else {
-            format!(
+            ),
+            _ => format!(
                 "\t\t\t&cli.StringFlag{{Name: \"api-key\", Usage: \"API key (default: ${env})\"}},\n",
                 env = api.api_key_env
-            )
+            ),
         },
         profile_flag = if config.auth.is_some() {
             "\t\t\t&cli.StringFlag{Name: \"profile\", Value: \"default\", Usage: \"Stored-credentials profile\"},\n"
@@ -2019,7 +2030,7 @@ func newClient(cmd *cli.Command) (*sdk.Client, error) {{
 	// when blank so the SDK rejects it and never silently falls back to the
 	// ambient environment value.
 	opts := []sdk.Option{{}}
-{api_key_forward}	if cmd.Root().IsSet("base-url") {{
+{auth_forward}	if cmd.Root().IsSet("base-url") {{
 		opts = append(opts, sdk.WithBaseURL(cmd.Root().String("base-url")))
 	}}
 	if cmd.Root().Bool("debug") {{
@@ -2039,8 +2050,8 @@ func newClient(cmd *cli.Command) (*sdk.Client, error) {{
                 format!("\t// Top-level alias ([lang.cli.aliases]), validated at generation.\n\taddAlias(root, \"{alias}\"{segs})\n")
             })
             .collect::<String>(),
-        cred_fallback = match (&config.auth, matches!(api.auth, Auth::None)) {
-            (Some(auth), false) => {
+        cred_fallback = match (&config.auth, &api.auth) {
+            (Some(auth), Auth::Bearer | Auth::ApiKeyHeader(_)) => {
                 let workspace_default = auth
                     .workspaces_param
                     .as_deref()
@@ -2089,11 +2100,14 @@ func newClient(cmd *cli.Command) (*sdk.Client, error) {{
                 )
             })
             .collect::<String>(),
-        api_key_forward = if matches!(api.auth, Auth::None) {
-            // No security scheme: no credential flag, nothing forwarded.
-            String::new()
-        } else {
-            "\tif cmd.Root().IsSet(\"api-key\") {\n\t\topts = append(opts, sdk.WithAPIKey(cmd.Root().String(\"api-key\")))\n\t}\n".to_string()
+        auth_forward = match api.auth {
+            Auth::None => String::new(),
+            Auth::Basic => format!(
+                "\tif cmd.Root().IsSet(\"username\") || cmd.Root().IsSet(\"password\") {{\n\t\tusername := os.Getenv(\"{username_env}\")\n\t\tif cmd.Root().IsSet(\"username\") {{\n\t\t\tusername = cmd.Root().String(\"username\")\n\t\t}}\n\t\tpassword := os.Getenv(\"{password_env}\")\n\t\tif cmd.Root().IsSet(\"password\") {{\n\t\t\tpassword = cmd.Root().String(\"password\")\n\t\t}}\n\t\topts = append(opts, sdk.WithBasicAuth(username, password))\n\t}}\n",
+                username_env = api.basic_username_env,
+                password_env = api.basic_password_env,
+            ),
+            _ => "\tif cmd.Root().IsSet(\"api-key\") {\n\t\topts = append(opts, sdk.WithAPIKey(cmd.Root().String(\"api-key\")))\n\t}\n".to_string(),
         },
     )
     .unwrap();

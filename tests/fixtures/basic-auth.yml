@@ -1,0 +1,25 @@
+openapi: 3.1.0
+info:
+  title: Passwords API
+  version: "1.0"
+servers:
+  - url: https://passwords.example.test
+paths:
+  /v1/passwords:
+    get:
+      tags: [PasswordService]
+      operationId: PasswordService_ListPasswords
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+security:
+  - basicAuth: []

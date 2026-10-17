@@ -34,6 +34,9 @@ pub struct Api {
     pub client_params: Vec<ClientParam>,
     /// Env var consulted for the API key.
     pub api_key_env: String,
+    /// Env vars consulted for HTTP Basic Auth credentials.
+    pub basic_username_env: String,
+    pub basic_password_env: String,
     /// Env var consulted for the webhook signing key.
     pub webhook_env: String,
     /// Default automatic retries for retryable failures. 0 disables —
@@ -70,6 +73,8 @@ pub struct Webhook {
 pub enum Auth {
     /// `Authorization: Bearer <token>`
     Bearer,
+    /// `Authorization: Basic base64(<username>:<password>)`
+    Basic,
     /// API key in a named header.
     ApiKeyHeader(String),
     None,

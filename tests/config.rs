@@ -232,6 +232,8 @@ fn client_params_reject_unknown_duplicate_and_reserved() {
             "duplicates",
         ),
         ("client_params = [\"apiKey\"]", "built-in"),
+        ("client_params = [\"username\"]", "built-in"),
+        ("client_params = [\"password\"]", "built-in"),
     ];
     for (line, needle) in cases {
         let mut api = redwood::ir::lower::lower(&spec).expect("lowers");
